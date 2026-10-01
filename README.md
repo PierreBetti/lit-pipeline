@@ -19,8 +19,7 @@ simply done the next night.
 ## One-time setup (about 20 minutes)
 
 ### 1. Create the GitHub repository
-1. Create a free account at https://github.com (with your UQAM address you can also claim the
-   GitHub Student Developer Pack).
+1. Create a free account at https://github.com.
 2. New repository, name it `lit-pipeline`. **Private works**: Actions are free on private repos
    (this uses a few minutes a day out of 2,000 free per month). Publishing the map with GitHub Pages
    from a private repo needs GitHub Pro, which the Student Developer Pack gives you for free. Either

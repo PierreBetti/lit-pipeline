@@ -39,7 +39,10 @@ GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")          # free tier, default 
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")    # optional paid alternative
 S2_KEY = os.environ.get("S2_API_KEY", "")  # optional, Semantic Scholar works without it
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+# Tried in order. A model whose free quota is 0 for your key is skipped automatically.
+GEMINI_MODELS = [m.strip() for m in os.environ.get(
+    "GEMINI_MODELS", "gemini-2.5-flash-lite,gemini-2.5-flash,gemini-flash-lite-latest,gemini-flash-latest").split(",") if m.strip()]
+GEMINI_MODEL = GEMINI_MODELS[0]
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
 GEMINI_SECONDS_BETWEEN_CALLS = float(os.environ.get("GEMINI_SECONDS_BETWEEN_CALLS", "7"))  # stays under free-tier per-minute limits
 
@@ -406,8 +409,13 @@ def _gemini_schema(schema):
     return out
 
 
+class GeminiQuotaError(RuntimeError):
+    pass
+
+
 def ask_gemini(system, user):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+    """Call Gemini, falling back to the next model when one has no free quota for this key."""
+    global GEMINI_MODEL
     body = {
         "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": user}]}],
@@ -417,19 +425,30 @@ def ask_gemini(system, user):
             "responseSchema": _gemini_schema(TRIAGE_TOOL["input_schema"]),
         },
     }
-    for attempt in range(5):
-        r = requests.post(url, params={"key": GEMINI_KEY}, json=body, timeout=120)
-        if r.status_code in (429, 500, 503):
-            wait = 20 * (attempt + 1)
-            log(f"   Gemini busy or rate limited, waiting {wait}s")
-            time.sleep(wait)
-            continue
-        if not r.ok:
-            raise RuntimeError(f"Gemini -> {r.status_code}: {r.text[:300]}")
-        data = r.json()
-        text = data["candidates"][0]["content"]["parts"][0]["text"]
-        return json.loads(text)
-    raise RuntimeError("Gemini: daily or per-minute quota reached, the remaining papers will be done next run")
+    while GEMINI_MODELS:
+        GEMINI_MODEL = GEMINI_MODELS[0]
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+        for attempt in range(4):
+            r = requests.post(url, params={"key": GEMINI_KEY}, json=body, timeout=120)
+            if r.ok:
+                text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+                return json.loads(text)
+            detail = r.text[:400].replace("\n", " ")
+            if r.status_code == 404 or (r.status_code == 429 and "limit: 0" in r.text):
+                log(f"   {GEMINI_MODEL} not usable with this key ({r.status_code}), trying the next model")
+                break
+            if r.status_code == 429 and ("PerDay" in r.text or "per day" in r.text.lower()):
+                raise GeminiQuotaError(f"daily free quota reached on {GEMINI_MODEL}")
+            if r.status_code in (429, 500, 503):
+                wait = 15 * (attempt + 1)
+                log(f"   Gemini {r.status_code} on {GEMINI_MODEL}, waiting {wait}s. Google says: {detail[:200]}")
+                time.sleep(wait)
+                continue
+            raise RuntimeError(f"Gemini {r.status_code} on {GEMINI_MODEL}: {detail}")
+        else:
+            log(f"   {GEMINI_MODEL} still rate limited after retries, trying the next model")
+        GEMINI_MODELS.pop(0)
+    raise GeminiQuotaError("no Gemini model has free quota left for this key today")
 
 
 def ask_claude(client, system, user):
@@ -448,7 +467,7 @@ def triage_papers(papers):
     if AI_PROVIDER == "none":
         log("   skipped (no GEMINI_API_KEY, or --no-ai)")
         return
-    log(f"   using {AI_PROVIDER} ({GEMINI_MODEL if AI_PROVIDER == 'gemini' else CLAUDE_MODEL})")
+    log(f"   using {AI_PROVIDER} ({', '.join(GEMINI_MODELS) if AI_PROVIDER == 'gemini' else CLAUDE_MODEL})")
     client = None
     if AI_PROVIDER == "claude":
         import anthropic  # only needed if you opt into the paid Claude API
@@ -475,7 +494,7 @@ def triage_papers(papers):
                 result = ask_claude(client, system, user)
         except Exception as e:
             log(f"   AI error on {p['name']}: {e}")
-            if "quota" in str(e).lower():
+            if isinstance(e, GeminiQuotaError):
                 break  # stop for today, the rest is picked up tomorrow
             continue
         if not result:

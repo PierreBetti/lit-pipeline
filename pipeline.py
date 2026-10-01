@@ -287,6 +287,19 @@ def percentile(work):
     return round(v * 100, 1) if v is not None else None
 
 
+def best_abstract(notion_abstract, openalex_abstract):
+    """Notero sometimes syncs a truncated abstract. Use OpenAlex's version when it is clearly fuller."""
+    a, b = (notion_abstract or "").strip(), (openalex_abstract or "").strip()
+    if not a:
+        return b
+    if not b:
+        return a
+    looks_cut = not a.rstrip().endswith((".", "!", "?", ")", "]", '"'))
+    if len(b) > len(a) + 150 or (looks_cut and len(b) > len(a)):
+        return b
+    return a
+
+
 # ----------------------------------------------------------------------------
 # Step 0: load the library
 # ----------------------------------------------------------------------------
@@ -329,8 +342,7 @@ def enrich_metrics(papers):
             continue
         found += 1
         p["work"] = w
-        if not p["abstract"]:
-            p["abstract"] = abstract_text(w.get("abstract_inverted_index"))
+        p["abstract"] = best_abstract(p["abstract"], abstract_text(w.get("abstract_inverted_index")))
 
         new = {
             "Citations": w.get("cited_by_count"),

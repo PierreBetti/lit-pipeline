@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Literature map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<style>
+  :root {
+    --bg: #e8ece6;          /* pale sedge */
+    --panel: #f5f7f3;
+    --ink: #23302a;         /* peat */
+    --muted: #5d6b63;
+    --line: #c9d1c8;
+    --edge: rgba(52, 70, 60, 0.28);
+    --focus: #2e6f8e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b2320;
+      --panel: #232d29;
+      --ink: #dfe7e1;
+      --muted: #9fb0a6;
+      --line: #36433d;
+      --edge: rgba(200, 216, 206, 0.22);
+      --focus: #7fb6d1;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #map { position: fixed; inset: 0; }
+
+  .panel { position: fixed; top: 16px; left: 16px; width: min(300px, calc(100vw - 32px));
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 16px 12px; }
+  h1 { font-family: Literata, Georgia, serif; font-weight: 600; font-size: 22px; line-height: 1.15; margin: 0 0 4px; }
+  .counts { color: var(--muted); margin: 0 0 12px; }
+  input[type=search] { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); font: inherit; }
+  input:focus-visible, button:focus-visible, label:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .legend { list-style: none; padding: 0; margin: 12px 0 8px; display: grid; gap: 2px; }
+  .legend button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%;
+    padding: 3px 4px; border-radius: 4px; }
+  .legend button[aria-pressed=false] { opacity: 0.35; }
+  .legend button:hover { background: var(--bg); }
+  .dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+  .dot.suggested { border: 1.5px dashed var(--muted); background: transparent; }
+  .n { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hint { color: var(--muted); font-size: 12.5px; margin: 6px 0 0; }
+
+  .detail { position: fixed; top: 16px; right: 16px; width: min(340px, calc(100vw - 32px));
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: none; }
+  .detail.open { display: block; }
+  .detail h2 { font-family: Literata, Georgia, serif; font-weight: 500; font-size: 17px; line-height: 1.3; margin: 0 0 8px; }
+  .detail p { margin: 0 0 8px; }
+  .detail .meta { color: var(--muted); }
+  .detail a { color: var(--focus); }
+  .close { all: unset; cursor: pointer; float: right; color: var(--muted); padding: 0 2px; font-size: 18px; line-height: 1; }
+
+  .empty { position: fixed; inset: 0; display: grid; place-items: center; color: var(--muted); padding: 24px; text-align: center; }
+  @media (max-width: 640px) { .detail { top: auto; bottom: 16px; } }
+</style>
+</head>
+<body>
+<div id="map" role="img" aria-label="Citation map of the papers in your library"></div>
+
+<section class="panel" aria-label="Map controls">
+  <h1>Literature map</h1>
+  <p class="counts" id="counts"></p>
+  <input type="search" id="search" placeholder="Find a paper or author" aria-label="Find a paper or author">
+  <ul class="legend" id="legend"></ul>
+  <p class="hint">Bigger dot means more citations. A ring means you have read it. Arrows point to the paper being cited. Click a dot for details.</p>
+</section>
+
+<aside class="detail" id="detail" aria-live="polite"></aside>
+
+<script>
+const DATA = /*__GRAPH_DATA__*/null;
+
+const PALETTE = {
+  "Fluxes & microclimate": "#2e6f8e",
+  "Vegetation & tree stems": "#4f7a32",
+  "Soil & water microbes": "#7b5a8f",
+  "Hydrology & biogeochemistry": "#b5652b",
+  "Methods & instrumentation": "#6c7479",
+  "Nature-based solutions & policy": "#b38f1e",
+  "Uncategorized": "#a3aea6",
+  "Suggested": "transparent"
+};
+
+const css = getComputedStyle(document.documentElement);
+const INK = css.getPropertyValue("--ink").trim();
+const MUTED = css.getPropertyValue("--muted").trim();
+const EDGE = css.getPropertyValue("--edge").trim();
+const BG = css.getPropertyValue("--bg").trim();
+
+if (!DATA || !DATA.nodes.length) {
+  document.getElementById("map").innerHTML =
+    '<p class="empty">No papers yet. Run the pipeline once your Notero database has papers with a DOI.</p>';
+} else {
+  const lib = DATA.nodes.filter(n => n.kind === "library").length;
+  const sug = DATA.nodes.length - lib;
+  document.getElementById("counts").textContent =
+    `${lib} papers in your library, ${sug} suggested. Updated ${DATA.generated}.`;
+
+  const size = c => 9 + Math.min(26, Math.sqrt(c || 0) * 1.6);
+  const nodes = new vis.DataSet(DATA.nodes.map(n => ({
+    id: n.id,
+    label: n.label,
+    raw: n,
+    size: size(n.citations),
+    shape: "dot",
+    color: n.kind === "suggested"
+      ? { background: BG, border: MUTED, highlight: { background: BG, border: INK } }
+      : { background: PALETTE[n.category] || PALETTE.Uncategorized,
+          border: n.read ? INK : (PALETTE[n.category] || PALETTE.Uncategorized),
+          highlight: { background: PALETTE[n.category] || PALETTE.Uncategorized, border: INK } },
+    borderWidth: n.read ? 3 : (n.kind === "suggested" ? 1.5 : 1),
+    shapeProperties: { borderDashes: n.kind === "suggested" ? [4, 3] : false },
+    font: { color: n.kind === "suggested" ? MUTED : INK, size: 12, face: "system-ui" }
+  })));
+  const edges = new vis.DataSet(DATA.edges.map((e, i) => ({
+    id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
+    color: { color: EDGE, highlight: INK }, width: 1, smooth: { type: "continuous" }
+  })));
+
+  const network = new vis.Network(document.getElementById("map"), { nodes, edges }, {
+    physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -60, springLength: 110 },
+               stabilization: { iterations: 250 } },
+    interaction: { hover: true, tooltipDelay: 150, navigationButtons: false, keyboard: true }
+  });
+
+  // Legend with category toggles
+  const counts = {};
+  DATA.nodes.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
+  const hidden = new Set();
+  const legend = document.getElementById("legend");
+  Object.keys(PALETTE).filter(c => counts[c]).forEach(cat => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.setAttribute("aria-pressed", "true");
+    b.innerHTML = `<span class="dot ${cat === "Suggested" ? "suggested" : ""}" style="background:${cat === "Suggested" ? "transparent" : PALETTE[cat]}"></span>
+                   <span>${cat === "Suggested" ? "Suggested papers" : cat}</span><span class="n">${counts[cat]}</span>`;
+    b.addEventListener("click", () => {
+      hidden.has(cat) ? hidden.delete(cat) : hidden.add(cat);
+      b.setAttribute("aria-pressed", String(!hidden.has(cat)));
+      nodes.update(DATA.nodes.map(n => ({ id: n.id, hidden: hidden.has(n.category) })));
+    });
+    li.appendChild(b);
+    legend.appendChild(li);
+  });
+
+  // Search
+  document.getElementById("search").addEventListener("input", e => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { network.unselectAll(); return; }
+    const hit = DATA.nodes.find(n => (n.label + " " + (n.title || "")).toLowerCase().includes(q));
+    if (hit) { network.selectNodes([hit.id]); network.focus(hit.id, { scale: 1.2, animation: { duration: 400 } }); show(hit); }
+  });
+
+  // Detail panel
+  const detail = document.getElementById("detail");
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function show(n) {
+    const pct = n.percentile != null ? `, ${n.percentile}th citation percentile` : "";
+    detail.innerHTML = `
+      <button class="close" aria-label="Close details">×</button>
+      <h2>${esc(n.title || n.label)}</h2>
+      <p class="meta">${esc(n.label)}. ${n.citations} citations${pct}.</p>
+      ${n.kind === "suggested"
+        ? `<p>${esc(n.why)}</p>`
+        : `<p class="meta">${esc(n.category)}${n.read ? ", read" : ", not read yet"}.</p>`}
+      <p>${n.doi ? `<a href="${esc(n.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""}
+         ${n.notion ? ` &nbsp; <a href="${esc(n.notion)}" target="_blank" rel="noopener">Open in Notion</a>` : ""}</p>`;
+    detail.classList.add("open");
+    detail.querySelector(".close").addEventListener("click", () => detail.classList.remove("open"));
+  }
+  network.on("click", params => {
+    if (params.nodes.length) show(nodes.get(params.nodes[0]).raw);
+    else detail.classList.remove("open");
+  });
+}
+</script>
+</body>
+</html>

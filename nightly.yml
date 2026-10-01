@@ -1,0 +1,47 @@
+name: Literature pipeline
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # every day at 07:00 UTC (3:00 in Montréal in summer, 2:00 in winter)
+  workflow_dispatch:       # adds a "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write          # needed to commit the updated literature map
+
+concurrency:
+  group: lit-pipeline
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+          MAX_TRIAGE_PER_RUN: "40"
+          GEMINI_SECONDS_BETWEEN_CALLS: "7"
+        run: python pipeline.py
+
+      - name: Publish the updated literature map
+        run: |
+          git config user.name "lit-pipeline"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html
+          git diff --cached --quiet || git commit -m "Update literature map"
+          git push

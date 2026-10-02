@@ -53,6 +53,9 @@ MAX_TRIAGE_PER_RUN = int(os.environ.get("MAX_TRIAGE_PER_RUN", "40"))
 MAX_SUGGESTIONS = int(os.environ.get("MAX_SUGGESTIONS", "40"))
 MIN_CONNECTIONS = int(os.environ.get("MIN_CONNECTIONS", "2"))
 GRAPH_SUGGESTIONS = int(os.environ.get("GRAPH_SUGGESTIONS", "25"))
+MAX_SUGGESTION_TRIAGE_PER_RUN = int(os.environ.get("MAX_SUGGESTION_TRIAGE_PER_RUN", "20"))
+CANDIDATE_POOL = int(os.environ.get("CANDIDATE_POOL", "150"))   # candidates scored in depth each run
+CITER_PAGES = int(os.environ.get("CITER_PAGES", "2"))           # pages of 200 citing papers per batch
 
 DRY_RUN = "--dry-run" in sys.argv
 # Gemini (free) is used when its key is set; Claude only if you choose to add a paid key instead.
@@ -131,9 +134,10 @@ def update_page(page_id, props):
 def create_page(data_source_id, props):
     if DRY_RUN:
         log(f"   [dry-run] would create page in {data_source_id}")
-        return
-    notion("POST", "/pages", {"parent": {"type": "data_source_id", "data_source_id": data_source_id},
-                              "properties": props})
+        return None
+    res = notion("POST", "/pages", {"parent": {"type": "data_source_id", "data_source_id": data_source_id},
+                                    "properties": props})
+    return res.get("id")
 
 
 def read(prop):
@@ -319,6 +323,7 @@ def load_library():
             "status": read(pr.get("Reading status")),
             "category": read(pr.get("Category")) or [],
             "triage_date": read(pr.get("Triage date")),
+            "relevance": read(pr.get("Relevance")),
             "citations": read(pr.get("Citations")),
             "percentile": read(pr.get("Citation percentile")),
             "fwci": read(pr.get("FWCI")),
@@ -475,54 +480,78 @@ def ask_claude(client, system, user):
     return next((b.input for b in msg.content if b.type == "tool_use"), None)
 
 
-def triage_papers(papers):
-    if AI_PROVIDER == "none":
+class Triager:
+    """Shared AI access for library papers and suggestions. Stops cleanly when the free quota is used up."""
+
+    def __init__(self):
+        self.provider = AI_PROVIDER
+        self.exhausted = False
+        self.client = None
+        if self.provider == "none":
+            return
+        log(f"   using {self.provider} ({', '.join(GEMINI_MODELS) if self.provider == 'gemini' else CLAUDE_MODEL})")
+        if self.provider == "claude":
+            import anthropic  # only needed if you opt into the paid Claude API
+            self.client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
+        context = (ROOT / "research_context.md").read_text(encoding="utf-8")
+        self.system = TRIAGE_SYSTEM.format(context=context)
+        if self.provider == "gemini":
+            self.system = self.system.replace("Record your answer with the record_triage tool.",
+                                              "Answer in the requested JSON format.")
+
+    @property
+    def available(self):
+        return self.provider != "none" and not self.exhausted
+
+    def run(self, label, title, year, journal, abstract):
+        if not self.available:
+            return None
+        user = (f"Title: {title}\nYear: {year or 'unknown'}\n"
+                f"Journal: {journal or 'unknown'}\n"
+                f"Abstract: {abstract or '(no abstract available)'}")
+        try:
+            if self.provider == "gemini":
+                result = ask_gemini(self.system, user)
+                time.sleep(GEMINI_SECONDS_BETWEEN_CALLS)
+            else:
+                result = ask_claude(self.client, self.system, user)
+        except GeminiQuotaError as e:
+            log(f"   AI quota reached ({e}), the rest waits for the next run")
+            self.exhausted = True
+            return None
+        except Exception as e:
+            log(f"   AI error on {label}: {e}")
+            return None
+        if not result:
+            log(f"   no triage returned for {label}")
+            return None
+        try:
+            result["relevance"] = max(1, min(5, int(result.get("relevance", 1))))
+        except (TypeError, ValueError):
+            result["relevance"] = 1
+        return result
+
+
+def keep(values, allowed):
+    return [v for v in (values or []) if v in allowed]
+
+
+def triage_papers(papers, triager):
+    if triager.provider == "none":
         log("   skipped (no GEMINI_API_KEY, or --no-ai)")
         return
-    log(f"   using {AI_PROVIDER} ({', '.join(GEMINI_MODELS) if AI_PROVIDER == 'gemini' else CLAUDE_MODEL})")
-    client = None
-    if AI_PROVIDER == "claude":
-        import anthropic  # only needed if you opt into the paid Claude API
-        client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
-
-    context = (ROOT / "research_context.md").read_text(encoding="utf-8")
-    system = TRIAGE_SYSTEM.format(context=context).replace(
-        "Record your answer with the record_triage tool.", "Answer in the requested JSON format.")
-    if AI_PROVIDER == "claude":
-        system = TRIAGE_SYSTEM.format(context=context)
-
     todo = [p for p in papers if not p["triage_date"]]
     todo.sort(key=lambda p: p["status"] == "Read")  # unread papers first
     done = 0
     for p in todo[:MAX_TRIAGE_PER_RUN]:
-        user = (f"Title: {p['title']}\nYear: {p['year'] or 'unknown'}\n"
-                f"Journal: {p['journal'] or 'unknown'}\n"
-                f"Abstract: {p['abstract'] or '(no abstract available)'}")
-        try:
-            if AI_PROVIDER == "gemini":
-                result = ask_gemini(system, user)
-                time.sleep(GEMINI_SECONDS_BETWEEN_CALLS)
-            else:
-                result = ask_claude(client, system, user)
-        except Exception as e:
-            log(f"   AI error on {p['name']}: {e}")
-            if isinstance(e, GeminiQuotaError):
-                break  # stop for today, the rest is picked up tomorrow
-            continue
+        result = triager.run(p["name"], p["title"], p["year"], p["journal"], p["abstract"])
+        if triager.exhausted:
+            break
         if not result:
-            log(f"   no triage returned for {p['name']}")
             continue
-
-        def keep(values, allowed):
-            return [v for v in (values or []) if v in allowed]
-
-        try:
-            relevance = max(1, min(5, int(result.get("relevance", 1))))
-        except (TypeError, ValueError):
-            relevance = 1
         props = {
             "Summary": p_text(result.get("summary")),
-            "Relevance": p_num(relevance),
+            "Relevance": p_num(result["relevance"]),
             "Relevance reason": p_text(result.get("relevance_reason")),
             "Research questions": p_multi(keep(result.get("research_questions"), RESEARCH_QUESTIONS)),
             "Ecosystem": p_multi(keep(result.get("ecosystems"), ECOSYSTEMS)),
@@ -536,14 +565,32 @@ def triage_papers(papers):
             props["Category"] = p_multi(cats)
             p["category"] = cats
         update_page(p["page_id"], props)
+        p["relevance"] = result["relevance"]
         done += 1
     left = max(0, len(todo) - done)
     log(f"   triaged {done} papers" + (f", {left} left for the next runs" if left else ""))
 
 
 # ----------------------------------------------------------------------------
-# Step 3: suggestions
+# Step 3: suggestions (Connected Papers-style similarity + your own relevance)
 # ----------------------------------------------------------------------------
+def recency(year):
+    if not year:
+        return 0.5
+    return max(0.0, 1 - (dt.date.today().year - year) / 15)
+
+
+def global_score(relevance, similarity, connections, pct, year):
+    """Same formula as the 'Global score' property in Notion. If you change one, change the other."""
+    return round(100 * (
+        0.35 * (relevance / 5 if relevance else 0.5)
+        + 0.30 * (similarity or 0) / 100
+        + 0.15 * min(connections or 0, 5) / 5
+        + 0.12 * (pct / 100 if pct is not None else 0.5)
+        + 0.08 * recency(year)
+    ))
+
+
 def semantic_scholar_recommendations(dois):
     if not dois:
         return []
@@ -560,107 +607,186 @@ def semantic_scholar_recommendations(dois):
             log(f"   Semantic Scholar -> {r.status_code}, skipping recommendations")
             return []
         recs = r.json().get("recommendedPapers", [])
-        return [norm_doi((x.get("externalIds") or {}).get("DOI")) for x in recs if (x.get("externalIds") or {}).get("DOI")]
+        return [norm_doi((x.get("externalIds") or {}).get("DOI")) for x in recs
+                if (x.get("externalIds") or {}).get("DOI")]
     return []
 
 
-def build_suggestions(papers):
+def fetch_citers(lib_ids):
+    """Reference lists of papers that cite your library (used for co-citation and derivative works)."""
+    citers = {}
+    for chunk in chunks(sorted(lib_ids), 40):
+        for page in range(1, CITER_PAGES + 1):
+            res = openalex("/works", {"filter": "cites:" + "|".join(chunk), "per_page": 200, "page": page,
+                                      "sort": "cited_by_count:desc", "select": "id,referenced_works"})
+            results = (res or {}).get("results", [])
+            for c in results:
+                citers[short_id(c["id"])] = {short_id(r) for r in (c.get("referenced_works") or [])}
+            if len(results) < 200:
+                break
+    return citers
+
+
+def load_existing_suggestions():
+    existing = {}
+    for page in query_all(SUGGEST_DS):
+        pr = page["properties"]
+        oid = short_id(read(pr.get("OpenAlex ID")))
+        if oid:
+            existing[oid] = {"page_id": page["id"], "decision": read(pr.get("Decision")),
+                             "relevance": read(pr.get("Relevance")), "triage_date": read(pr.get("Triage date"))}
+    return existing
+
+
+def build_suggestions(papers, existing):
     lib = [p for p in papers if p.get("work")]
     lib_ids = {short_id(p["work"]["id"]) for p in lib}
     lib_dois = {p["doi"] for p in papers if p["doi"]}
     name_of = {short_id(p["work"]["id"]): p["name"] for p in lib}
+    lib_refs = {short_id(p["work"]["id"]): {short_id(r) for r in (p["work"].get("referenced_works") or [])}
+                for p in lib}
+    # Similarity to a paper you rated 5/5 counts more than to one you rated 2/5.
+    weight = {short_id(p["work"]["id"]): (p.get("relevance") or 3) / 5 for p in lib}
 
-    links = defaultdict(lambda: {"cited_by": set(), "cites": set(), "s2": False})
+    cited_by_lib = defaultdict(set)                    # X -> your papers that cite X   (prior work)
+    cites_lib = defaultdict(set)                       # X -> your papers that X cites  (derivative work)
+    cocite = defaultdict(lambda: defaultdict(int))     # X -> your paper -> times cited together
+    appear = defaultdict(int)                          # X -> sampled citing papers that also cite X
+    lib_appear = defaultdict(int)                      # your paper -> sampled citing papers
 
-    # a) works your papers cite (bibliographic coupling)
-    for p in lib:
-        for ref in p["work"].get("referenced_works") or []:
-            rid = short_id(ref)
-            if rid not in lib_ids:
-                links[rid]["cited_by"].add(p["name"])
+    for lid, refs in lib_refs.items():
+        for r in refs - lib_ids:
+            cited_by_lib[r].add(lid)
 
-    # b) works that cite your papers
-    for chunk in chunks(sorted(lib_ids), 40):
-        citing = works_filter("cites:" + "|".join(chunk), per_page=200,
-                              sort="cited_by_count:desc", select="id,referenced_works")
-        for c in citing:
-            cid = short_id(c["id"])
-            if cid in lib_ids:
-                continue
-            hits = {short_id(r) for r in (c.get("referenced_works") or [])} & lib_ids
-            links[cid]["cites"].update(name_of[h] for h in hits)
+    citers = fetch_citers(lib_ids)
+    for cid, refs in citers.items():
+        hits = refs & lib_ids
+        if not hits:
+            continue
+        if cid not in lib_ids:
+            cites_lib[cid] |= hits
+        for lid in hits:
+            lib_appear[lid] += 1
+        for r in refs - lib_ids:
+            appear[r] += 1
+            for lid in hits:
+                cocite[r][lid] += 1
+    log(f"   {len(citers)} citing papers sampled for co-citation")
 
-    # c) Semantic Scholar recommendations, mapped back to OpenAlex IDs
+    s2 = set()
     rec_dois = [d for d in semantic_scholar_recommendations(sorted(lib_dois)) if d and d not in lib_dois]
     for chunk in chunks(rec_dois, 50):
         for w in works_filter("doi:" + "|".join(chunk), per_page=50, select="id"):
-            wid = short_id(w["id"])
-            if wid not in lib_ids:
-                links[wid]["s2"] = True
+            s2.add(short_id(w["id"]))
 
-    def score(info):
-        return len(info["cited_by"] | info["cites"]) + (1 if info["s2"] else 0)
+    # Cheap pre-ranking, then score the best CANDIDATE_POOL in depth.
+    candidates = (set(cited_by_lib) | set(cites_lib) | set(cocite) | s2) - lib_ids
+    pre = {x: 2 * len(cited_by_lib[x]) + 2 * len(cites_lib[x]) + sum(cocite[x].values()) + (2 if x in s2 else 0)
+           for x in candidates}
+    pool = [x for x, v in sorted(pre.items(), key=lambda kv: kv[1], reverse=True) if v >= 2][:CANDIDATE_POOL]
 
-    ranked = sorted(((wid, info) for wid, info in links.items()
-                     if score(info) >= MIN_CONNECTIONS or (info["s2"] and score(info) >= 1)),
-                    key=lambda kv: score(kv[1]), reverse=True)
-
-    # fetch metadata for the best candidates
     meta = {}
-    wanted = [wid for wid, _ in ranked[:MAX_SUGGESTIONS * 2]]
-    for chunk in chunks(wanted, 50):
+    for chunk in chunks(pool, 50):
         for w in works_filter("openalex_id:" + "|".join(chunk), per_page=50):
             meta[short_id(w["id"])] = w
 
-    suggestions = []
-    for wid, info in ranked:
-        w = meta.get(wid)
+    lib_ref_union = set().union(*lib_refs.values()) if lib_refs else set()
+    scored = []
+    for x in pool:
+        w = meta.get(x)
         if not w or w.get("type") in SKIP_WORK_TYPES or norm_doi(w.get("doi")) in lib_dois:
             continue
+        refs_x = {short_id(r) for r in (w.get("referenced_works") or [])}
+        raw, per_lib = 0.0, {}
+        for lid, refs_l in lib_refs.items():
+            coupling = (len(refs_x & refs_l) / math.sqrt(len(refs_x) * len(refs_l))) if refs_x and refs_l else 0.0
+            co = cocite[x].get(lid, 0)
+            cocitation = co / math.sqrt(max(1, appear[x]) * max(1, lib_appear[lid])) if co else 0.0
+            direct = 1.0 if (lid in cited_by_lib[x] or lid in cites_lib[x]) else 0.0
+            sim = 0.45 * coupling + 0.45 * cocitation + 0.10 * direct
+            per_lib[lid] = sim
+            raw += weight[lid] * sim
+        scored.append({"id": x, "work": w, "raw": raw, "per_lib": per_lib, "refs": refs_x})
+
+    top_raw = max((c["raw"] for c in scored), default=0) or 1
+    for c in scored:
+        x, w = c["id"], c["work"]
+        c["similarity"] = round(100 * c["raw"] / top_raw)
+        c["cited_by"] = {name_of[l] for l in cited_by_lib[x]}
+        c["cites"] = {name_of[l] for l in cites_lib[x]}
+        c["s2"] = x in s2
+        c["score"] = len(cited_by_lib[x] | cites_lib[x]) + (1 if c["s2"] else 0)
+        c["shared_refs"] = len(c["refs"] & lib_ref_union)
+        c["cocitations"] = appear[x]
+        roles = []
+        if len(cited_by_lib[x]) >= 2:
+            roles.append("Prior work")
+        if len(cites_lib[x]) >= 2:
+            roles.append("Derivative work")
+        if c["similarity"] >= 40 or not roles:
+            roles.append("Similar work")
+        c["roles"] = roles
+        # the two of your papers it is most similar to (used for the map and the explanation)
+        c["closest"] = [l for l, v in sorted(c["per_lib"].items(), key=lambda kv: kv[1], reverse=True)[:2] if v > 0]
+
         reasons, sources = [], []
-        if info["cited_by"]:
-            reasons.append(f"Cited by {len(info['cited_by'])} of your papers ({'; '.join(sorted(info['cited_by'])[:4])})")
+        if c["cited_by"]:
+            reasons.append(f"Cited by {len(c['cited_by'])} of your papers ({'; '.join(sorted(c['cited_by'])[:4])})")
             sources.append("Cited by your papers")
-        if info["cites"]:
-            reasons.append(f"Cites {len(info['cites'])} of your papers ({'; '.join(sorted(info['cites'])[:4])})")
+        if c["cites"]:
+            reasons.append(f"Cites {len(c['cites'])} of your papers ({'; '.join(sorted(c['cites'])[:4])})")
             sources.append("Cites your papers")
-        if info["s2"]:
+        if c["s2"]:
             reasons.append("Recommended by Semantic Scholar from your library")
             sources.append("Semantic Scholar recommendation")
-        suggestions.append({"id": wid, "work": w, "score": score(info), "why": ". ".join(reasons) + ".",
-                            "sources": sources, "cited_by": info["cited_by"], "cites": info["cites"]})
-        if len(suggestions) >= MAX_SUGGESTIONS:
-            break
-    log(f"   {len(links)} connected papers found, keeping the top {len(suggestions)}")
-    return suggestions, lib_ids
+        if c["closest"]:
+            reasons.append("Most similar to " + " and ".join(name_of[l] for l in c["closest"]))
+        if c["shared_refs"]:
+            reasons.append(f"Shares {c['shared_refs']} reference{'s' if c['shared_refs'] > 1 else ''} with your library")
+        c["why"] = ". ".join(reasons) + "."
+        c["sources"] = sources
+        prev = existing.get(x, {})
+        c["relevance"] = prev.get("relevance")
+        c["global"] = global_score(c["relevance"], c["similarity"], c["score"],
+                                   percentile(w), w.get("publication_year"))
+
+    scored.sort(key=lambda c: c["global"], reverse=True)
+    top = scored[:MAX_SUGGESTIONS]
+    top_ids = {c["id"] for c in top}
+    # also refresh suggestions already in Notion that are still in the scored pool
+    refresh = [c for c in scored if c["id"] in existing and c["id"] not in top_ids]
+    log(f"   {len(candidates)} connected papers found, {len(scored)} scored in depth, "
+        f"keeping the top {len(top)}")
+    return top, refresh, lib_ids
 
 
-def sync_suggestions(suggestions, lib_ids):
-    existing = {}
-    for page in query_all(SUGGEST_DS):
-        oid = short_id(read(page["properties"].get("OpenAlex ID")))
-        if oid:
-            existing[oid] = page
-
+def sync_suggestions(top, refresh, lib_ids, existing, triager):
     # Suggestions you have since added to Zotero get marked automatically.
-    for oid, page in existing.items():
-        if oid in lib_ids and read(page["properties"].get("Decision")) == "To review":
-            update_page(page["id"], {"Decision": p_select("Added to Zotero")})
+    for oid, info in existing.items():
+        if oid in lib_ids and info["decision"] == "To review":
+            update_page(info["page_id"], {"Decision": p_select("Added to Zotero")})
 
     created = updated = 0
-    for s in suggestions:
-        w = s["work"]
+    to_triage = []
+    for c in top + refresh:
+        w = c["work"]
         props = {
-            "Connection score": p_num(s["score"]),
-            "Why suggested": p_text(s["why"]),
-            "Source": p_multi(s["sources"]),
+            "Connection score": p_num(c["score"]),
+            "Similarity": p_num(c["similarity"]),
+            "Role": p_multi(c["roles"]),
+            "Shared references": p_num(c["shared_refs"]),
+            "Co-citations": p_num(c["cocitations"]),
+            "Why suggested": p_text(c["why"]),
+            "Source": p_multi(c["sources"]),
             "Citations": p_num(w.get("cited_by_count")),
             "Citation percentile": p_num(percentile(w)),
         }
-        page = existing.get(s["id"])
-        if page:
-            update_page(page["id"], props)
+        info = existing.get(c["id"])
+        if info:
+            update_page(info["page_id"], props)
             updated += 1
+            if not info["triage_date"]:
+                to_triage.append((info["page_id"], c))
             continue
         props.update({
             "Title": p_title(w.get("display_name")),
@@ -673,9 +799,40 @@ def sync_suggestions(suggestions, lib_ids):
             "Decision": p_select("To review"),
             "First suggested": p_date(TODAY),
         })
-        create_page(SUGGEST_DS, props)
+        page_id = create_page(SUGGEST_DS, props)
         created += 1
+        if page_id:
+            to_triage.append((page_id, c))
     log(f"   {created} new suggestions, {updated} updated")
+
+    # AI relevance for suggestions, best candidates first, within the free quota left today
+    if not triager.available:
+        if triager.provider != "none":
+            log("   suggestion triage postponed (AI quota used up today)")
+        return
+    to_triage.sort(key=lambda pc: pc[1]["global"], reverse=True)
+    done = 0
+    for page_id, c in to_triage[:MAX_SUGGESTION_TRIAGE_PER_RUN]:
+        w = c["work"]
+        result = triager.run(w.get("display_name"), w.get("display_name"), w.get("publication_year"),
+                             journal(w), abstract_text(w.get("abstract_inverted_index")))
+        if triager.exhausted:
+            break
+        if not result:
+            continue
+        update_page(page_id, {
+            "Summary": p_text(result.get("summary")),
+            "Relevance": p_num(result["relevance"]),
+            "Relevance reason": p_text(result.get("relevance_reason")),
+            "Research questions": p_multi(keep(result.get("research_questions"), RESEARCH_QUESTIONS)),
+            "Triage date": p_date(TODAY),
+        })
+        c["relevance"] = result["relevance"]
+        c["global"] = global_score(c["relevance"], c["similarity"], c["score"],
+                                   percentile(w), w.get("publication_year"))
+        done += 1
+    left = max(0, len(to_triage) - done)
+    log(f"   AI-scored {done} suggestions" + (f", {left} left for the next runs" if left else ""))
 
 
 # ----------------------------------------------------------------------------
@@ -685,7 +842,13 @@ def build_graph(papers, suggestions):
     lib = [p for p in papers if p.get("work")]
     lib_ids = {short_id(p["work"]["id"]) for p in lib}
     lib_by_name = {p["name"]: short_id(p["work"]["id"]) for p in lib}
-    nodes, edges = [], []
+    nodes, edges, seen = [], [], set()
+
+    def add_edge(a, b, kind):
+        key = (a, b, kind) if kind == "cites" else (tuple(sorted((a, b))), kind)
+        if key not in seen:
+            seen.add(key)
+            edges.append({"from": a, "to": b, "kind": kind})
 
     for p in lib:
         w = p["work"]
@@ -705,12 +868,13 @@ def build_graph(papers, suggestions):
         for ref in w.get("referenced_works") or []:
             rid = short_id(ref)
             if rid in lib_ids:
-                edges.append({"from": short_id(w["id"]), "to": rid})
+                add_edge(short_id(w["id"]), rid, "cites")
 
-    for s in suggestions[:GRAPH_SUGGESTIONS]:
-        w = s["work"]
+    shown = sorted(suggestions, key=lambda c: c["global"], reverse=True)[:GRAPH_SUGGESTIONS]
+    for c in shown:
+        w = c["work"]
         nodes.append({
-            "id": s["id"],
+            "id": c["id"],
             "label": f"{first_author(w)} et al., {w.get('publication_year') or 'n.d.'}",
             "title": w.get("display_name"),
             "year": w.get("publication_year"),
@@ -721,12 +885,18 @@ def build_graph(papers, suggestions):
             "doi": w.get("doi"),
             "notion": None,
             "kind": "suggested",
-            "why": s["why"],
+            "why": c["why"],
+            "roles": c["roles"],
+            "similarity": c["similarity"],
+            "relevance": c["relevance"],
+            "global": c["global"],
         })
-        for name in s["cited_by"]:
-            edges.append({"from": lib_by_name[name], "to": s["id"]})
-        for name in s["cites"]:
-            edges.append({"from": s["id"], "to": lib_by_name[name]})
+        for name in c["cited_by"]:
+            add_edge(lib_by_name[name], c["id"], "cites")
+        for name in c["cites"]:
+            add_edge(c["id"], lib_by_name[name], "cites")
+        for lid in c["closest"]:
+            add_edge(c["id"], lid, "similar")
 
     data = {"generated": TODAY, "nodes": nodes, "edges": edges}
     template = (ROOT / "graph_template.html").read_text(encoding="utf-8")
@@ -734,7 +904,7 @@ def build_graph(papers, suggestions):
     out = ROOT / "docs" / "index.html"
     out.parent.mkdir(exist_ok=True)
     out.write_text(html, encoding="utf-8")
-    log(f"   wrote {out.relative_to(ROOT)} ({len(nodes)} nodes, {len(edges)} links)")
+    log(f"   wrote docs/index.html ({len(nodes)} nodes, {len(edges)} links)")
 
 
 # ----------------------------------------------------------------------------
@@ -751,15 +921,17 @@ def main():
     log("1. Citation metrics (OpenAlex)")
     enrich_metrics(papers)
 
-    log("2. AI triage")
-    triage_papers(papers)
+    log("2. AI triage of your papers")
+    triager = Triager()
+    triage_papers(papers, triager)
 
     log("3. Suggested papers")
-    suggestions, lib_ids = build_suggestions(papers)
-    sync_suggestions(suggestions, lib_ids)
+    existing = load_existing_suggestions()
+    top, refresh, lib_ids = build_suggestions(papers, existing)
+    sync_suggestions(top, refresh, lib_ids, existing, triager)
 
     log("4. Literature map")
-    build_graph(papers, suggestions)
+    build_graph(papers, top)
     log("Done.")
 
 

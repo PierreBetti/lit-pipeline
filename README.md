@@ -6,8 +6,11 @@ Every night, this enriches your Notero database in Notion:
 2. **Preliminary infos** written by Claude from each abstract: summary, relevance (1 to 5) and why,
    research questions, ecosystem, gases, methods, key result, and Category if it is still empty.
    Notion then computes a **Priority** score (60% relevance, 25% citation percentile, 15% recency).
-3. **Suggested papers**: papers cited by several of yours, papers citing several of yours, and
-   Semantic Scholar recommendations, ranked by how connected they are to your library.
+3. **Suggested papers**, Connected Papers-style: each candidate gets a **Similarity** score
+   (shared references + co-citation with your papers, weighted by how relevant you rated them), a
+   **Role** (Prior work, Derivative work, Similar work), and an AI relevance score. Notion combines them
+   into a **Global score**: 35% relevance, 30% similarity, 15% direct citation links, 12% citation
+   impact, 8% recency.
 4. **Literature map**: an interactive citation graph published on GitHub Pages, which you embed in Notion.
 
 **Everything is free**: GitHub Actions runs it, OpenAlex and Semantic Scholar are free, and the AI step
@@ -19,7 +22,8 @@ simply done the next night.
 ## One-time setup (about 20 minutes)
 
 ### 1. Create the GitHub repository
-1. Create a free account at https://github.com.
+1. Create a free account at https://github.com (with your UQAM address you can also claim the
+   GitHub Student Developer Pack).
 2. New repository, name it `lit-pipeline`. **Private works**: Actions are free on private repos
    (this uses a few minutes a day out of 2,000 free per month). Publishing the map with GitHub Pages
    from a private repo needs GitHub Pro, which the Student Developer Pack gives you for free. Either
@@ -71,6 +75,8 @@ papers were matched, triaged and suggested. After that it runs by itself every n
 
 - **Re-run the AI on a paper**: clear its *Triage date* in Notion.
 - **Change how Priority is weighted**: edit the *Priority* formula in the Notero database.
+- **Change how suggestions are ranked**: edit the *Global score* formula in Suggested papers, and the
+  `global_score` function in `pipeline.py` (it uses the same weights to choose which candidates to keep).
 - **Your project evolves**: edit `research_context.md`, then clear *Triage date* on papers you want re-scored.
 - **A suggestion looks good**: add it to Zotero (ResearchRabbit or the DOI). Next night it is marked
   *Added to Zotero* automatically. Mark the others *Not relevant* so they leave the list.

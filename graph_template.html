@@ -73,7 +73,7 @@
   <p class="counts" id="counts"></p>
   <input type="search" id="search" placeholder="Find a paper or author" aria-label="Find a paper or author">
   <ul class="legend" id="legend"></ul>
-  <p class="hint">Bigger dot means more citations. A ring means you have read it. Arrows point to the paper being cited. Click a dot for details.</p>
+  <p class="hint">Bigger dot means more citations. A ring means you have read it. Arrows point to the paper being cited; dashed lines join similar papers. Click a dot for details.</p>
 </section>
 
 <aside class="detail" id="detail" aria-live="polite"></aside>
@@ -123,10 +123,11 @@ if (!DATA || !DATA.nodes.length) {
     shapeProperties: { borderDashes: n.kind === "suggested" ? [4, 3] : false },
     font: { color: n.kind === "suggested" ? MUTED : INK, size: 12, face: "system-ui" }
   })));
-  const edges = new vis.DataSet(DATA.edges.map((e, i) => ({
-    id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
-    color: { color: EDGE, highlight: INK }, width: 1, smooth: { type: "continuous" }
-  })));
+  const edges = new vis.DataSet(DATA.edges.map((e, i) => e.kind === "similar"
+    ? { id: i, from: e.from, to: e.to, dashes: [3, 4], arrows: { to: { enabled: false } },
+        color: { color: EDGE, highlight: MUTED }, width: 1, smooth: { type: "continuous" } }
+    : { id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
+        color: { color: EDGE, highlight: INK }, width: 1, smooth: { type: "continuous" } }));
 
   const network = new vis.Network(document.getElementById("map"), { nodes, edges }, {
     physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -60, springLength: 110 },
@@ -172,7 +173,9 @@ if (!DATA || !DATA.nodes.length) {
       <h2>${esc(n.title || n.label)}</h2>
       <p class="meta">${esc(n.label)}. ${n.citations} citations${pct}.</p>
       ${n.kind === "suggested"
-        ? `<p>${esc(n.why)}</p>`
+        ? `<p><strong>${esc((n.roles || []).join(", "))}</strong>. Global score ${n.global}/100,
+             similarity ${n.similarity}/100${n.relevance ? `, relevance ${n.relevance}/5` : ""}.</p>
+           <p class="meta">${esc(n.why)}</p>`
         : `<p class="meta">${esc(n.category)}${n.read ? ", read" : ", not read yet"}.</p>`}
       <p>${n.doi ? `<a href="${esc(n.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""}
          ${n.notion ? ` &nbsp; <a href="${esc(n.notion)}" target="_blank" rel="noopener">Open in Notion</a>` : ""}</p>`;

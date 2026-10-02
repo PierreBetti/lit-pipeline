@@ -38,10 +38,12 @@ jobs:
           GEMINI_SECONDS_BETWEEN_CALLS: "7"
         run: python pipeline.py
 
-      - name: Publish the updated literature map
+      - name: Publish the dashboard and save the audit trail
         run: |
           git config user.name "lit-pipeline"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/index.html
-          git diff --cached --quiet || git commit -m "Update literature map"
+          git add docs/
+          git add data/ 2>/dev/null || true
+          git add logs/ 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Nightly literature review update"
           git push

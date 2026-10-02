@@ -1,17 +1,22 @@
 # lit-pipeline
 
-Every night, this enriches your Notero database in Notion:
+Every night, this runs a living literature review on top of your Notero database in Notion:
 
-1. **Citation metrics** from OpenAlex: citations, field-normalized citation percentile, FWCI.
-2. **Preliminary infos** written by Claude from each abstract: summary, relevance (1 to 5) and why,
-   research questions, ecosystem, gases, methods, key result, and Category if it is still empty.
-   Notion then computes a **Priority** score (60% relevance, 25% citation percentile, 15% recency).
-3. **Suggested papers**, Connected Papers-style: each candidate gets a **Similarity** score
-   (shared references + co-citation with your papers, weighted by how relevant you rated them), a
-   **Role** (Prior work, Derivative work, Similar work), and an AI relevance score. Notion combines them
-   into a **Global score**: 35% relevance, 30% similarity, 15% direct citation links, 12% citation
-   impact, 8% recency.
-4. **Literature map**: an interactive citation graph published on GitHub Pages, which you embed in Notion.
+1. **Citation metrics** from OpenAlex (citations, field-normalized percentile, FWCI) and **retraction alerts**.
+2. **AI triage** of each abstract: summary, relevance (1 to 5) and why, research questions, ecosystem,
+   gases, methods, key result. Notion turns it into a **Priority** score.
+3. **Structured extraction**: study sites (geocoded for free with OpenStreetMap), biome, study design,
+   duration and reported values.
+4. **Suggested papers**, Connected Papers-style: Similarity (shared references + co-citation, weighted by
+   your own relevance ratings), Role (Prior / Derivative / Similar work), AI relevance, and a **Global
+   score**. Once you have screened enough suggestions, a **Personal score** learned from your own
+   Added / Not relevant decisions.
+5. **Dashboard** (GitHub Pages, embed it in Notion) with five tabs: citation map, study site map,
+   evidence gap map, timeline (your library vs. the whole field, milestones, coverage check), and
+   screening (PRISMA 2020-style flow, exclusion reasons, saturation curve, learned preferences).
+6. **Audit trail**: one row per run in the Notion *Review log*, plus `logs/review_log.csv`,
+   `logs/decisions.csv` (every screening decision, dated) and `data/state.json`, all committed to the
+   repository every night, so the whole review is timestamped and reproducible.
 
 **Everything is free**: GitHub Actions runs it, OpenAlex and Semantic Scholar are free, and the AI step
 uses the free tier of Google's Gemini API. If the free daily quota runs out, the remaining papers are
@@ -22,7 +27,8 @@ simply done the next night.
 ## One-time setup (about 20 minutes)
 
 ### 1. Create the GitHub repository
-1. Create a free account at https://github.com.
+1. Create a free account at https://github.com (with your UQAM address you can also claim the
+   GitHub Student Developer Pack).
 2. New repository, name it `lit-pipeline`. **Private works**: Actions are free on private repos
    (this uses a few minutes a day out of 2,000 free per month). Publishing the map with GitHub Pages
    from a private repo needs GitHub Pro, which the Student Developer Pack gives you for free. Either
@@ -82,6 +88,11 @@ papers were matched, triaged and suggested. After that it runs by itself every n
 - **Hitting the free quota often**: lower `MAX_TRIAGE_PER_RUN` (default 40) or raise
   `GEMINI_SECONDS_BETWEEN_CALLS` (default 7) in `nightly.yml`. A big first import just takes a few nights.
 - **Paid alternative**: the script also supports the Claude API (`ANTHROPIC_API_KEY`), but you do not need it.
+- **Screening a suggestion**: set *Exclusion reason* first, then *Decision* to Not relevant (the row leaves
+  the To review view once the decision changes). The reason feeds the PRISMA flow.
+- **Re-extract sites and data for a paper**: clear its *Extraction date*.
+- **The field trend**: edit `FIELD_QUERY` at the top of `pipeline.py` to describe your field (OpenAlex
+  boolean search on titles and abstracts).
 - **Test without writing anything**: `python pipeline.py --dry-run` (or `--no-ai` to skip the AI step).
 
 Good to know: the AI only sees titles and abstracts, so treat its relevance score as triage, not a

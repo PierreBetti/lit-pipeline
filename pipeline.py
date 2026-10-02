@@ -8,7 +8,10 @@ lit-pipeline: nightly enrichment of the Notero (Zotero -> Notion) database.
                   (Gemini API free tier by default)
   3. Suggestions  papers strongly connected to your library but not in it yet
                   (OpenAlex citation links + Semantic Scholar recommendations)
-  4. Graph        interactive citation map written to docs/index.html (GitHub Pages)
+  4. Extraction   study sites (geocoded), biome, study design, duration, reported values
+  5. Dashboard    docs/index.html with tabs: citation map, study sites, evidence gaps,
+                  timeline, screening (PRISMA flow, saturation curve, audit log)
+  Every run is logged to the Notion Review log, logs/*.csv and data/state.json (audit trail).
 
 Usage:
   python pipeline.py              full run
@@ -48,6 +51,11 @@ GEMINI_SECONDS_BETWEEN_CALLS = float(os.environ.get("GEMINI_SECONDS_BETWEEN_CALL
 
 LIBRARY_DS = os.environ.get("NOTERO_DATA_SOURCE_ID", "87a4954a-4928-8345-b3a8-87caeb0b2c4a")
 SUGGEST_DS = os.environ.get("SUGGESTED_DATA_SOURCE_ID", "444be872-ca23-4e7e-8d93-665568721b36")
+REVIEW_LOG_DS = os.environ.get("REVIEW_LOG_DATA_SOURCE_ID", "4e18753f-4ddc-4caa-911c-04eacc6a4d90")
+
+# OpenAlex search describing your field, used for the "field vs your library" timeline.
+FIELD_QUERY = os.environ.get("FIELD_QUERY",
+    '(swamp OR "forested wetland" OR "forested wetlands") AND (methane OR "carbon dioxide" OR "nitrous oxide" OR "greenhouse gas")')
 
 MAX_TRIAGE_PER_RUN = int(os.environ.get("MAX_TRIAGE_PER_RUN", "40"))
 MAX_SUGGESTIONS = int(os.environ.get("MAX_SUGGESTIONS", "40"))
@@ -56,6 +64,10 @@ GRAPH_SUGGESTIONS = int(os.environ.get("GRAPH_SUGGESTIONS", "25"))
 MAX_SUGGESTION_TRIAGE_PER_RUN = int(os.environ.get("MAX_SUGGESTION_TRIAGE_PER_RUN", "20"))
 CANDIDATE_POOL = int(os.environ.get("CANDIDATE_POOL", "150"))   # candidates scored in depth each run
 CITER_PAGES = int(os.environ.get("CITER_PAGES", "2"))           # pages of 200 citing papers per batch
+MAX_EXTRACT_PER_RUN = int(os.environ.get("MAX_EXTRACT_PER_RUN", "25"))
+MIN_DECISIONS_TO_LEARN = int(os.environ.get("MIN_DECISIONS_TO_LEARN", "12"))
+DATA_DIR = ROOT / "data"
+LOG_DIR = ROOT / "logs"
 
 DRY_RUN = "--dry-run" in sys.argv
 # Gemini (free) is used when its key is set; Claude only if you choose to add a paid key instead.
@@ -80,6 +92,9 @@ RESEARCH_QUESTIONS = [
 ]
 ECOSYSTEMS = ["Forested swamp", "Peatland / bog / fen", "Marsh", "Upland forest", "Other wetland", "Other"]
 GASES = ["CO2", "CH4", "N2O"]
+BIOMES = ["Boreal", "Temperate", "Subtropical", "Tropical", "Arctic / tundra", "Multiple / global", "Not stated"]
+STUDY_DESIGNS = ["Field observation", "Field experiment", "Lab / incubation", "Modelling", "Review",
+                 "Meta-analysis / synthesis", "Methods"]
 SKIP_WORK_TYPES = {"paratext", "erratum", "retraction", "editorial", "letter", "peer-review"}
 
 
@@ -191,7 +206,7 @@ def p_date(d):
 # OpenAlex
 # ----------------------------------------------------------------------------
 OPENALEX = "https://api.openalex.org"
-WORK_FIELDS = ("id,doi,display_name,publication_year,type,cited_by_count,fwci,"
+WORK_FIELDS = ("id,doi,display_name,publication_year,type,cited_by_count,fwci,is_retracted,"
                "citation_normalized_percentile,referenced_works,authorships,"
                "primary_location,abstract_inverted_index")
 
@@ -324,6 +339,16 @@ def load_library():
             "category": read(pr.get("Category")) or [],
             "triage_date": read(pr.get("Triage date")),
             "relevance": read(pr.get("Relevance")),
+            "summary": read(pr.get("Summary")) or "",
+            "key_result": read(pr.get("Key result")) or "",
+            "rqs": read(pr.get("Research questions")) or [],
+            "ecosystems": read(pr.get("Ecosystem")) or [],
+            "gases": read(pr.get("Gases")) or [],
+            "biome": read(pr.get("Biome")),
+            "design": read(pr.get("Study design")),
+            "sites_text": read(pr.get("Study sites")) or "",
+            "extraction_date": read(pr.get("Extraction date")),
+            "retracted": bool((pr.get("Retracted") or {}).get("checkbox")),
             "citations": read(pr.get("Citations")),
             "percentile": read(pr.get("Citation percentile")),
             "fwci": read(pr.get("FWCI")),
@@ -355,11 +380,17 @@ def enrich_metrics(papers):
             "FWCI": round(w["fwci"], 2) if w.get("fwci") is not None else None,
         }
         old = {"Citations": p["citations"], "Citation percentile": p["percentile"], "FWCI": p["fwci"]}
-        if new != old or p["openalex_url"] != w["id"]:
+        retracted = bool(w.get("is_retracted"))
+        if retracted and not p["retracted"]:
+            log(f"   ⚠️ RETRACTED according to OpenAlex: {p['name']}")
+        if new != old or p["openalex_url"] != w["id"] or retracted != p["retracted"]:
             props = {k: p_num(v) for k, v in new.items()}
             props["OpenAlex ID"] = p_url(w["id"])
+            props["Retracted"] = {"checkbox": retracted}
             update_page(p["page_id"], props)
+        p["retracted"] = retracted
     log(f"   {found}/{len(papers)} papers matched on OpenAlex")
+    return {"retractions": [p["name"] for p in papers if p["retracted"]]}
 
 
 # ----------------------------------------------------------------------------
@@ -430,7 +461,7 @@ class GeminiQuotaError(RuntimeError):
     pass
 
 
-def ask_gemini(system, user):
+def ask_gemini(system, user, tool=None):
     """Call Gemini, falling back to the next model when one has no free quota for this key."""
     global GEMINI_MODEL
     body = {
@@ -439,7 +470,7 @@ def ask_gemini(system, user):
         "generationConfig": {
             "temperature": 0.2,
             "responseMimeType": "application/json",
-            "responseSchema": _gemini_schema(TRIAGE_TOOL["input_schema"]),
+            "responseSchema": _gemini_schema((tool or TRIAGE_TOOL)["input_schema"]),
         },
     }
     while GEMINI_MODELS:
@@ -468,13 +499,14 @@ def ask_gemini(system, user):
     raise GeminiQuotaError("no Gemini model has free quota left for this key today")
 
 
-def ask_claude(client, system, user):
+def ask_claude(client, system, user, tool=None):
+    tool = tool or TRIAGE_TOOL
     msg = client.messages.create(
         model=CLAUDE_MODEL,
-        max_tokens=1200,
+        max_tokens=1500,
         system=system,
-        tools=[TRIAGE_TOOL],
-        tool_choice={"type": "tool", "name": "record_triage"},
+        tools=[tool],
+        tool_choice={"type": "tool", "name": tool["name"]},
         messages=[{"role": "user", "content": user}],
     )
     return next((b.input for b in msg.content if b.type == "tool_use"), None)
@@ -495,26 +527,36 @@ class Triager:
             self.client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
         context = (ROOT / "research_context.md").read_text(encoding="utf-8")
         self.system = TRIAGE_SYSTEM.format(context=context)
+        self.extract_system = EXTRACT_SYSTEM
         if self.provider == "gemini":
             self.system = self.system.replace("Record your answer with the record_triage tool.",
                                               "Answer in the requested JSON format.")
+            self.extract_system = self.extract_system.replace("Record your answer with the record_extraction tool.",
+                                                              "Answer in the requested JSON format.")
+        self.calls = 0
+
+    @property
+    def model(self):
+        return {"gemini": GEMINI_MODEL, "claude": CLAUDE_MODEL}.get(self.provider, "none")
 
     @property
     def available(self):
         return self.provider != "none" and not self.exhausted
 
-    def run(self, label, title, year, journal, abstract):
+    def run(self, label, title, year, journal, abstract, kind="triage"):
         if not self.available:
             return None
         user = (f"Title: {title}\nYear: {year or 'unknown'}\n"
                 f"Journal: {journal or 'unknown'}\n"
                 f"Abstract: {abstract or '(no abstract available)'}")
+        system, tool = (self.system, TRIAGE_TOOL) if kind == "triage" else (self.extract_system, EXTRACT_TOOL)
         try:
+            self.calls += 1
             if self.provider == "gemini":
-                result = ask_gemini(self.system, user)
+                result = ask_gemini(system, user, tool)
                 time.sleep(GEMINI_SECONDS_BETWEEN_CALLS)
             else:
-                result = ask_claude(self.client, self.system, user)
+                result = ask_claude(self.client, system, user, tool)
         except GeminiQuotaError as e:
             log(f"   AI quota reached ({e}), the rest waits for the next run")
             self.exhausted = True
@@ -523,12 +565,13 @@ class Triager:
             log(f"   AI error on {label}: {e}")
             return None
         if not result:
-            log(f"   no triage returned for {label}")
+            log(f"   no answer returned for {label}")
             return None
-        try:
-            result["relevance"] = max(1, min(5, int(result.get("relevance", 1))))
-        except (TypeError, ValueError):
-            result["relevance"] = 1
+        if kind == "triage":
+            try:
+                result["relevance"] = max(1, min(5, int(result.get("relevance", 1))))
+            except (TypeError, ValueError):
+                result["relevance"] = 1
         return result
 
 
@@ -539,7 +582,7 @@ def keep(values, allowed):
 def triage_papers(papers, triager):
     if triager.provider == "none":
         log("   skipped (no GEMINI_API_KEY, or --no-ai)")
-        return
+        return 0
     todo = [p for p in papers if not p["triage_date"]]
     todo.sort(key=lambda p: p["status"] == "Read")  # unread papers first
     done = 0
@@ -566,9 +609,174 @@ def triage_papers(papers, triager):
             p["category"] = cats
         update_page(p["page_id"], props)
         p["relevance"] = result["relevance"]
+        p["summary"] = result.get("summary") or ""
+        p["key_result"] = result.get("key_result") or ""
+        p["rqs"] = keep(result.get("research_questions"), RESEARCH_QUESTIONS)
+        p["ecosystems"] = keep(result.get("ecosystems"), ECOSYSTEMS)
+        p["gases"] = keep(result.get("gases"), GASES)
         done += 1
     left = max(0, len(todo) - done)
     log(f"   triaged {done} papers" + (f", {left} left for the next runs" if left else ""))
+    return done
+
+
+# ----------------------------------------------------------------------------
+# Step 2b: structured extraction (study sites, design, reported values)
+# ----------------------------------------------------------------------------
+EXTRACT_TOOL = {
+    "name": "record_extraction",
+    "description": "Record structured information extracted from one scientific abstract.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "sites": {
+                "type": "array",
+                "description": "Field sites where data were collected. Empty for reviews, models without sites, or when no place is named.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string", "description": "Site name as written, e.g. 'Mer Bleue bog'."},
+                        "region": {"type": "string", "description": "Province, state or region, if stated or obvious from the site."},
+                        "country": {"type": "string", "description": "Country, if stated or obvious from the site."},
+                    },
+                    "required": ["name", "region", "country"],
+                },
+            },
+            "biome": {"type": "string", "enum": BIOMES},
+            "study_design": {"type": "string", "enum": STUDY_DESIGNS},
+            "duration": {"type": "string", "description": "Study period or duration, e.g. '2 growing seasons (2019-2020)'. Empty if not stated."},
+            "reported_values": {
+                "type": "array",
+                "description": "Quantitative results exactly as stated in the abstract. Never compute or invent values.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "gas": {"type": "string", "description": "CO2, CH4, N2O or other quantity."},
+                        "value": {"type": "string", "description": "Value or range as written, with sign."},
+                        "unit": {"type": "string"},
+                        "context": {"type": "string", "description": "What the value refers to, a few words."},
+                    },
+                    "required": ["gas", "value", "unit", "context"],
+                },
+            },
+        },
+        "required": ["sites", "biome", "study_design", "duration", "reported_values"],
+    },
+}
+
+EXTRACT_SYSTEM = """You extract structured data from scientific abstracts for a literature database.
+Only use information present in the title and abstract. Never invent sites, numbers or units.
+For sites, give the most specific place named; add region and country when they are stated or unambiguous.
+Use biome "Not stated" when the abstract gives no clue. Record your answer with the record_extraction tool."""
+
+
+def geocode(query, state):
+    """Free geocoding with OpenStreetMap Nominatim (max 1 request per second), cached between runs."""
+    cache = state.setdefault("geocode", {})
+    if query in cache:
+        return cache[query]
+    time.sleep(1.1)
+    try:
+        r = requests.get("https://nominatim.openstreetmap.org/search",
+                         params={"q": query, "format": "json", "limit": 1},
+                         headers={"User-Agent": f"lit-pipeline/1.0 ({CONTACT_EMAIL or 'personal research tool'})"},
+                         timeout=30)
+        hits = r.json() if r.ok else []
+    except Exception:
+        hits = []
+    result = [float(hits[0]["lat"]), float(hits[0]["lon"])] if hits else None
+    cache[query] = result
+    return result
+
+
+def locate_sites(sites, state):
+    """Geocode each site, falling back to region then country. Returns points with their precision."""
+    points = []
+    for site in sites or []:
+        name, region, country = (site.get(k, "").strip() for k in ("name", "region", "country"))
+        attempts = [(", ".join(x for x in (name, region, country) if x) if name else "", "site"),
+                    (", ".join(x for x in (region, country) if x), "region"),
+                    (country, "country")]
+        for query, precision in attempts:
+            if not query:
+                continue
+            coords = geocode(query, state)
+            if coords:
+                points.append({"label": ", ".join(x for x in (name, region, country) if x),
+                               "lat": coords[0], "lon": coords[1], "precision": precision})
+                break
+    return points
+
+
+def extract_papers(papers, triager, state):
+    sites_store = state.setdefault("sites", {})
+    if not triager.available:
+        return 0
+    todo = [p for p in papers if not p.get("extraction_date")]
+    done = 0
+    for p in todo[:MAX_EXTRACT_PER_RUN]:
+        result = triager.run(p["name"], p["title"], p["year"], p["journal"], p["abstract"], kind="extract")
+        if triager.exhausted:
+            break
+        if not result:
+            continue
+        sites = result.get("sites") or []
+        points = locate_sites(sites, state)
+        sites_store[p["page_id"]] = points
+        values = [f"{v.get('gas', '')}: {v.get('value', '')} {v.get('unit', '')} ({v.get('context', '')})".strip()
+                  for v in (result.get("reported_values") or [])]
+        biome = result.get("biome") if result.get("biome") in BIOMES else "Not stated"
+        design = result.get("study_design") if result.get("study_design") in STUDY_DESIGNS else None
+        sites_text = "; ".join(", ".join(x for x in (s.get("name"), s.get("region"), s.get("country")) if x)
+                               for s in sites)
+        update_page(p["page_id"], {
+            "Study sites": p_text(sites_text),
+            "Biome": p_select(biome),
+            "Study design": p_select(design),
+            "Study duration": p_text(result.get("duration")),
+            "Reported values": p_text("\n".join(values)),
+            "Extraction date": p_date(TODAY),
+        })
+        p.update({"biome": biome, "design": design, "sites_text": sites_text, "extraction_date": TODAY})
+        done += 1
+    left = max(0, len(todo) - done)
+    log(f"   extracted {done} papers" + (f", {left} left for the next runs" if left else ""))
+    return done
+
+
+# ----------------------------------------------------------------------------
+# Persistent state (committed to the repo each night: the audit trail)
+# ----------------------------------------------------------------------------
+def load_state():
+    path = DATA_DIR / "state.json"
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            log("   warning: data/state.json unreadable, starting a fresh state")
+    return {}
+
+
+def save_state(state):
+    if DRY_RUN:
+        return
+    DATA_DIR.mkdir(exist_ok=True)
+    (DATA_DIR / "state.json").write_text(json.dumps(state, ensure_ascii=False, indent=1, sort_keys=True),
+                                         encoding="utf-8")
+
+
+def append_csv(name, header, rows):
+    if DRY_RUN or not rows:
+        return
+    import csv
+    LOG_DIR.mkdir(exist_ok=True)
+    path = LOG_DIR / name
+    new = not path.exists()
+    with path.open("a", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(header)
+        w.writerows(rows)
 
 
 # ----------------------------------------------------------------------------
@@ -633,8 +841,22 @@ def load_existing_suggestions():
         pr = page["properties"]
         oid = short_id(read(pr.get("OpenAlex ID")))
         if oid:
-            existing[oid] = {"page_id": page["id"], "decision": read(pr.get("Decision")),
-                             "relevance": read(pr.get("Relevance")), "triage_date": read(pr.get("Triage date"))}
+            existing[oid] = {
+                "page_id": page["id"],
+                "title": read(pr.get("Title")) or "",
+                "decision": read(pr.get("Decision")),
+                "reason": read(pr.get("Exclusion reason")),
+                "relevance": read(pr.get("Relevance")),
+                "similarity": read(pr.get("Similarity")),
+                "connections": read(pr.get("Connection score")),
+                "percentile": read(pr.get("Citation percentile")),
+                "year": read(pr.get("Year")),
+                "triage_date": read(pr.get("Triage date")),
+                "first_suggested": read(pr.get("First suggested")),
+                "personal": read(pr.get("Personal score")),
+                "roles": read(pr.get("Role")) or [],
+                "summary": read(pr.get("Summary")) or "",
+            }
     return existing
 
 
@@ -747,6 +969,7 @@ def build_suggestions(papers, existing):
         c["sources"] = sources
         prev = existing.get(x, {})
         c["relevance"] = prev.get("relevance")
+        c["summary"] = prev.get("summary") or ""
         c["global"] = global_score(c["relevance"], c["similarity"], c["score"],
                                    percentile(w), w.get("publication_year"))
 
@@ -757,10 +980,81 @@ def build_suggestions(papers, existing):
     refresh = [c for c in scored if c["id"] in existing and c["id"] not in top_ids]
     log(f"   {len(candidates)} connected papers found, {len(scored)} scored in depth, "
         f"keeping the top {len(top)}")
-    return top, refresh, lib_ids
+    return top, refresh, lib_ids, candidates
 
 
-def sync_suggestions(top, refresh, lib_ids, existing, triager):
+# ---- Learning from your decisions -------------------------------------------
+FEATURES = ["AI relevance", "Similarity", "Direct citation links", "Citation impact", "Recency"]
+
+
+def feature_vector(relevance, similarity, connections, pct, year):
+    return [relevance / 5 if relevance else 0.5,
+            (similarity or 0) / 100,
+            min(connections or 0, 5) / 5,
+            pct / 100 if pct is not None else 0.5,
+            recency(year)]
+
+
+def _sigmoid(z):
+    return 1 / (1 + math.exp(-max(-30, min(30, z))))
+
+
+def train_preferences(existing):
+    """Logistic regression on your Added / Not relevant decisions (pure Python, no dependencies)."""
+    X, y = [], []
+    for info in existing.values():
+        if info["decision"] in ("Added to Zotero", "Not relevant"):
+            X.append(feature_vector(info["relevance"], info["similarity"], info["connections"],
+                                    info["percentile"], info["year"]))
+            y.append(1 if info["decision"] == "Added to Zotero" else 0)
+    n_pos, n_neg = sum(y), len(y) - sum(y)
+    if len(y) < MIN_DECISIONS_TO_LEARN or n_pos < 3 or n_neg < 3:
+        return {"ready": False, "n": len(y), "added": n_pos, "excluded": n_neg,
+                "needed": MIN_DECISIONS_TO_LEARN}
+    w = [0.0] * (len(FEATURES) + 1)          # last weight is the intercept
+    lr, l2 = 0.5, 0.05
+    for _ in range(4000):
+        grad = [0.0] * len(w)
+        for xi, yi in zip(X, y):
+            err = _sigmoid(sum(a * b for a, b in zip(w, xi + [1]))) - yi
+            for j, v in enumerate(xi + [1]):
+                grad[j] += err * v
+        for j in range(len(w)):
+            reg = l2 * w[j] if j < len(FEATURES) else 0
+            w[j] -= lr * (grad[j] / len(y) + reg)
+    # in-sample AUC: how well the learned score separates what you kept from what you excluded
+    scores = [sum(a * b for a, b in zip(w, xi + [1])) for xi in X]
+    pos = [s for s, t in zip(scores, y) if t]
+    neg = [s for s, t in zip(scores, y) if not t]
+    auc = sum((p > q) + 0.5 * (p == q) for p in pos for q in neg) / (len(pos) * len(neg))
+    return {"ready": True, "n": len(y), "added": n_pos, "excluded": n_neg, "weights": w[:-1],
+            "intercept": w[-1], "auc": round(auc, 2)}
+
+
+def personal_score(model, relevance, similarity, connections, pct, year):
+    if not model.get("ready"):
+        return None
+    x = feature_vector(relevance, similarity, connections, pct, year)
+    return round(100 * _sigmoid(sum(a * b for a, b in zip(model["weights"], x)) + model["intercept"]))
+
+
+def track_decisions(existing, state):
+    """Compare decisions with last run's snapshot and log every change (the screening audit trail)."""
+    snap = state.setdefault("decisions", {})
+    events = []
+    for oid, info in existing.items():
+        current = [info["decision"] or "", info["reason"] or ""]
+        if snap.get(oid) != current:
+            if snap.get(oid) is not None or info["decision"] != "To review":
+                events.append([TODAY, oid, info["title"][:200], (snap.get(oid) or ["", ""])[0],
+                               current[0], current[1]])
+            snap[oid] = current
+    append_csv("decisions.csv", ["date", "openalex_id", "title", "previous_decision", "decision",
+                                 "exclusion_reason"], events)
+    return len(events)
+
+
+def sync_suggestions(top, refresh, lib_ids, existing, triager, model):
     # Suggestions you have since added to Zotero get marked automatically.
     for oid, info in existing.items():
         if oid in lib_ids and info["decision"] == "To review":
@@ -781,6 +1075,11 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager):
             "Citations": p_num(w.get("cited_by_count")),
             "Citation percentile": p_num(percentile(w)),
         }
+        ps = personal_score(model, c["relevance"], c["similarity"], c["score"], percentile(w),
+                            w.get("publication_year"))
+        if ps is not None:
+            props["Personal score"] = p_num(ps)
+        c["personal"] = ps
         info = existing.get(c["id"])
         if info:
             update_page(info["page_id"], props)
@@ -804,12 +1103,25 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager):
         if page_id:
             to_triage.append((page_id, c))
     log(f"   {created} new suggestions, {updated} updated")
+    new_ids = {c["id"] for c in top + refresh if c["id"] not in existing}
 
+    # Personal score for older pending suggestions that were not re-scored this run
+    if model.get("ready"):
+        scored_ids = {c["id"] for c in top + refresh}
+        for oid, info in existing.items():
+            if oid in scored_ids or info["decision"] != "To review":
+                continue
+            ps = personal_score(model, info["relevance"], info["similarity"], info["connections"],
+                                info["percentile"], info["year"])
+            if ps != info["personal"]:
+                update_page(info["page_id"], {"Personal score": p_num(ps)})
+
+    stats = {"created": created, "new_ids": new_ids, "new_relevant": 0, "triaged": 0}
     # AI relevance for suggestions, best candidates first, within the free quota left today
     if not triager.available:
         if triager.provider != "none":
             log("   suggestion triage postponed (AI quota used up today)")
-        return
+        return stats
     to_triage.sort(key=lambda pc: pc[1]["global"], reverse=True)
     done = 0
     for page_id, c in to_triage[:MAX_SUGGESTION_TRIAGE_PER_RUN]:
@@ -828,11 +1140,17 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager):
             "Triage date": p_date(TODAY),
         })
         c["relevance"] = result["relevance"]
+        c["summary"] = result.get("summary") or ""
         c["global"] = global_score(c["relevance"], c["similarity"], c["score"],
                                    percentile(w), w.get("publication_year"))
+        if c["id"] in existing:
+            existing[c["id"]]["relevance"] = c["relevance"]
         done += 1
     left = max(0, len(to_triage) - done)
     log(f"   AI-scored {done} suggestions" + (f", {left} left for the next runs" if left else ""))
+    stats["triaged"] = done
+    stats["new_relevant"] = sum(1 for c in top + refresh if c["id"] in new_ids and (c["relevance"] or 0) >= 4)
+    return stats
 
 
 # ----------------------------------------------------------------------------
@@ -898,13 +1216,163 @@ def build_graph(papers, suggestions):
         for lid in c["closest"]:
             add_edge(c["id"], lid, "similar")
 
-    data = {"generated": TODAY, "nodes": nodes, "edges": edges}
+    return {"nodes": nodes, "edges": edges}
+
+
+# ----------------------------------------------------------------------------
+# Step 5: dashboard data, run log
+# ----------------------------------------------------------------------------
+def field_trend():
+    """Papers per year in the whole field (OpenAlex search), to compare with your library."""
+    if not FIELD_QUERY:
+        return {}
+    res = openalex("/works", {"filter": f"title_and_abstract.search:{FIELD_QUERY}",
+                              "group_by": "publication_year"})
+    out = {}
+    for g in (res or {}).get("group_by", []):
+        try:
+            year = int(g["key"])
+        except (TypeError, ValueError):
+            continue
+        if 1960 <= year <= dt.date.today().year:
+            out[year] = g["count"]
+    return out
+
+
+def find_milestones(papers, suggestions, limit=12):
+    """Landmark papers: highly cited and/or cited by several of your papers."""
+    lib = [p for p in papers if p.get("work")]
+    lib_ids = {short_id(p["work"]["id"]) for p in lib}
+    cited_in_lib = defaultdict(int)
+    for p in lib:
+        for r in p["work"].get("referenced_works") or []:
+            cited_in_lib[short_id(r)] += 1
+    items = []
+    for p in lib:
+        w = p["work"]
+        wid = short_id(w["id"])
+        items.append({"id": wid, "label": p["name"], "title": p["title"], "year": p["year"] or w.get("publication_year"),
+                      "citations": w.get("cited_by_count") or 0, "percentile": percentile(w),
+                      "in_library": True, "links": cited_in_lib[wid],
+                      "note": (p["key_result"] or p["summary"]).split(". ")[0][:260],
+                      "doi": w.get("doi")})
+    for c in suggestions:
+        if "Prior work" not in c["roles"]:
+            continue
+        w = c["work"]
+        items.append({"id": c["id"], "label": f"{first_author(w)} et al., {w.get('publication_year') or 'n.d.'}",
+                      "title": w.get("display_name"), "year": w.get("publication_year"),
+                      "citations": w.get("cited_by_count") or 0, "percentile": percentile(w),
+                      "in_library": False, "links": len(c["cited_by"]),
+                      "note": (c.get("summary") or f"Foundational: cited by {len(c['cited_by'])} of your papers.").split(". ")[0][:260],
+                      "doi": w.get("doi")})
+    for it in items:
+        it["landmark"] = math.log10(it["citations"] + 10) * (1 + it["links"]) * (1.3 if (it["percentile"] or 0) >= 99 else 1)
+    items = [it for it in items if it["year"]]
+    items.sort(key=lambda it: it["landmark"], reverse=True)
+    chosen = sorted(items[:limit], key=lambda it: it["year"])
+    for it in chosen:
+        it.pop("landmark", None)
+    return chosen
+
+
+def prisma_counts(papers, existing, state):
+    decided = [i for i in existing.values() if i["decision"] in ("Added to Zotero", "Not relevant")]
+    reasons = defaultdict(int)
+    for i in existing.values():
+        if i["decision"] == "Not relevant":
+            reasons[i["reason"] or "No reason given"] += 1
+    identified = len(state.get("seen_candidates", []))
+    suggested = len(existing)
+    added = sum(1 for i in decided if i["decision"] == "Added to Zotero")
+    library = len(papers)
+    return {
+        "identified_automation": identified,
+        "removed_by_ranking": max(0, identified - suggested),
+        "suggested": suggested,
+        "screened": len(decided),
+        "pending": sum(1 for i in existing.values() if i["decision"] == "To review"),
+        "excluded": len(decided) - added,
+        "exclusion_reasons": dict(sorted(reasons.items(), key=lambda kv: -kv[1])),
+        "retained_network": added,
+        "own_searches": max(0, library - added),
+        "library": library,
+        "retracted": [p["name"] for p in papers if p.get("retracted")],
+    }
+
+
+def saturation_series(existing):
+    """Cumulative number of relevant suggestions (AI relevance >= 4) by date first suggested."""
+    by_day = defaultdict(lambda: [0, 0])
+    for i in existing.values():
+        day = (i["first_suggested"] or TODAY)[:10]
+        by_day[day][0] += 1
+        if (i["relevance"] or 0) >= 4:
+            by_day[day][1] += 1
+    series, total, relevant = [], 0, 0
+    for day in sorted(by_day):
+        total += by_day[day][0]
+        relevant += by_day[day][1]
+        series.append({"date": day, "suggested": total, "relevant": relevant})
+    return series
+
+
+def library_rows(papers, state):
+    sites = state.get("sites", {})
+    rows = []
+    for p in papers:
+        rows.append({
+            "name": p["name"], "title": p["title"], "year": p["year"],
+            "category": (p["category"] or ["Uncategorized"])[0],
+            "rqs": p["rqs"], "ecosystems": p["ecosystems"], "gases": p["gases"],
+            "biome": p.get("biome"), "design": p.get("design"),
+            "relevance": p.get("relevance"), "read": p["status"] == "Read",
+            "sites": sites.get(p["page_id"], []),
+            "doi": (p.get("work") or {}).get("doi") or (f"https://doi.org/{p['doi']}" if p["doi"] else None),
+        })
+    return rows
+
+
+def write_run_log(row):
+    header = ["date", "library", "candidates_evaluated", "unique_candidates", "suggested_to_date",
+              "new_suggestions", "new_relevant", "pending", "retained", "excluded", "decisions",
+              "triaged", "extracted", "retractions", "model"]
+    append_csv("review_log.csv", header, [[row.get(k, "") for k in header]])
+    if DRY_RUN or not REVIEW_LOG_DS:
+        return
+    try:
+        create_page(REVIEW_LOG_DS, {
+            "Run": p_title(f"Run {row['date']}"),
+            "Run date": p_date(row["date"]),
+            "Library size": p_num(row["library"]),
+            "Candidates evaluated": p_num(row["candidates_evaluated"]),
+            "Unique candidates to date": p_num(row["unique_candidates"]),
+            "Suggested to date": p_num(row["suggested_to_date"]),
+            "New suggestions": p_num(row["new_suggestions"]),
+            "New relevant": p_num(row["new_relevant"]),
+            "Pending review": p_num(row["pending"]),
+            "Retained to date": p_num(row["retained"]),
+            "Excluded to date": p_num(row["excluded"]),
+            "Decisions this run": p_num(row["decisions"]),
+            "Papers triaged": p_num(row["triaged"]),
+            "Papers extracted": p_num(row["extracted"]),
+            "Retractions": p_num(row["retractions"]),
+            "Model": p_text(row["model"]),
+            "Notes": p_text(row.get("notes", "")),
+        })
+    except RuntimeError as e:
+        log("   could not write to the Review log database (connect your integration to it): " + str(e)[:150])
+
+
+def write_dashboard(data):
     template = (ROOT / "graph_template.html").read_text(encoding="utf-8")
     html = template.replace("/*__GRAPH_DATA__*/null", json.dumps(data, ensure_ascii=False))
     out = ROOT / "docs" / "index.html"
     out.parent.mkdir(exist_ok=True)
     out.write_text(html, encoding="utf-8")
-    log(f"   wrote docs/index.html ({len(nodes)} nodes, {len(edges)} links)")
+    g = data["graph"]
+    log(f"   wrote docs/index.html ({len(g['nodes'])} nodes, {len(g['edges'])} links, "
+        f"{sum(len(r['sites']) for r in data['library'])} mapped sites, {len(data['milestones'])} milestones)")
 
 
 # ----------------------------------------------------------------------------
@@ -913,31 +1381,76 @@ def main():
         sys.exit("NOTION_TOKEN is not set.")
     if not OPENALEX_KEY:
         log("Warning: OPENALEX_API_KEY is not set, OpenAlex will only allow a tiny daily quota.")
+    state = load_state()
 
     log("Loading library from Notion")
     papers = load_library()
     log(f"   {len(papers)} papers")
 
     log("1. Citation metrics (OpenAlex)")
-    enrich_metrics(papers)
+    metrics = enrich_metrics(papers)
 
     log("2. AI triage of your papers")
     triager = Triager()
-    triage_papers(papers, triager)
+    triaged = triage_papers(papers, triager)
 
-    log("3. Suggested papers")
+    log("3. Extraction: study sites, design, reported values")
+    extracted = extract_papers(papers, triager, state)
+
+    log("4. Suggested papers")
     try:
         existing = load_existing_suggestions()
     except RuntimeError as e:
         existing = None
         log("   Could not open the Suggested papers database in Notion. Open it, click ••• > Connections")
         log("   and add your integration (this happens when the database is moved). Details: " + str(e)[:200])
-    top, refresh, lib_ids = build_suggestions(papers, existing or {})
+    decisions = track_decisions(existing, state) if existing is not None else 0
+    model = train_preferences(existing or {})
+    if model["ready"]:
+        log(f"   learned your preferences from {model['n']} decisions (separation AUC {model['auc']})")
+    else:
+        log(f"   preference learning waits for more decisions ({model['n']}/{model['needed']}, "
+            "with at least 3 Added and 3 Not relevant)")
+    top, refresh, lib_ids, candidates = build_suggestions(papers, existing or {})
+    # everything ever suggested was, by definition, identified by the algorithm
+    seen = set(state.get("seen_candidates", [])) | set(candidates) | set(existing or {})
+    state["seen_candidates"] = sorted(seen)
+    stats = {"created": 0, "new_relevant": 0, "triaged": 0}
     if existing is not None:
-        sync_suggestions(top, refresh, lib_ids, existing, triager)
+        stats = sync_suggestions(top, refresh, lib_ids, existing, triager, model)
+        existing = load_existing_suggestions()   # fresh view including today's additions
 
-    log("4. Literature map")
-    build_graph(papers, top)
+    log("5. Dashboard and review log")
+    state["seen_candidates"] = sorted(set(state["seen_candidates"]) | set(existing or {}))
+    prisma = prisma_counts(papers, existing or {}, state)
+    data = {
+        "generated": TODAY,
+        "graph": build_graph(papers, top),
+        "library": library_rows(papers, state),
+        "field_trend": field_trend(),
+        "field_query": FIELD_QUERY,
+        "milestones": find_milestones(papers, top),
+        "prisma": prisma,
+        "saturation": saturation_series(existing or {}),
+        "preferences": {**model, "features": FEATURES},
+        "runs": state.get("runs", [])[-60:],
+        "options": {"rqs": RESEARCH_QUESTIONS, "ecosystems": ECOSYSTEMS, "gases": GASES,
+                    "biomes": BIOMES, "categories": CATEGORIES},
+    }
+    run = {
+        "date": TODAY, "library": len(papers), "candidates_evaluated": len(candidates),
+        "unique_candidates": len(seen), "suggested_to_date": prisma["suggested"],
+        "new_suggestions": stats["created"], "new_relevant": stats["new_relevant"],
+        "pending": prisma["pending"], "retained": prisma["retained_network"], "excluded": prisma["excluded"],
+        "decisions": decisions, "triaged": (triaged or 0) + stats["triaged"], "extracted": extracted,
+        "retractions": len(metrics["retractions"]), "model": triager.model,
+        "notes": ("Retracted in library: " + "; ".join(metrics["retractions"])) if metrics["retractions"] else "",
+    }
+    state.setdefault("runs", []).append(run)
+    data["runs"] = state["runs"][-60:]
+    write_dashboard(data)
+    write_run_log(run)
+    save_state(state)
     log("Done.")
 
 

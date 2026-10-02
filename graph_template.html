@@ -3,189 +3,454 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Literature map</title>
+<title>Literature review dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #e8ece6;          /* pale sedge */
-    --panel: #f5f7f3;
-    --ink: #23302a;         /* peat */
-    --muted: #5d6b63;
-    --line: #c9d1c8;
-    --edge: rgba(52, 70, 60, 0.28);
-    --focus: #2e6f8e;
+    --bg: #e8ece6; --panel: #f5f7f3; --ink: #23302a; --muted: #5d6b63; --line: #c9d1c8;
+    --edge: rgba(52, 70, 60, 0.28); --focus: #2e6f8e; --gap: #b5652b; --heat: 46, 111, 142;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1b2320;
-      --panel: #232d29;
-      --ink: #dfe7e1;
-      --muted: #9fb0a6;
-      --line: #36433d;
-      --edge: rgba(200, 216, 206, 0.22);
-      --focus: #7fb6d1;
-    }
+    :root { --bg: #1b2320; --panel: #232d29; --ink: #dfe7e1; --muted: #9fb0a6; --line: #36433d;
+      --edge: rgba(200, 216, 206, 0.22); --focus: #7fb6d1; --gap: #e0955e; --heat: 127, 182, 209; }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
     font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  #map { position: fixed; inset: 0; }
+  body { display: flex; flex-direction: column; }
+  header { display: flex; align-items: baseline; gap: 18px; padding: 12px 16px 0; flex-wrap: wrap; }
+  h1 { font-family: Literata, Georgia, serif; font-weight: 600; font-size: 21px; margin: 0; }
+  .updated { color: var(--muted); font-size: 12.5px; }
+  nav { display: flex; gap: 2px; padding: 8px 12px 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  nav button { all: unset; cursor: pointer; padding: 8px 12px; border-radius: 6px 6px 0 0; color: var(--muted);
+    white-space: nowrap; border-bottom: 2px solid transparent; }
+  nav button[aria-selected=true] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+  nav button:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  main { flex: 1; position: relative; min-height: 0; }
+  .tab { position: absolute; inset: 0; display: none; overflow: auto; }
+  .tab.active { display: block; }
+  .pad { padding: 16px; max-width: 1100px; }
+  h2 { font-family: Literata, Georgia, serif; font-weight: 500; font-size: 17px; margin: 18px 0 6px; }
+  h2:first-child { margin-top: 0; }
+  p.lead { color: var(--muted); margin: 0 0 12px; max-width: 70ch; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .chip { all: unset; cursor: pointer; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+  .chip[aria-pressed=true] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 10px; }
+  .muted { color: var(--muted); }
+  table { border-collapse: collapse; }
+  .scroll { overflow-x: auto; }
 
-  .panel { position: fixed; top: 16px; left: 16px; width: min(300px, calc(100vw - 32px));
-    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 16px 12px; }
-  h1 { font-family: Literata, Georgia, serif; font-weight: 600; font-size: 22px; line-height: 1.15; margin: 0 0 4px; }
-  .counts { color: var(--muted); margin: 0 0 12px; }
-  input[type=search] { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--line);
+  /* citation map */
+  #graph { position: absolute; inset: 0; }
+  .overlay { position: absolute; top: 12px; left: 12px; width: min(290px, calc(100% - 24px));
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .overlay input { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--line);
     background: var(--bg); color: var(--ink); font: inherit; }
-  input:focus-visible, button:focus-visible, label:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
-
-  .legend { list-style: none; padding: 0; margin: 12px 0 8px; display: grid; gap: 2px; }
-  .legend button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%;
-    padding: 3px 4px; border-radius: 4px; }
+  .legend { list-style: none; padding: 0; margin: 10px 0 6px; display: grid; gap: 1px; }
+  .legend button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; padding: 2px 4px; border-radius: 4px; }
   .legend button[aria-pressed=false] { opacity: 0.35; }
-  .legend button:hover { background: var(--bg); }
   .dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
-  .dot.suggested { border: 1.5px dashed var(--muted); background: transparent; }
+  .dot.suggested { border: 1.5px dashed var(--muted); }
   .n { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .hint { color: var(--muted); font-size: 12.5px; margin: 6px 0 0; }
-
-  .detail { position: fixed; top: 16px; right: 16px; width: min(340px, calc(100vw - 32px));
-    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: none; }
+  .hint { color: var(--muted); font-size: 12.5px; margin: 4px 0 0; }
+  .detail { position: absolute; top: 12px; right: 12px; width: min(340px, calc(100% - 24px));
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: none; z-index: 500; }
   .detail.open { display: block; }
-  .detail h2 { font-family: Literata, Georgia, serif; font-weight: 500; font-size: 17px; line-height: 1.3; margin: 0 0 8px; }
+  .detail h3 { font-family: Literata, Georgia, serif; font-weight: 500; font-size: 16px; line-height: 1.3; margin: 0 0 8px; }
   .detail p { margin: 0 0 8px; }
-  .detail .meta { color: var(--muted); }
-  .detail a { color: var(--focus); }
+  .detail a, .card a { color: var(--focus); }
   .close { all: unset; cursor: pointer; float: right; color: var(--muted); padding: 0 2px; font-size: 18px; line-height: 1; }
 
-  .empty { position: fixed; inset: 0; display: grid; place-items: center; color: var(--muted); padding: 24px; text-align: center; }
-  @media (max-width: 640px) { .detail { top: auto; bottom: 16px; } }
+  /* sites */
+  #sitesmap { position: absolute; inset: 0; }
+  .leaflet-popup-content { font: 13px/1.4 system-ui, sans-serif; }
+
+  /* gaps */
+  .heat td, .heat th { border: 1px solid var(--line); padding: 6px 8px; text-align: center; min-width: 74px; }
+  .heat th { font-weight: 600; font-size: 12.5px; background: var(--panel); }
+  .heat th.row { text-align: left; }
+  .heat td { cursor: pointer; font-variant-numeric: tabular-nums; }
+  .heat td.zero { color: var(--gap); font-weight: 600; background: repeating-linear-gradient(45deg, transparent 0 5px, rgba(181,101,43,.08) 5px 10px); }
+  .papers-list { margin: 10px 0 0; padding-left: 18px; }
+
+  /* timeline */
+  .chartbox { position: relative; height: 320px; }
+  .milestones { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--line); }
+  .milestones li { position: relative; padding: 0 0 14px 16px; }
+  .milestones li::before { content: ""; position: absolute; left: -6px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+  .milestones li.external::before { background: var(--bg); border: 2px dashed var(--muted); width: 6px; height: 6px; }
+  .milestones .yr { font-variant-numeric: tabular-nums; font-weight: 600; margin-right: 6px; }
+  .tag { font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 4px; }
+  .cov td, .cov th { padding: 4px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+  .cov th:first-child, .cov td:first-child { text-align: left; }
+
+  /* screening */
+  .prisma { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; max-width: 760px; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .box b { font-size: 20px; font-variant-numeric: tabular-nums; display: block; }
+  .box.side { border-style: dashed; }
+  .stage { grid-column: 1 / -1; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .arrow { grid-column: 1 / 2; text-align: center; color: var(--muted); line-height: 1; }
+  .bar { height: 8px; background: rgba(var(--heat), .85); border-radius: 4px; }
+  .alert { border-left: 4px solid var(--gap); }
+  .runs td, .runs th { padding: 4px 8px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+  .runs th:first-child, .runs td:first-child { text-align: left; }
+  @media (max-width: 640px) { .prisma { grid-template-columns: 1fr; } .detail { top: auto; bottom: 12px; } }
 </style>
 </head>
 <body>
-<div id="map" role="img" aria-label="Citation map of the papers in your library"></div>
+<header>
+  <h1>Literature review</h1>
+  <span class="updated" id="updated"></span>
+</header>
+<nav role="tablist" aria-label="Dashboard sections">
+  <button role="tab" aria-selected="true" data-tab="t-map">Citation map</button>
+  <button role="tab" aria-selected="false" data-tab="t-sites">Study sites</button>
+  <button role="tab" aria-selected="false" data-tab="t-gaps">Evidence gaps</button>
+  <button role="tab" aria-selected="false" data-tab="t-time">Timeline</button>
+  <button role="tab" aria-selected="false" data-tab="t-screen">Screening</button>
+</nav>
+<main>
+  <section class="tab active" id="t-map" role="tabpanel">
+    <div id="graph" role="img" aria-label="Citation map of your library and suggested papers"></div>
+    <div class="overlay">
+      <input type="search" id="search" placeholder="Find a paper or author" aria-label="Find a paper or author">
+      <ul class="legend" id="legend"></ul>
+      <p class="hint">Bigger dot means more citations; a ring means you have read it. Arrows point to the cited paper, dashed lines join similar papers.</p>
+    </div>
+    <aside class="detail" id="detail" aria-live="polite"></aside>
+  </section>
 
-<section class="panel" aria-label="Map controls">
-  <h1>Literature map</h1>
-  <p class="counts" id="counts"></p>
-  <input type="search" id="search" placeholder="Find a paper or author" aria-label="Find a paper or author">
-  <ul class="legend" id="legend"></ul>
-  <p class="hint">Bigger dot means more citations. A ring means you have read it. Arrows point to the paper being cited; dashed lines join similar papers. Click a dot for details.</p>
-</section>
+  <section class="tab" id="t-sites" role="tabpanel">
+    <div id="sitesmap" role="img" aria-label="Map of study sites"></div>
+    <div class="overlay" style="z-index:500">
+      <strong>Where the evidence comes from</strong>
+      <p class="hint" id="sites-summary"></p>
+      <ul class="legend" id="sites-legend"></ul>
+      <p class="hint">Solid dot: exact site. Hollow: located at region level. Faint: country only. Sites are extracted by AI from abstracts and geocoded automatically, so check them before using the map in a figure.</p>
+    </div>
+  </section>
 
-<aside class="detail" id="detail" aria-live="polite"></aside>
+  <section class="tab" id="t-gaps" role="tabpanel"><div class="pad">
+    <h2>Evidence gap map</h2>
+    <p class="lead">How many papers in your library address each research question in each ecosystem. Hatched cells are gaps. Click a cell to see the papers.</p>
+    <div class="chips" id="gas-filter" role="group" aria-label="Filter by gas"></div>
+    <div class="scroll"><table class="heat" id="heat-rq"></table></div>
+    <div id="cell-papers"></div>
+    <h2>Study design by biome</h2>
+    <p class="lead">What kind of evidence you have, and where.</p>
+    <div class="scroll"><table class="heat" id="heat-design"></table></div>
+  </div></section>
+
+  <section class="tab" id="t-time" role="tabpanel"><div class="pad">
+    <h2>Your library against the field</h2>
+    <p class="lead" id="time-lead"></p>
+    <div class="card"><div class="chartbox"><canvas id="timechart" aria-label="Papers per year"></canvas></div></div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <h2>Milestones</h2>
+        <p class="lead">Landmark papers: highly cited, or cited by several of your papers. Notes are drafted by AI from abstracts: verify before quoting.</p>
+        <ul class="milestones" id="milestones"></ul>
+      </div>
+      <div class="card">
+        <h2>Coverage check</h2>
+        <p class="lead">Share of the field's papers vs. share of your library, per period. A period where your share is much lower than the field's may be underrepresented in your reading.</p>
+        <table class="cov" id="coverage"></table>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="tab" id="t-screen" role="tabpanel"><div class="pad">
+    <div id="alerts"></div>
+    <h2>Screening flow</h2>
+    <p class="lead">PRISMA 2020-style flow of everything the pipeline has surfaced since it started logging.</p>
+    <div class="prisma" id="prisma"></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card">
+        <h2>Saturation curve</h2>
+        <p class="lead">Cumulative suggestions vs. relevant ones (AI relevance 4 or 5). When the relevant curve flattens while suggestions keep coming, your search is approaching saturation.</p>
+        <div class="chartbox" style="height:240px"><canvas id="satchart" aria-label="Saturation curve"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>What your decisions say you value</h2>
+        <div id="prefs"></div>
+      </div>
+    </div>
+    <h2>Recent runs</h2>
+    <div class="scroll"><table class="runs" id="runs"></table></div>
+  </div></section>
+</main>
 
 <script>
 const DATA = /*__GRAPH_DATA__*/null;
 
 const PALETTE = {
-  "Fluxes & microclimate": "#2e6f8e",
-  "Vegetation & tree stems": "#4f7a32",
-  "Soil & water microbes": "#7b5a8f",
-  "Hydrology & biogeochemistry": "#b5652b",
-  "Methods & instrumentation": "#6c7479",
-  "Nature-based solutions & policy": "#b38f1e",
-  "Uncategorized": "#a3aea6",
-  "Suggested": "transparent"
+  "Fluxes & microclimate": "#2e6f8e", "Vegetation & tree stems": "#4f7a32", "Soil & water microbes": "#7b5a8f",
+  "Hydrology & biogeochemistry": "#b5652b", "Methods & instrumentation": "#6c7479",
+  "Nature-based solutions & policy": "#b38f1e", "Uncategorized": "#a3aea6", "Suggested": "transparent"
 };
-
 const css = getComputedStyle(document.documentElement);
-const INK = css.getPropertyValue("--ink").trim();
-const MUTED = css.getPropertyValue("--muted").trim();
-const EDGE = css.getPropertyValue("--edge").trim();
-const BG = css.getPropertyValue("--bg").trim();
+const V = n => css.getPropertyValue(n).trim();
+const INK = V("--ink"), MUTED = V("--muted"), EDGE = V("--edge"), BG = V("--bg"), LINE = V("--line"), HEAT = V("--heat");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const colorOf = cat => PALETTE[cat] || PALETTE.Uncategorized;
 
-if (!DATA || !DATA.nodes.length) {
-  document.getElementById("map").innerHTML =
-    '<p class="empty">No papers yet. Run the pipeline once your Notero database has papers with a DOI.</p>';
+// ---------- tabs (each tab is drawn the first time it is opened)
+const drawn = {};
+const drawers = {};
+function openTab(id) {
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.id === id));
+  if (!drawn[id] && drawers[id]) { drawers[id](); drawn[id] = true; }
+  if (id === "t-sites" && window._sitesMap) setTimeout(() => window._sitesMap.invalidateSize(), 50);
+  history.replaceState(null, "", "#" + id.slice(2));
+}
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => openTab(b.dataset.tab)));
+
+if (!DATA) {
+  document.querySelector("main").innerHTML = '<p class="pad muted">No data yet. Run the pipeline once to fill this dashboard.</p>';
 } else {
-  const lib = DATA.nodes.filter(n => n.kind === "library").length;
-  const sug = DATA.nodes.length - lib;
-  document.getElementById("counts").textContent =
-    `${lib} papers in your library, ${sug} suggested. Updated ${DATA.generated}.`;
+  document.getElementById("updated").textContent = `Updated ${DATA.generated}`;
 
-  const size = c => 9 + Math.min(26, Math.sqrt(c || 0) * 1.6);
-  const nodes = new vis.DataSet(DATA.nodes.map(n => ({
-    id: n.id,
-    label: n.label,
-    raw: n,
-    size: size(n.citations),
-    shape: "dot",
-    color: n.kind === "suggested"
-      ? { background: BG, border: MUTED, highlight: { background: BG, border: INK } }
-      : { background: PALETTE[n.category] || PALETTE.Uncategorized,
-          border: n.read ? INK : (PALETTE[n.category] || PALETTE.Uncategorized),
-          highlight: { background: PALETTE[n.category] || PALETTE.Uncategorized, border: INK } },
-    borderWidth: n.read ? 3 : (n.kind === "suggested" ? 1.5 : 1),
-    shapeProperties: { borderDashes: n.kind === "suggested" ? [4, 3] : false },
-    font: { color: n.kind === "suggested" ? MUTED : INK, size: 12, face: "system-ui" }
-  })));
-  const edges = new vis.DataSet(DATA.edges.map((e, i) => e.kind === "similar"
-    ? { id: i, from: e.from, to: e.to, dashes: [3, 4], arrows: { to: { enabled: false } },
-        color: { color: EDGE, highlight: MUTED }, width: 1, smooth: { type: "continuous" } }
-    : { id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
-        color: { color: EDGE, highlight: INK }, width: 1, smooth: { type: "continuous" } }));
-
-  const network = new vis.Network(document.getElementById("map"), { nodes, edges }, {
-    physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -60, springLength: 110 },
-               stabilization: { iterations: 250 } },
-    interaction: { hover: true, tooltipDelay: 150, navigationButtons: false, keyboard: true }
-  });
-
-  // Legend with category toggles
-  const counts = {};
-  DATA.nodes.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
-  const hidden = new Set();
-  const legend = document.getElementById("legend");
-  Object.keys(PALETTE).filter(c => counts[c]).forEach(cat => {
-    const li = document.createElement("li");
-    const b = document.createElement("button");
-    b.setAttribute("aria-pressed", "true");
-    b.innerHTML = `<span class="dot ${cat === "Suggested" ? "suggested" : ""}" style="background:${cat === "Suggested" ? "transparent" : PALETTE[cat]}"></span>
-                   <span>${cat === "Suggested" ? "Suggested papers" : cat}</span><span class="n">${counts[cat]}</span>`;
-    b.addEventListener("click", () => {
-      hidden.has(cat) ? hidden.delete(cat) : hidden.add(cat);
-      b.setAttribute("aria-pressed", String(!hidden.has(cat)));
-      nodes.update(DATA.nodes.map(n => ({ id: n.id, hidden: hidden.has(n.category) })));
+  // ---------- 1. citation map
+  drawers["t-map"] = () => {
+    const G = DATA.graph;
+    if (!G.nodes.length) { document.getElementById("graph").innerHTML = '<p class="pad muted">No papers matched yet.</p>'; return; }
+    const size = c => 9 + Math.min(26, Math.sqrt(c || 0) * 1.6);
+    const nodes = new vis.DataSet(G.nodes.map(n => ({
+      id: n.id, label: n.label, raw: n, size: size(n.citations), shape: "dot",
+      color: n.kind === "suggested"
+        ? { background: BG, border: MUTED, highlight: { background: BG, border: INK } }
+        : { background: colorOf(n.category), border: n.read ? INK : colorOf(n.category),
+            highlight: { background: colorOf(n.category), border: INK } },
+      borderWidth: n.read ? 3 : (n.kind === "suggested" ? 1.5 : 1),
+      shapeProperties: { borderDashes: n.kind === "suggested" ? [4, 3] : false },
+      font: { color: n.kind === "suggested" ? MUTED : INK, size: 12, face: "system-ui" }
+    })));
+    const edges = new vis.DataSet(G.edges.map((e, i) => e.kind === "similar"
+      ? { id: i, from: e.from, to: e.to, dashes: [3, 4], arrows: { to: { enabled: false } },
+          color: { color: EDGE, highlight: MUTED }, width: 1, smooth: { type: "continuous" } }
+      : { id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
+          color: { color: EDGE, highlight: INK }, width: 1, smooth: { type: "continuous" } }));
+    const network = new vis.Network(document.getElementById("graph"), { nodes, edges }, {
+      physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -60, springLength: 110 },
+                 stabilization: { iterations: 250 } },
+      interaction: { hover: true, keyboard: true }
     });
-    li.appendChild(b);
-    legend.appendChild(li);
-  });
+    const counts = {};
+    G.nodes.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
+    const hidden = new Set();
+    const legend = document.getElementById("legend");
+    Object.keys(PALETTE).filter(c => counts[c]).forEach(cat => {
+      const li = document.createElement("li"), b = document.createElement("button");
+      b.setAttribute("aria-pressed", "true");
+      b.innerHTML = `<span class="dot ${cat === "Suggested" ? "suggested" : ""}" style="background:${cat === "Suggested" ? "transparent" : colorOf(cat)}"></span>
+        <span>${cat === "Suggested" ? "Suggested papers" : cat}</span><span class="n">${counts[cat]}</span>`;
+      b.addEventListener("click", () => {
+        hidden.has(cat) ? hidden.delete(cat) : hidden.add(cat);
+        b.setAttribute("aria-pressed", String(!hidden.has(cat)));
+        nodes.update(G.nodes.map(n => ({ id: n.id, hidden: hidden.has(n.category) })));
+      });
+      li.appendChild(b); legend.appendChild(li);
+    });
+    const detail = document.getElementById("detail");
+    function show(n) {
+      const pct = n.percentile != null ? `, ${n.percentile}th citation percentile` : "";
+      detail.innerHTML = `<button class="close" aria-label="Close details">×</button>
+        <h3>${esc(n.title || n.label)}</h3>
+        <p class="muted">${esc(n.label)}. ${n.citations} citations${pct}.</p>
+        ${n.kind === "suggested"
+          ? `<p><strong>${esc((n.roles || []).join(", "))}</strong>. Global score ${n.global}/100, similarity ${n.similarity}/100${n.relevance ? `, relevance ${n.relevance}/5` : ""}.</p>
+             <p class="muted">${esc(n.why)}</p>`
+          : `<p class="muted">${esc(n.category)}${n.read ? ", read" : ", not read yet"}.</p>`}
+        <p>${n.doi ? `<a href="${esc(n.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""}
+           ${n.notion ? ` &nbsp; <a href="${esc(n.notion)}" target="_blank" rel="noopener">Open in Notion</a>` : ""}</p>`;
+      detail.classList.add("open");
+      detail.querySelector(".close").addEventListener("click", () => detail.classList.remove("open"));
+    }
+    network.on("click", p => p.nodes.length ? show(nodes.get(p.nodes[0]).raw) : detail.classList.remove("open"));
+    document.getElementById("search").addEventListener("input", e => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) { network.unselectAll(); return; }
+      const hit = G.nodes.find(n => (n.label + " " + (n.title || "")).toLowerCase().includes(q));
+      if (hit) { network.selectNodes([hit.id]); network.focus(hit.id, { scale: 1.2, animation: { duration: 400 } }); show(hit); }
+    });
+  };
 
-  // Search
-  document.getElementById("search").addEventListener("input", e => {
-    const q = e.target.value.trim().toLowerCase();
-    if (!q) { network.unselectAll(); return; }
-    const hit = DATA.nodes.find(n => (n.label + " " + (n.title || "")).toLowerCase().includes(q));
-    if (hit) { network.selectNodes([hit.id]); network.focus(hit.id, { scale: 1.2, animation: { duration: 400 } }); show(hit); }
-  });
+  // ---------- 2. study sites
+  drawers["t-sites"] = () => {
+    const map = L.map("sitesmap", { worldCopyJump: true }).setView([45, -40], 2);
+    window._sitesMap = map;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    const bounds = [], perCat = {};
+    let mapped = 0, unmapped = 0;
+    DATA.library.forEach(p => {
+      if (!p.sites.length) { unmapped++; return; }
+      mapped++;
+      perCat[p.category] = (perCat[p.category] || 0) + 1;
+      p.sites.forEach(s => {
+        const c = colorOf(p.category);
+        const style = s.precision === "site" ? { radius: 7, fillOpacity: 0.9, weight: 1.5, color: INK }
+          : s.precision === "region" ? { radius: 8, fillOpacity: 0.15, weight: 2, color: c }
+          : { radius: 9, fillOpacity: 0.1, weight: 1, color: c, opacity: 0.6, dashArray: "3 3" };
+        L.circleMarker([s.lat, s.lon], { ...style, fillColor: c })
+          .bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(p.title)}<br><span style="opacity:.7">${esc(s.label)} (${s.precision})</span>`
+            + (p.doi ? `<br><a href="${esc(p.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""))
+          .addTo(map);
+        bounds.push([s.lat, s.lon]);
+      });
+    });
+    if (bounds.length) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
+    document.getElementById("sites-summary").textContent =
+      `${mapped} papers placed on the map. ${unmapped} without a site (reviews, models, global studies, or not yet extracted).`;
+    document.getElementById("sites-legend").innerHTML = Object.entries(perCat).map(([c, n]) =>
+      `<li><span style="display:flex;gap:8px;align-items:center"><span class="dot" style="background:${colorOf(c)}"></span>${esc(c)}<span class="n">${n}</span></span></li>`).join("");
+  };
 
-  // Detail panel
-  const detail = document.getElementById("detail");
-  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  function show(n) {
-    const pct = n.percentile != null ? `, ${n.percentile}th citation percentile` : "";
-    detail.innerHTML = `
-      <button class="close" aria-label="Close details">×</button>
-      <h2>${esc(n.title || n.label)}</h2>
-      <p class="meta">${esc(n.label)}. ${n.citations} citations${pct}.</p>
-      ${n.kind === "suggested"
-        ? `<p><strong>${esc((n.roles || []).join(", "))}</strong>. Global score ${n.global}/100,
-             similarity ${n.similarity}/100${n.relevance ? `, relevance ${n.relevance}/5` : ""}.</p>
-           <p class="meta">${esc(n.why)}</p>`
-        : `<p class="meta">${esc(n.category)}${n.read ? ", read" : ", not read yet"}.</p>`}
-      <p>${n.doi ? `<a href="${esc(n.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""}
-         ${n.notion ? ` &nbsp; <a href="${esc(n.notion)}" target="_blank" rel="noopener">Open in Notion</a>` : ""}</p>`;
-    detail.classList.add("open");
-    detail.querySelector(".close").addEventListener("click", () => detail.classList.remove("open"));
-  }
-  network.on("click", params => {
-    if (params.nodes.length) show(nodes.get(params.nodes[0]).raw);
-    else detail.classList.remove("open");
-  });
+  // ---------- 3. evidence gaps
+  drawers["t-gaps"] = () => {
+    const O = DATA.options;
+    let gas = "All";
+    const filter = document.getElementById("gas-filter");
+    ["All", ...O.gases].forEach(g => {
+      const b = document.createElement("button");
+      b.className = "chip"; b.textContent = g; b.setAttribute("aria-pressed", String(g === gas));
+      b.addEventListener("click", () => { gas = g; filter.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); });
+      filter.appendChild(b);
+    });
+    function heat(table, rows, cols, rowKey, colKey, papers) {
+      const max = Math.max(1, ...rows.flatMap(r => cols.map(c => papers.filter(p => rowKey(p, r) && colKey(p, c)).length)));
+      table.innerHTML = `<tr><th></th>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr>` + rows.map(r =>
+        `<tr><th class="row">${esc(r)}</th>${cols.map(c => {
+          const hits = papers.filter(p => rowKey(p, r) && colKey(p, c));
+          const a = hits.length ? 0.12 + 0.75 * hits.length / max : 0;
+          return `<td class="${hits.length ? "" : "zero"}" style="${hits.length ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}"
+                   data-r="${esc(r)}" data-c="${esc(c)}">${hits.length || "gap"}</td>`;
+        }).join("")}</tr>`).join("");
+      table.querySelectorAll("td").forEach(td => td.addEventListener("click", () => {
+        const hits = papers.filter(p => rowKey(p, td.dataset.r) && colKey(p, td.dataset.c));
+        document.getElementById("cell-papers").innerHTML = `<div class="card" style="margin-top:12px"><strong>${esc(td.dataset.r)} × ${esc(td.dataset.c)}</strong>${
+          hits.length ? `<ul class="papers-list">${hits.map(p => `<li>${esc(p.name)}: ${esc(p.title)}</li>`).join("")}</ul>`
+                      : `<p class="muted" style="margin:6px 0 0">No paper in your library covers this combination yet.</p>`}</div>`;
+      }));
+    }
+    function draw() {
+      const papers = DATA.library.filter(p => gas === "All" || p.gases.includes(gas));
+      heat(document.getElementById("heat-rq"), O.ecosystems, O.rqs, (p, r) => p.ecosystems.includes(r), (p, c) => p.rqs.includes(c), papers);
+      document.getElementById("cell-papers").innerHTML = "";
+    }
+    draw();
+    const designs = [...new Set(DATA.library.map(p => p.design).filter(Boolean))];
+    const biomes = O.biomes.filter(b => b !== "Not stated");
+    heat(document.getElementById("heat-design"), designs.length ? designs : ["(not extracted yet)"], biomes,
+      (p, r) => p.design === r, (p, c) => p.biome === c, DATA.library);
+  };
+
+  // ---------- 4. timeline
+  drawers["t-time"] = () => {
+    const lib = DATA.library.filter(p => p.year);
+    const field = DATA.field_trend || {};
+    const years = [...new Set([...lib.map(p => +p.year), ...Object.keys(field).map(Number)])].sort((a, b) => a - b);
+    const from = Math.min(...lib.map(p => +p.year), years.find(y => (field[y] || 0) > 0) || 9999);
+    const span = years.filter(y => y >= from);
+    const cats = [...new Set(lib.map(p => p.category))];
+    document.getElementById("time-lead").textContent = Object.keys(field).length
+      ? `Bars: your library by publication year and category. Line: papers per year in the whole field (OpenAlex search: ${DATA.field_query}).`
+      : "Bars: your library by publication year and category. (The field trend will appear once OpenAlex returns counts for your field query.)";
+    new Chart(document.getElementById("timechart"), {
+      data: { labels: span, datasets: [
+        ...cats.map(c => ({ type: "bar", label: c, data: span.map(y => lib.filter(p => +p.year === y && p.category === c).length),
+          backgroundColor: colorOf(c), stack: "lib", yAxisID: "y" })),
+        ...(Object.keys(field).length ? [{ type: "line", label: "Whole field", data: span.map(y => field[y] || 0),
+          borderColor: MUTED, backgroundColor: MUTED, pointRadius: 0, borderWidth: 1.5, tension: .25, yAxisID: "y2" }] : [])
+      ] },
+      options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+        plugins: { legend: { labels: { color: INK, boxWidth: 12 } } },
+        scales: { x: { stacked: true, ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
+          y: { stacked: true, title: { display: true, text: "Your papers", color: MUTED }, ticks: { color: MUTED, precision: 0 }, grid: { color: LINE } },
+          y2: { position: "right", display: Object.keys(field).length > 0, title: { display: true, text: "Field papers", color: MUTED },
+            ticks: { color: MUTED }, grid: { display: false } } } }
+    });
+    document.getElementById("milestones").innerHTML = DATA.milestones.map(m =>
+      `<li class="${m.in_library ? "" : "external"}"><span class="yr">${m.year}</span>${m.doi ? `<a href="${esc(m.doi)}" target="_blank" rel="noopener">${esc(m.label)}</a>` : esc(m.label)}
+        <span class="tag">${m.in_library ? "in your library" : "not in your library"}</span><span class="tag">${m.citations} citations</span>
+        <div class="muted">${esc(m.note || m.title)}</div></li>`).join("") || '<li class="muted">Not enough data yet.</li>';
+    // coverage by period
+    const periods = [[0, 1999, "Before 2000"], [2000, 2009, "2000s"], [2010, 2014, "2010-2014"], [2015, 2019, "2015-2019"], [2020, 9999, "2020 onwards"]];
+    const fTot = Object.values(field).reduce((a, b) => a + b, 0), lTot = lib.length;
+    document.getElementById("coverage").innerHTML = `<tr><th>Period</th><th>Field</th><th>Your library</th><th></th></tr>` +
+      periods.map(([a, b, name]) => {
+        const f = fTot ? Object.entries(field).filter(([y]) => y >= a && y <= b).reduce((s, [, n]) => s + n, 0) / fTot : null;
+        const l = lTot ? lib.filter(p => p.year >= a && p.year <= b).length / lTot : 0;
+        const flag = f !== null && f > 0.08 && l < f / 2 ? "⚠️ underrepresented" : "";
+        return `<tr><td>${name}</td><td>${f === null ? "n/a" : Math.round(f * 100) + "%"}</td><td>${Math.round(l * 100)}%</td><td class="muted">${flag}</td></tr>`;
+      }).join("");
+  };
+
+  // ---------- 5. screening
+  drawers["t-screen"] = () => {
+    const P = DATA.prisma;
+    const alerts = [];
+    if (P.retracted.length) alerts.push(`⚠️ Retracted papers in your library: ${P.retracted.map(esc).join("; ").replace(/\.$/, "")}. Check them before citing.`);
+    document.getElementById("alerts").innerHTML = alerts.map(a => `<div class="card alert" style="margin-bottom:12px">${a}</div>`).join("");
+    const reasons = Object.entries(P.exclusion_reasons).map(([r, n]) => `${esc(r)}: ${n}`).join("<br>") || "none yet";
+    document.getElementById("prisma").innerHTML = `
+      <div class="stage">Identification</div>
+      <div class="box"><span class="muted">Identified by citation network &amp; recommendations</span><b>${P.identified_automation}</b></div>
+      <div class="box"><span class="muted">Identified by your own searches (Zotero)</span><b>${P.own_searches}</b></div>
+      <div class="arrow">↓</div><div></div>
+      <div class="box"><span class="muted">Proposed for screening</span><b>${P.suggested}</b></div>
+      <div class="box side"><span class="muted">Marked ineligible by automation (ranked below the cut-off)</span><b>${P.removed_by_ranking}</b></div>
+      <div class="stage">Screening</div>
+      <div class="box"><span class="muted">Screened by you</span><b>${P.screened}</b><span class="muted">${P.pending} still pending</span></div>
+      <div class="box side"><span class="muted">Excluded, with reasons</span><b>${P.excluded}</b><span class="muted" style="font-size:12.5px">${reasons}</span></div>
+      <div class="stage">Included</div>
+      <div class="box"><span class="muted">Retained from suggestions</span><b>${P.retained_network}</b></div>
+      <div class="box"><span class="muted">Total papers in your library</span><b>${P.library}</b></div>`;
+    const S = DATA.saturation;
+    new Chart(document.getElementById("satchart"), {
+      type: "line",
+      data: { labels: S.map(s => s.date), datasets: [
+        { label: "Suggested (cumulative)", data: S.map(s => s.suggested), borderColor: MUTED, pointRadius: 2, borderWidth: 1.5 },
+        { label: "Relevant (cumulative)", data: S.map(s => s.relevant), borderColor: "#2e6f8e", backgroundColor: "rgba(46,111,142,.12)", fill: true, pointRadius: 2, borderWidth: 2 }
+      ] },
+      options: { maintainAspectRatio: false, plugins: { legend: { labels: { color: INK, boxWidth: 12 } } },
+        scales: { x: { ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 14 }, grid: { display: false } },
+                  y: { beginAtZero: true, ticks: { color: MUTED, precision: 0 }, grid: { color: LINE } } } }
+    });
+    const pr = DATA.preferences;
+    const prefs = document.getElementById("prefs");
+    if (!pr.ready) {
+      prefs.innerHTML = `<p class="lead">The tool will learn what you value from your screening decisions. It has ${pr.n} so far (${pr.added} added, ${pr.excluded} excluded) and needs ${pr.needed}, including at least 3 of each. Then every suggestion gets a <strong>Personal score</strong> in Notion.</p>`;
+    } else {
+      const max = Math.max(...pr.weights.map(Math.abs), 0.01);
+      prefs.innerHTML = `<p class="lead">Learned from ${pr.n} decisions. How strongly each criterion pushes a paper toward being kept (right) or excluded (left). Separation quality (AUC, 0.5 = chance, 1 = perfect): ${Number(pr.auc).toFixed(2)}.</p>` +
+        pr.features.map((f, i) => {
+          const w = pr.weights[i], pct = Math.abs(w) / max * 50;
+          return `<div style="display:grid;grid-template-columns:140px 1fr 48px;gap:8px;align-items:center;margin:4px 0">
+            <span>${esc(f)}</span>
+            <span style="position:relative;height:8px;background:${LINE};border-radius:4px">
+              <span class="bar" style="position:absolute;top:0;${w >= 0 ? `left:50%;width:${pct}%` : `right:50%;width:${pct}%;background:${V("--gap")}`}"></span></span>
+            <span class="muted" style="text-align:right">${w >= 0 ? "+" : ""}${w.toFixed(1)}</span></div>`;
+        }).join("");
+    }
+    const R = DATA.runs.slice(-10).reverse();
+    document.getElementById("runs").innerHTML = `<tr><th>Date</th><th>Library</th><th>Evaluated</th><th>New suggestions</th><th>New relevant</th><th>Decisions</th><th>Pending</th><th>Model</th></tr>` +
+      R.map(r => `<tr><td>${r.date}</td><td>${r.library}</td><td>${r.candidates_evaluated}</td><td>${r.new_suggestions}</td><td>${r.new_relevant}</td><td>${r.decisions}</td><td>${r.pending}</td><td class="muted">${esc(r.model)}</td></tr>`).join("");
+  };
+
+  const start = "t-" + (location.hash.slice(1) || "map");
+  openTab(document.getElementById(start) ? start : "t-map");
 }
 </script>
 </body>

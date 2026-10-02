@@ -45,5 +45,6 @@ jobs:
           git add docs/
           git add data/ 2>/dev/null || true
           git add logs/ 2>/dev/null || true
+          git add export/ 2>/dev/null || true
           git diff --cached --quiet || git commit -m "Nightly literature review update"
           git push

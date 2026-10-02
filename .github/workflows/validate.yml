@@ -1,0 +1,45 @@
+name: Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "What to run"
+        required: true
+        default: "all"
+        type: choice
+        options: [all, sample, evaluate, calibration, consistency, preferences, benchmark]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lit-pipeline
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run validation task
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+        run: python validate.py ${{ inputs.task }}
+      - name: Save results
+        run: |
+          git config user.name "lit-pipeline"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ docs/ 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Validation: ${{ inputs.task }}"
+          git pull --rebase && git push

@@ -103,6 +103,13 @@
   .alert { border-left: 4px solid var(--gap); }
   .runs td, .runs th { padding: 4px 8px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
   .runs th:first-child, .runs td:first-child { text-align: left; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 0 0 8px; }
+  .kpi b { font-size: 26px; font-variant-numeric: tabular-nums; display: block; line-height: 1.2; }
+  .kpi .muted { font-size: 12.5px; }
+  .vt td, .vt th { padding: 5px 10px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+  .vt th:first-child, .vt td:first-child { text-align: left; }
+  .good { color: #3b7a3b; } .fair { color: #a07020; } .poor { color: var(--gap); }
+  @media (prefers-color-scheme: dark) { .good { color: #8fca8f; } .fair { color: #e2b45f; } }
   .rings-wrap { display: grid; grid-template-columns: minmax(300px, 520px) minmax(260px, 1fr); gap: 16px; align-items: start; }
   .rings-wrap svg path.sector { cursor: pointer; }
   .rings-wrap svg path.sector:hover, .rings-wrap svg path.sector.sel { stroke: var(--ink); stroke-width: 1.5; }
@@ -128,6 +135,7 @@
   <button role="tab" aria-selected="false" data-tab="t-rings">Field rings</button>
   <button role="tab" aria-selected="false" data-tab="t-time">Timeline</button>
   <button role="tab" aria-selected="false" data-tab="t-screen">Screening</button>
+  <button role="tab" aria-selected="false" data-tab="t-valid">Validation</button>
 </nav>
 <main>
   <section class="tab active" id="t-map" role="tabpanel">
@@ -212,6 +220,12 @@
     </div>
     <h2>Recent runs</h2>
     <div class="scroll"><table class="runs" id="runs"></table></div>
+  </div></section>
+  <section class="tab" id="t-valid" role="tabpanel"><div class="pad">
+    <h2>How good is this pipeline?</h2>
+    <p class="lead">Evidence for a methods paper, produced by <code>validate.py</code> (Actions tab, workflow "Validation"). Agreement is reported as Cohen's kappa: above 0.6 is substantial, above 0.8 almost perfect agreement.</p>
+    <div class="kpis" id="kpis"></div>
+    <div id="vdetail"></div>
   </div></section>
 </main>
 
@@ -606,6 +620,92 @@ if (!DATA) {
     const R = DATA.runs.slice(-10).reverse();
     document.getElementById("runs").innerHTML = `<tr><th>Date</th><th>Library</th><th>Evaluated</th><th>New suggestions</th><th>New relevant</th><th>Decisions</th><th>Pending</th><th>Model</th></tr>` +
       R.map(r => `<tr><td>${r.date}</td><td>${r.library}</td><td>${r.candidates_evaluated}</td><td>${r.new_suggestions}</td><td>${r.new_relevant}</td><td>${r.decisions}</td><td>${r.pending}</td><td class="muted">${esc(r.model)}</td></tr>`).join("");
+  };
+
+
+  // ---------- 6. validation
+  drawers["t-valid"] = () => {
+    const Va = DATA.validation || {};
+    const cls = v => v == null ? "muted" : v >= 0.8 ? "good" : v >= 0.6 ? "fair" : "poor";
+    const num = (v, d = 2) => v == null || Number.isNaN(v) ? "n/a" : Number(v).toFixed(d);
+    const waiting = t => t && t.status !== "ok" ? `<span class="muted">${esc(t.message || t.status || "not run yet")}</span>` : null;
+    const E = Va.evaluate, C = Va.calibration, R = Va.consistency, Pf = Va.preferences, B = Va.benchmark;
+    const pref = DATA.preferences || {};
+    const cal200 = C && C.status === "ok" ? C.scopes.map(s => Object.entries(s.sizes)).flat() : [];
+    const covs = cal200.map(([, v]) => v.coverage);
+    const bench = B && B.status === "ok" ? B.benchmarks.filter(b => b.status === "ok") : [];
+    const lastRecall = bench.length ? statistics(bench.map(b => b.rounds[b.rounds.length - 1].recall)) : null;
+    function statistics(a) { return a.reduce((x, y) => x + y, 0) / a.length; }
+    const kpi = (title, value, sub, c) => `<div class="card kpi"><span class="muted">${title}</span><b class="${c || ""}">${value}</b><span class="muted">${sub}</span></div>`;
+    document.getElementById("kpis").innerHTML = [
+      E && E.status === "ok" ? kpi("AI vs human: on-topic", num(E.ai_vs_human.on_topic.kappa), `kappa, ${E.coded} papers hand-coded`, cls(E.ai_vs_human.on_topic.kappa))
+                             : kpi("AI vs human agreement", "–", "hand-code the validation sample"),
+      E && E.status === "ok" ? kpi("AI vs human: research questions", num(E.ai_vs_human.rqs.micro_f1), "micro-F1 across questions", cls(E.ai_vs_human.rqs.micro_f1))
+                             : kpi("Research question tagging", "–", "waiting for coded rows"),
+      covs.length ? kpi("Confidence intervals", Math.round(100 * statistics(covs)) + "%", "actual coverage of the 95% intervals", Math.abs(statistics(covs) - .95) < .03 ? "good" : "fair")
+                  : kpi("Confidence intervals", "–", "needs a fully classified scope"),
+      R && R.status === "ok" ? kpi("AI test-retest", num(R.agreement.on_topic.kappa), `on-topic kappa, ${R.n} papers classified twice`, cls(R.agreement.on_topic.kappa))
+                             : kpi("AI test-retest", "–", "run the consistency task"),
+      pref.auc_cv != null ? kpi("Preference model", num(pref.auc_cv), "cross-validated AUC", cls(pref.auc_cv))
+                          : kpi("Preference model", "–", "needs screening decisions"),
+      lastRecall != null ? kpi("Discovery recall", Math.round(100 * lastRecall) + "%", `of review studies found, mean of ${bench.length} benchmark(s)`, lastRecall >= .6 ? "good" : "fair")
+                         : kpi("Discovery recall", "–", "add a benchmark review"),
+    ].join("");
+
+    let h = "";
+    // classification
+    h += `<h2>AI classification vs. human coding</h2>`;
+    if (E && E.status === "ok") {
+      const A = E.ai_vs_human, H = E.human_vs_human;
+      const row = (label, a, hh, metric) => `<tr><td>${label}</td><td class="${cls(a)}">${num(a)}</td><td class="${cls(hh)}">${num(hh)}</td><td class="muted">${metric}</td></tr>`;
+      h += `<p class="lead">${E.coded} papers coded blind by hand. Human vs. human uses the double-coded subset${H ? ` (${H.n} papers)` : " (not coded yet)"}: it is the ceiling the AI can reasonably be held to.</p>
+        <div class="scroll"><table class="vt"><tr><th>Category</th><th>AI vs human</th><th>Human vs human</th><th></th></tr>
+        ${row("On topic", A.on_topic.kappa, H && H.on_topic.kappa, "kappa")}
+        ${row("Research questions", A.rqs.micro_f1, H && H.rqs.micro_f1, "micro-F1")}
+        ${row("Ecosystems", A.ecosystems.micro_f1, H && H.ecosystems.micro_f1, "micro-F1")}
+        ${row("Gases", A.gases.micro_f1, H && H.gases.micro_f1, "micro-F1")}
+        ${row("Biome", A.biome.kappa, H && H.biome.kappa, "kappa")}
+        ${row("Study design", A.design.kappa, H && H.design.kappa, "kappa")}</table></div>
+        <h2 style="font-size:15px">Per research question (AI vs human)</h2>
+        <div class="scroll"><table class="vt"><tr><th>Question</th><th>Papers (human)</th><th>Precision</th><th>Recall</th><th>F1</th><th>Kappa</th></tr>
+        ${Object.entries(A.rqs.per_label).map(([q, m]) => `<tr><td>${esc(q)}</td><td>${m.positives}</td><td>${num(m.precision)}</td><td>${num(m.recall)}</td><td>${num(m.f1)}</td><td class="${cls(m.kappa)}">${num(m.kappa)}</td></tr>`).join("")}</table></div>
+        ${E.with_abstract || E.title_only ? `<p class="muted">On-topic accuracy with an abstract: ${num(E.with_abstract && E.with_abstract.accuracy)} (n=${E.with_abstract ? E.with_abstract.n : 0}); from the title only: ${num(E.title_only && E.title_only.accuracy)} (n=${E.title_only ? E.title_only.n : 0}).</p>` : ""}`;
+    } else h += `<p class="lead">${waiting(E) || "Not run yet."} Steps: run Validation with task <b>sample</b>, code the rows in the 🧪 Validation sample database in Notion (without looking anything up), then run task <b>evaluate</b>.</p>`;
+
+    // calibration
+    h += `<h2>Are the sampled estimates honest?</h2>`;
+    if (C && C.status === "ok") {
+      h += `<p class="lead">Fully classified scopes are re-sampled ${C.repeats} times at several sample sizes: a well-calibrated method has its 95% intervals contain the true value about 95% of the time.</p>` +
+        C.scopes.map(sc => `<div class="scroll"><table class="vt"><tr><th>${esc(sc.scope)} (${sc.population} papers)</th><th>Interval coverage</th><th>Mean error</th></tr>
+        ${Object.entries(sc.sizes).map(([n, v]) => `<tr><td>Sample of ${n}</td><td class="${Math.abs(v.coverage - .95) < .03 ? "good" : "fair"}">${Math.round(100 * v.coverage)}%</td><td>${v.mean_abs_error_pts} pts</td></tr>`).join("")}</table></div>`).join("");
+    } else h += `<p class="lead">${waiting(C) || "Not run yet: task calibration."}</p>`;
+
+    // consistency
+    h += `<h2>Does the AI give the same answer twice?</h2>`;
+    h += R && R.status === "ok"
+      ? `<p class="lead">${R.n} papers classified a second time with ${esc(R.model)}. On-topic kappa ${num(R.agreement.on_topic.kappa)}, research questions micro-F1 ${num(R.agreement.rqs.micro_f1)}, identical set of research questions for ${Math.round(100 * R.exact_rq_match)}% of papers, biome kappa ${num(R.agreement.biome.kappa)}, design kappa ${num(R.agreement.design.kappa)}.</p>`
+      : `<p class="lead">${waiting(R) || "Not run yet: task consistency."}</p>`;
+
+    // preferences
+    h += `<h2>Does the personal score predict your decisions?</h2>`;
+    const pro = pref.prospective || {};
+    h += pref.ready
+      ? `<p class="lead">From ${pref.n} decisions: in-sample AUC ${num(pref.auc)} (optimistic), cross-validated AUC <b>${num(pref.auc_cv)}</b> (on decisions it did not learn from). Prospective test, scores recorded before you decided: ${pro.n ? `AUC <b>${num(pro.auc)}</b> on ${pro.n} decisions` : "accumulating"}. 0.5 means no better than chance.</p>`
+      : `<p class="lead">Needs at least ${pref.needed || 12} screening decisions (3 kept and 3 excluded minimum); ${pref.n || 0} so far.</p>`;
+
+    // benchmarks
+    h += `<h2>Does it find the studies a systematic review found?</h2>`;
+    if (bench.length) {
+      h += bench.map(b => `<div class="card" style="margin-bottom:12px"><strong>${esc(b.name)}</strong> <span class="muted">${esc(b.source)}</span>
+        <p class="muted" style="margin:4px 0 8px">${b.findable} of ${b.gold} included studies are in OpenAlex. Seeded with ${b.seeds} of them, ${b.repeats} random repeats.</p>
+        <div class="scroll"><table class="vt"><tr><th>Method</th><th>Papers screened</th><th>Recall</th></tr>
+        ${b.rounds.map(r => `<tr><td>lit-pipeline, round ${r.round}</td><td>${r.screened}</td><td><b>${Math.round(100 * r.recall)}%</b> <span class="muted">± ${Math.round(100 * r.recall_sd)}</span></td></tr>`).join("")}
+        <tr><td>Plain citation chasing (one round, unranked)</td><td>${b.baseline.screened}</td><td>${Math.round(100 * b.baseline.recall)}%</td></tr>
+        ${Object.entries(b.comparators || {}).filter(([, c]) => c && c.gold_found != null).map(([n, c]) => `<tr><td>${esc(n)}</td><td>${c.screened ?? "n/a"}</td><td>${Math.round(100 * c.gold_found / Math.max(1, b.findable - b.seeds))}%</td></tr>`).join("")}
+        </table></div></div>`).join("");
+    } else h += `<p class="lead">${waiting(B) || "Not run yet."} Add one or more published systematic reviews as benchmarks (copy <code>benchmarks/_TEMPLATE.json</code>), then run task <b>benchmark</b>.</p>`;
+    h += `<p class="muted" style="margin-top:18px">Reproducibility: every AI answer is logged with the exact model version and a prompt version (data/ai_log.jsonl); all prompts are archived in data/state.json; the classified field corpus is exported to export/field_corpus.csv. Last validation run: ${esc(Va.updated || "never")}.</p>`;
+    document.getElementById("vdetail").innerHTML = h;
   };
 
   const start = "t-" + (location.hash.slice(1) || "map");

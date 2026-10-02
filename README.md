@@ -82,6 +82,26 @@ papers were matched, triaged and suggested. After that it runs by itself every n
 
 ---
 
+## Validation (numbers for a methods paper)
+
+Run from **Actions > Validation > Run workflow**, choosing a task. Results appear in the dashboard's
+**Validation** tab (`#valid`). Full protocol in `METHODS.md`.
+
+1. **calibration** (no setup): checks that the confidence intervals of sampled scopes are honest. Needs one
+   fully classified scope of 150+ papers.
+2. **consistency** (no setup): re-classifies 30 papers to measure the AI's test-retest agreement.
+3. **sample**, then hand-code, then **evaluate**: draws a blind random sample (50 per scope, 30 double-coded)
+   into the 🧪 Validation sample database in Notion. Code each row from its title and abstract without
+   looking anything up, tick *Coded*, then run *evaluate* for AI vs human (and human vs human) agreement.
+   Rows marked Coder B are best coded by a second person.
+4. **preferences**: cross-validated and prospective accuracy of the Personal score (needs screening decisions).
+5. **benchmark**: copy `benchmarks/_TEMPLATE.json`, paste the DOIs of the included studies of a published
+   systematic review, run *benchmark*. Optionally record what Connected Papers / ResearchRabbit / Litmaps
+   found with the same seeds under `comparators`.
+
+`all` runs everything that has the data it needs. Reproducibility settings are in `config.json`
+(temperature, model pinning); every AI answer is logged in `data/ai_log.jsonl`.
+
 ## Day-to-day
 
 - **Re-run the AI on a paper**: clear its *Triage date* in Notion.

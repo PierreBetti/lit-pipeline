@@ -95,6 +95,45 @@ STUDY_DESIGNS = ["Field observation", "Field experiment", "Lab / incubation", "M
                  "Meta-analysis / synthesis", "Methods"]
 SKIP_WORK_TYPES = {"paratext", "erratum", "retraction", "editorial", "letter", "peer-review"}
 
+# ---- config.json overrides everything above (lists, Notion IDs, AI settings) --------
+CONFIG = {}
+if (ROOT / "config.json").exists():
+    CONFIG = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
+    CATEGORIES = CONFIG.get("categories", CATEGORIES)
+    RESEARCH_QUESTIONS = CONFIG.get("research_questions", RESEARCH_QUESTIONS)
+    ECOSYSTEMS = CONFIG.get("ecosystems", ECOSYSTEMS)
+    GASES = CONFIG.get("gases", GASES)
+    BIOMES = CONFIG.get("biomes", BIOMES)
+    STUDY_DESIGNS = CONFIG.get("study_designs", STUDY_DESIGNS)
+    _n = CONFIG.get("notion", {})
+    LIBRARY_DS = os.environ.get("NOTERO_DATA_SOURCE_ID") or _n.get("library_data_source", LIBRARY_DS)
+    SUGGEST_DS = os.environ.get("SUGGESTED_DATA_SOURCE_ID") or _n.get("suggestions_data_source", SUGGEST_DS)
+    REVIEW_LOG_DS = os.environ.get("REVIEW_LOG_DATA_SOURCE_ID") or _n.get("review_log_data_source", REVIEW_LOG_DS)
+AI_CFG = {"temperature": 0, "pinned_model": None, "log_raw_outputs": True, **CONFIG.get("ai", {})}
+if AI_CFG.get("pinned_model"):
+    GEMINI_MODELS = [AI_CFG["pinned_model"]]
+elif AI_CFG.get("fallback_models") and "GEMINI_MODELS" not in os.environ:
+    GEMINI_MODELS = list(AI_CFG["fallback_models"])
+GEMINI_MODEL = GEMINI_MODELS[0]
+VALIDATION_DS = CONFIG.get("notion", {}).get("validation_data_source", "")
+
+
+def prompt_hash(system, tool):
+    return hashlib.sha256((system + json.dumps(tool, sort_keys=True)).encode()).hexdigest()[:12]
+
+
+_PROMPTS_SEEN = {}
+
+
+def log_ai_call(kind, label, model_version, phash, result):
+    """Raw record of every AI answer: what was asked (prompt version), which exact model answered, what it said."""
+    if DRY_RUN or not AI_CFG.get("log_raw_outputs", True):
+        return
+    DATA_DIR.mkdir(exist_ok=True)
+    with (DATA_DIR / "ai_log.jsonl").open("a", encoding="utf-8") as f:
+        f.write(json.dumps({"date": TODAY, "kind": kind, "item": label, "model": model_version,
+                            "prompt": phash, "output": result}, ensure_ascii=False) + "\n")
+
 
 def log(*args):
     print(*args, flush=True)
@@ -466,7 +505,7 @@ def ask_gemini(system, user, tool=None):
         "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": user}]}],
         "generationConfig": {
-            "temperature": 0.2,
+            "temperature": AI_CFG.get("temperature", 0),
             "responseMimeType": "application/json",
             "responseSchema": _gemini_schema((tool or TRIAGE_TOOL)["input_schema"]),
         },
@@ -477,8 +516,11 @@ def ask_gemini(system, user, tool=None):
         for attempt in range(4):
             r = requests.post(url, params={"key": GEMINI_KEY}, json=body, timeout=120)
             if r.ok:
-                text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
-                return json.loads(text)
+                data = r.json()
+                text = data["candidates"][0]["content"]["parts"][0]["text"]
+                result = json.loads(text)
+                result["_model"] = data.get("modelVersion") or GEMINI_MODEL   # the exact version behind an alias
+                return result
             detail = r.text[:400].replace("\n", " ")
             if r.status_code == 404 or (r.status_code == 429 and "limit: 0" in r.text):
                 log(f"   {GEMINI_MODEL} not usable with this key ({r.status_code}), trying the next model")
@@ -539,6 +581,8 @@ class Triager:
 
     @property
     def model(self):
+        if getattr(self, "last_version", None):
+            return self.last_version
         return {"gemini": GEMINI_MODEL, "claude": CLAUDE_MODEL}.get(self.provider, "none")
 
     @property
@@ -554,6 +598,8 @@ class Triager:
         system, tool = {"triage": (self.system, TRIAGE_TOOL),
                         "extract": (self.extract_system, EXTRACT_TOOL),
                         "field": (getattr(self, "field_system", ""), FIELD_TOOL)}[kind]
+        phash = prompt_hash(system, tool)
+        _PROMPTS_SEEN[phash] = {"kind": kind, "system": system, "schema": tool}
         try:
             self.calls += 1
             if self.provider == "gemini":
@@ -571,6 +617,10 @@ class Triager:
         if not result:
             log(f"   no answer returned for {label}")
             return None
+        version = result.pop("_model", None) or self.model
+        self.last_version = version
+        log_ai_call(kind, label, version, phash, result)
+        result["_model"], result["_prompt"] = version, phash
         if kind == "triage":
             try:
                 result["relevance"] = max(1, min(5, int(result.get("relevance", 1))))
@@ -880,7 +930,7 @@ def load_existing_suggestions():
     return existing
 
 
-def build_suggestions(papers, existing):
+def build_suggestions(papers, existing, keep_n=None):
     lib = [p for p in papers if p.get("work")]
     lib_ids = {short_id(p["work"]["id"]) for p in lib}
     lib_dois = {p["doi"] for p in papers if p["doi"]}
@@ -994,7 +1044,7 @@ def build_suggestions(papers, existing):
                                    percentile(w), w.get("publication_year"))
 
     scored.sort(key=lambda c: c["global"], reverse=True)
-    top = scored[:MAX_SUGGESTIONS]
+    top = scored[:keep_n or MAX_SUGGESTIONS]
     top_ids = {c["id"] for c in top}
     # also refresh suggestions already in Notion that are still in the scored pool
     refresh = [c for c in scored if c["id"] in existing and c["id"] not in top_ids]
@@ -1031,24 +1081,45 @@ def train_preferences(existing):
     if len(y) < MIN_DECISIONS_TO_LEARN or n_pos < 3 or n_neg < 3:
         return {"ready": False, "n": len(y), "added": n_pos, "excluded": n_neg,
                 "needed": MIN_DECISIONS_TO_LEARN}
-    w = [0.0] * (len(FEATURES) + 1)          # last weight is the intercept
-    lr, l2 = 0.5, 0.05
-    for _ in range(4000):
+    w = _fit_logistic(X, y)
+    scores = [sum(a * b for a, b in zip(w, xi + [1])) for xi in X]
+    auc_in = auc_score(scores, y)
+    # 5-fold cross-validated AUC: accuracy on decisions the model did not learn from
+    folds = 5 if len(y) >= 25 else len(y)            # leave-one-out for small sets
+    order = sorted(range(len(y)), key=lambda i: hashlib.md5(str(i).encode()).hexdigest())
+    cv_scores, cv_y = [], []
+    for f in range(folds):
+        test = [order[i] for i in range(len(order)) if i % folds == f]
+        train = [i for i in range(len(y)) if i not in test]
+        if len({y[i] for i in train}) < 2:
+            continue
+        wf = _fit_logistic([X[i] for i in train], [y[i] for i in train], iters=1500)
+        cv_scores += [sum(a * b for a, b in zip(wf, X[i] + [1])) for i in test]
+        cv_y += [y[i] for i in test]
+    return {"ready": True, "n": len(y), "added": n_pos, "excluded": n_neg, "weights": w[:-1],
+            "intercept": w[-1], "auc": round(auc_in, 2), "auc_cv": round(auc_score(cv_scores, cv_y), 2)}
+
+
+def _fit_logistic(X, y, iters=4000, lr=0.5, l2=0.05):
+    w = [0.0] * (len(X[0]) + 1)          # last weight is the intercept
+    for _ in range(iters):
         grad = [0.0] * len(w)
         for xi, yi in zip(X, y):
             err = _sigmoid(sum(a * b for a, b in zip(w, xi + [1]))) - yi
             for j, v in enumerate(xi + [1]):
                 grad[j] += err * v
         for j in range(len(w)):
-            reg = l2 * w[j] if j < len(FEATURES) else 0
+            reg = l2 * w[j] if j < len(w) - 1 else 0
             w[j] -= lr * (grad[j] / len(y) + reg)
-    # in-sample AUC: how well the learned score separates what you kept from what you excluded
-    scores = [sum(a * b for a, b in zip(w, xi + [1])) for xi in X]
-    pos = [s for s, t in zip(scores, y) if t]
-    neg = [s for s, t in zip(scores, y) if not t]
-    auc = sum((p > q) + 0.5 * (p == q) for p in pos for q in neg) / (len(pos) * len(neg))
-    return {"ready": True, "n": len(y), "added": n_pos, "excluded": n_neg, "weights": w[:-1],
-            "intercept": w[-1], "auc": round(auc, 2)}
+    return w
+
+
+def auc_score(scores, labels):
+    pos = [s for s, t in zip(scores, labels) if t]
+    neg = [s for s, t in zip(scores, labels) if not t]
+    if not pos or not neg:
+        return float("nan")
+    return sum((p > q) + 0.5 * (p == q) for p in pos for q in neg) / (len(pos) * len(neg))
 
 
 def personal_score(model, relevance, similarity, connections, pct, year):
@@ -1058,12 +1129,30 @@ def personal_score(model, relevance, similarity, connections, pct, year):
     return round(100 * _sigmoid(sum(a * b for a, b in zip(model["weights"], x)) + model["intercept"]))
 
 
+PREDICTIONS = {}   # bound to state["predictions"] in main()
+
+
+def prospective_eval(existing, state):
+    """AUC of personal scores recorded BEFORE you decided: the honest, forward-looking test."""
+    preds, dates = state.get("predictions", {}), state.get("decision_dates", {})
+    scores, labels = [], []
+    for oid, (pdate, score) in preds.items():
+        info = existing.get(oid)
+        if info and info["decision"] in ("Added to Zotero", "Not relevant") and dates.get(oid, "") > pdate:
+            scores.append(score)
+            labels.append(1 if info["decision"] == "Added to Zotero" else 0)
+    auc = auc_score(scores, labels)
+    return {"n": len(labels), "auc": None if auc != auc else round(auc, 2)}
+
+
 def track_decisions(existing, state):
     """Compare decisions with last run's snapshot and log every change (the screening audit trail)."""
     snap = state.setdefault("decisions", {})
     events = []
     for oid, info in existing.items():
         current = [info["decision"] or "", info["reason"] or ""]
+        if info["decision"] != "To review":
+            state.setdefault("decision_dates", {}).setdefault(oid, TODAY)
         if snap.get(oid) != current:
             if snap.get(oid) is not None or info["decision"] != "To review":
                 events.append([TODAY, oid, info["title"][:200], (snap.get(oid) or ["", ""])[0],
@@ -1099,6 +1188,7 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager, model):
                             w.get("publication_year"))
         if ps is not None:
             props["Personal score"] = p_num(ps)
+            PREDICTIONS.setdefault(c["id"], [TODAY, ps])
         c["personal"] = ps
         info = existing.get(c["id"])
         if info:
@@ -1275,7 +1365,16 @@ The student's research context, including the research questions to tag:
 
 Classify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome "Not stated" when there is no clue. Record your answer with the record_field_map tool."""
 
-FIELD_SELECT = "id,doi,display_name,publication_year,type,cited_by_count,abstract_inverted_index"
+FIELD_SELECT = "id,doi,display_name,publication_year,type,cited_by_count"
+
+
+def fetch_abstracts(work_ids):
+    """Abstracts are fetched just before classification and never stored (many are publisher-copyrighted)."""
+    out = {}
+    for chunk in chunks(work_ids, 50):
+        for w in works_filter("openalex_id:" + "|".join(chunk), per_page=50, select="id,abstract_inverted_index"):
+            out[short_id(w["id"])] = abstract_text(w.get("abstract_inverted_index"))[:4000]
+    return out
 
 
 def load_scopes():
@@ -1294,7 +1393,10 @@ def load_corpus():
     path = DATA_DIR / "corpus.json"
     if path.exists():
         try:
-            return json.loads(path.read_text(encoding="utf-8"))
+            corpus = json.loads(path.read_text(encoding="utf-8"))
+            for rec in corpus.values():
+                rec.pop("a", None)        # earlier versions stored abstracts: removed
+            return corpus
         except json.JSONDecodeError:
             log("   warning: data/corpus.json unreadable, rebuilding the field corpus")
     return {}
@@ -1337,8 +1439,6 @@ def fetch_scope(scope, cfg, corpus, state):
         rec = corpus.setdefault(wid, {"t": w.get("display_name") or "", "y": w.get("publication_year"),
                                       "d": w.get("doi"), "s": []})
         rec["c"] = w.get("cited_by_count") or 0
-        if "k" not in rec and "a" not in rec:
-            rec["a"] = abstract_text(w.get("abstract_inverted_index"))[:4000]
         if scope["id"] not in rec["s"]:
             rec["s"].append(scope["id"])
 
@@ -1376,13 +1476,16 @@ def classify_field(corpus, cfg, triager, scopes):
     done = 0
     if not triager.available:
         return 0
+    queue = []
     for scope in scopes:
-        pending = [wid for wid, rec in corpus.items() if scope["id"] in rec["s"] and "k" not in rec]
-        for wid in pending:
-            if done >= cfg["max_classify_per_run"] or not triager.available:
+        queue += [wid for wid, rec in corpus.items() if scope["id"] in rec["s"] and "k" not in rec and wid not in queue]
+    queue = queue[:cfg["max_classify_per_run"]]
+    abstracts = fetch_abstracts(queue) if queue else {}
+    for wid in queue:
+            if not triager.available:
                 return done
             rec = corpus[wid]
-            result = triager.run(rec["t"][:80], rec["t"], rec["y"], "", rec.get("a", ""), kind="field")
+            result = triager.run(rec["t"][:80], rec["t"], rec["y"], "", abstracts.get(wid, ""), kind="field")
             if triager.exhausted:
                 return done
             if not result:
@@ -1395,10 +1498,9 @@ def classify_field(corpus, cfg, triager, scopes):
                 "b": result.get("biome") if result.get("biome") in BIOMES else "Not stated",
                 "z": result.get("study_design") if result.get("study_design") in STUDY_DESIGNS else None,
                 "l": [s for s in (result.get("sites") or []) if isinstance(s, dict)][:5],
-                "na": not rec.get("a"),          # classified from the title only
-                "m": triager.model, "dt": TODAY,
+                "na": not abstracts.get(wid),      # classified from the title only
+                "m": result.get("_model"), "h": result.get("_prompt"), "dt": TODAY,
             }
-            rec.pop("a", None)
             done += 1
     return done
 
@@ -1418,9 +1520,12 @@ def geocode_field(corpus, cfg, state):
         _geo_budget["left"] = None
 
 
-def wilson(k, n, z=1.96):
+def wilson(k, n, z=1.96, population=None):
+    """Wilson 95% interval, with a finite population correction when the sample is a sizeable share of the scope."""
     if n == 0:
         return (0.0, 0.0, 0.0)
+    if population and population > n:
+        z = z * math.sqrt((population - n) / (population - 1))
     p = k / n
     d = 1 + z * z / n
     c = (p + z * z / (2 * n)) / d
@@ -1446,7 +1551,7 @@ def field_stats(corpus, scopes, state, papers):
             res = {}
             for v in values:
                 k_ = sum(1 for r in on if v in getter(r))
-                p, lo, hi = wilson(k_, len(on))
+                p, lo, hi = wilson(k_, len(on), population=est_on if meta.get("mode") == "sample" else None)
                 res[v] = {"n": k_, "p": round(p, 4), "lo": round(lo, 4), "hi": round(hi, 4),
                           "est": round(k_ * scale)}
             return res
@@ -1624,7 +1729,35 @@ def write_run_log(row):
         log("   could not write to the Review log database (connect your integration to it): " + str(e)[:150])
 
 
+def export_dataset(corpus_path=None):
+    """Citable dataset: the classified field corpus as CSV (no abstracts), with a data dictionary."""
+    corpus = load_corpus()
+    if not corpus or DRY_RUN:
+        return
+    import csv
+    out = ROOT / "export"
+    out.mkdir(exist_ok=True)
+    cols = ["openalex_id", "doi", "title", "year", "cited_by", "scopes", "on_topic", "research_questions",
+            "ecosystems", "gases", "biome", "study_design", "sites", "geocoded_points", "title_only",
+            "model_version", "prompt_version", "classified_on"]
+    with (out / "field_corpus.csv").open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(cols)
+        for wid, r in sorted(corpus.items()):
+            k = r.get("k") or {}
+            w.writerow([wid, r.get("d") or "", r.get("t", ""), r.get("y") or "", r.get("c", ""), "|".join(r["s"]),
+                        "" if not k else int(k["o"]), "|".join(k.get("q", [])), "|".join(k.get("e", [])),
+                        "|".join(k.get("g", [])), k.get("b", ""), k.get("z") or "",
+                        "|".join(", ".join(x for x in (s.get("name"), s.get("region"), s.get("country")) if x)
+                                 for s in k.get("l", [])),
+                        "|".join(f"{p[0]},{p[1]}" for p in k.get("p", [])), int(k["na"]) if k else "",
+                        k.get("m", ""), k.get("h", ""), k.get("dt", "")])
+
+
 def write_dashboard(data):
+    if not DRY_RUN:
+        DATA_DIR.mkdir(exist_ok=True)
+        (DATA_DIR / "dashboard.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     template = (ROOT / "graph_template.html").read_text(encoding="utf-8")
     html = template.replace("/*__GRAPH_DATA__*/null", json.dumps(data, ensure_ascii=False))
     out = ROOT / "docs" / "index.html"
@@ -1642,6 +1775,8 @@ def main():
     if not OPENALEX_KEY:
         log("Warning: OPENALEX_API_KEY is not set, OpenAlex will only allow a tiny daily quota.")
     state = load_state()
+    global PREDICTIONS
+    PREDICTIONS = state.setdefault("predictions", {})
 
     log("Loading library from Notion")
     papers = load_library()
@@ -1694,7 +1829,9 @@ def main():
         "milestones": find_milestones(papers, top),
         "prisma": prisma,
         "saturation": saturation_series(existing or {}),
-        "preferences": {**model, "features": FEATURES},
+        "preferences": {**model, "features": FEATURES, "prospective": prospective_eval(existing or {}, state)},
+        "validation": json.loads((DATA_DIR / "validation.json").read_text(encoding="utf-8"))
+                      if (DATA_DIR / "validation.json").exists() else {},
         "runs": state.get("runs", [])[-60:],
         "options": {"rqs": RESEARCH_QUESTIONS, "ecosystems": ECOSYSTEMS, "gases": GASES,
                     "biomes": BIOMES, "categories": CATEGORIES, "designs": STUDY_DESIGNS},
@@ -1711,7 +1848,9 @@ def main():
     }
     state.setdefault("runs", []).append(run)
     data["runs"] = state["runs"][-60:]
+    state.setdefault("prompts", {}).update(_PROMPTS_SEEN)   # every prompt version ever used, archived
     write_dashboard(data)
+    export_dataset()
     write_run_log(run)
     save_state(state)
     log("Done.")

@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "lit-pipeline: a living, question-driven literature review and systematic mapping pipeline"
+version: 0.1.0
+date-released: 2026-10-02
+license: MIT
+authors:
+  - family-names: "[Your last name]"
+    given-names: "Pierre"
+    affiliation: "Université du Québec à Montréal"
+repository-code: "https://github.com/[your-username]/lit-pipeline"

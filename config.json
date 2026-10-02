@@ -1,0 +1,24 @@
+{
+  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list.",
+  "notion": {
+    "library_data_source": "87a4954a-4928-8345-b3a8-87caeb0b2c4a",
+    "suggestions_data_source": "444be872-ca23-4e7e-8d93-665568721b36",
+    "review_log_data_source": "4e18753f-4ddc-4caa-911c-04eacc6a4d90",
+    "validation_data_source": "89c1a1e0-42c5-4229-8428-d092a6ef5533"
+  },
+  "ai": {
+    "temperature": 0,
+    "pinned_model": null,
+    "fallback_models": ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-flash-latest"],
+    "log_raw_outputs": true
+  },
+  "categories": ["Fluxes & microclimate", "Vegetation & tree stems", "Soil & water microbes",
+                 "Hydrology & biogeochemistry", "Methods & instrumentation", "Nature-based solutions & policy"],
+  "research_questions": ["RQ1 Source/sink controls", "RQ2 Disturbed vs intact", "RQ3 Anthropogenic impact",
+                         "RQ4 Soil vs water C sources", "RQ5 Microbial taxonomy & function"],
+  "ecosystems": ["Forested swamp", "Peatland / bog / fen", "Marsh", "Upland forest", "Other wetland", "Other"],
+  "gases": ["CO2", "CH4", "N2O"],
+  "biomes": ["Boreal", "Temperate", "Subtropical", "Tropical", "Arctic / tundra", "Multiple / global", "Not stated"],
+  "study_designs": ["Field observation", "Field experiment", "Lab / incubation", "Modelling", "Review",
+                    "Meta-analysis / synthesis", "Methods"]
+}

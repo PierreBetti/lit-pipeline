@@ -1,0 +1,18 @@
+{
+  "_help": "Copy this file to benchmarks/<short-name>.json (no leading underscore) and fill it in. gold_dois = the DOIs of ALL studies included in a published systematic review or map (often in its supplementary material; Zotero can export DOIs). The benchmark seeds the discovery algorithm with a few of them and measures how many of the rest it recovers, round after round, compared with plain citation chasing. Optionally record what other tools found with the same seeds under comparators.",
+  "name": "Short name, e.g. Wetland CH4 synthesis 2021",
+  "source": "Full citation of the systematic review used as ground truth",
+  "seeds": 5,
+  "repeats": 3,
+  "rounds": 3,
+  "screen_per_round": 50,
+  "gold_dois": [
+    "10.xxxx/first-included-study",
+    "10.xxxx/second-included-study"
+  ],
+  "comparators": {
+    "Connected Papers": {"gold_found": null, "screened": null, "note": "same seeds, top N of the graph"},
+    "ResearchRabbit": {"gold_found": null, "screened": null, "note": ""},
+    "Litmaps": {"gold_found": null, "screened": null, "note": ""}
+  }
+}

@@ -123,6 +123,7 @@ def prompt_hash(system, tool):
 
 
 _PROMPTS_SEEN = {}
+AI_LOG_FILE = "ai_log.jsonl"          # validate.py writes to its own file so the two workflows never collide
 
 
 def log_ai_call(kind, label, model_version, phash, result):
@@ -130,7 +131,7 @@ def log_ai_call(kind, label, model_version, phash, result):
     if DRY_RUN or not AI_CFG.get("log_raw_outputs", True):
         return
     DATA_DIR.mkdir(exist_ok=True)
-    with (DATA_DIR / "ai_log.jsonl").open("a", encoding="utf-8") as f:
+    with (DATA_DIR / AI_LOG_FILE).open("a", encoding="utf-8") as f:
         f.write(json.dumps({"date": TODAY, "kind": kind, "item": label, "model": model_version,
                             "prompt": phash, "output": result}, ensure_ascii=False) + "\n")
 

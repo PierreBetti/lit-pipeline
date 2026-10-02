@@ -26,6 +26,8 @@ from pathlib import Path
 
 import pipeline as P
 
+P.AI_LOG_FILE = "ai_log_validation.jsonl"
+
 ROOT = Path(__file__).resolve().parent
 RESULTS = P.DATA_DIR / "validation.json"
 SAMPLE_FILE = P.DATA_DIR / "validation_sample.json"
@@ -294,7 +296,8 @@ def save(results):
     P.DATA_DIR.mkdir(exist_ok=True)
     current = json.loads(RESULTS.read_text(encoding="utf-8")) if RESULTS.exists() else {}
     current.update(results)
-    current["updated"] = P.TODAY
+    if results:
+        current["updated"] = P.TODAY
     RESULTS.write_text(json.dumps(current, ensure_ascii=False, indent=1), encoding="utf-8")
     dash = P.DATA_DIR / "dashboard.json"
     if dash.exists():   # refresh the dashboard's Validation tab right away
@@ -306,6 +309,9 @@ def save(results):
 
 def main():
     task = sys.argv[1] if len(sys.argv) > 1 else "all"
+    if task == "render":          # re-draw the dashboard with the saved results (used by the workflow)
+        save({})
+        return
     if task == "sample":
         task_sample()
         return

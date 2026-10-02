@@ -1,0 +1,2 @@
+date,library,candidates_evaluated,unique_candidates,suggested_to_date,new_suggestions,new_relevant,pending,retained,excluded,decisions,triaged,extracted,retractions,model
+2026-10-02,12,24839,24839,62,2,0,62,0,0,0,20,12,0,gemini-flash-lite-latest

@@ -3,189 +3,454 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Literature map</title>
+<title>Literature review dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #e8ece6;          /* pale sedge */
-    --panel: #f5f7f3;
-    --ink: #23302a;         /* peat */
-    --muted: #5d6b63;
-    --line: #c9d1c8;
-    --edge: rgba(52, 70, 60, 0.28);
-    --focus: #2e6f8e;
+    --bg: #e8ece6; --panel: #f5f7f3; --ink: #23302a; --muted: #5d6b63; --line: #c9d1c8;
+    --edge: rgba(52, 70, 60, 0.28); --focus: #2e6f8e; --gap: #b5652b; --heat: 46, 111, 142;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1b2320;
-      --panel: #232d29;
-      --ink: #dfe7e1;
-      --muted: #9fb0a6;
-      --line: #36433d;
-      --edge: rgba(200, 216, 206, 0.22);
-      --focus: #7fb6d1;
-    }
+    :root { --bg: #1b2320; --panel: #232d29; --ink: #dfe7e1; --muted: #9fb0a6; --line: #36433d;
+      --edge: rgba(200, 216, 206, 0.22); --focus: #7fb6d1; --gap: #e0955e; --heat: 127, 182, 209; }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
     font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  #map { position: fixed; inset: 0; }
+  body { display: flex; flex-direction: column; }
+  header { display: flex; align-items: baseline; gap: 18px; padding: 12px 16px 0; flex-wrap: wrap; }
+  h1 { font-family: Literata, Georgia, serif; font-weight: 600; font-size: 21px; margin: 0; }
+  .updated { color: var(--muted); font-size: 12.5px; }
+  nav { display: flex; gap: 2px; padding: 8px 12px 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  nav button { all: unset; cursor: pointer; padding: 8px 12px; border-radius: 6px 6px 0 0; color: var(--muted);
+    white-space: nowrap; border-bottom: 2px solid transparent; }
+  nav button[aria-selected=true] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+  nav button:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  main { flex: 1; position: relative; min-height: 0; }
+  .tab { position: absolute; inset: 0; display: none; overflow: auto; }
+  .tab.active { display: block; }
+  .pad { padding: 16px; max-width: 1100px; }
+  h2 { font-family: Literata, Georgia, serif; font-weight: 500; font-size: 17px; margin: 18px 0 6px; }
+  h2:first-child { margin-top: 0; }
+  p.lead { color: var(--muted); margin: 0 0 12px; max-width: 70ch; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .chip { all: unset; cursor: pointer; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+  .chip[aria-pressed=true] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 10px; }
+  .muted { color: var(--muted); }
+  table { border-collapse: collapse; }
+  .scroll { overflow-x: auto; }
 
-  .panel { position: fixed; top: 16px; left: 16px; width: min(300px, calc(100vw - 32px));
-    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 16px 12px; }
-  h1 { font-family: Literata, Georgia, serif; font-weight: 600; font-size: 22px; line-height: 1.15; margin: 0 0 4px; }
-  .counts { color: var(--muted); margin: 0 0 12px; }
-  input[type=search] { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--line);
+  /* citation map */
+  #graph { position: absolute; inset: 0; }
+  .overlay { position: absolute; top: 12px; left: 12px; width: min(290px, calc(100% - 24px));
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .overlay input { width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--line);
     background: var(--bg); color: var(--ink); font: inherit; }
-  input:focus-visible, button:focus-visible, label:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
-
-  .legend { list-style: none; padding: 0; margin: 12px 0 8px; display: grid; gap: 2px; }
-  .legend button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%;
-    padding: 3px 4px; border-radius: 4px; }
+  .legend { list-style: none; padding: 0; margin: 10px 0 6px; display: grid; gap: 1px; }
+  .legend button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; padding: 2px 4px; border-radius: 4px; }
   .legend button[aria-pressed=false] { opacity: 0.35; }
-  .legend button:hover { background: var(--bg); }
   .dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
-  .dot.suggested { border: 1.5px dashed var(--muted); background: transparent; }
+  .dot.suggested { border: 1.5px dashed var(--muted); }
   .n { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .hint { color: var(--muted); font-size: 12.5px; margin: 6px 0 0; }
-
-  .detail { position: fixed; top: 16px; right: 16px; width: min(340px, calc(100vw - 32px));
-    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: none; }
+  .hint { color: var(--muted); font-size: 12.5px; margin: 4px 0 0; }
+  .detail { position: absolute; top: 12px; right: 12px; width: min(340px, calc(100% - 24px));
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: none; z-index: 500; }
   .detail.open { display: block; }
-  .detail h2 { font-family: Literata, Georgia, serif; font-weight: 500; font-size: 17px; line-height: 1.3; margin: 0 0 8px; }
+  .detail h3 { font-family: Literata, Georgia, serif; font-weight: 500; font-size: 16px; line-height: 1.3; margin: 0 0 8px; }
   .detail p { margin: 0 0 8px; }
-  .detail .meta { color: var(--muted); }
-  .detail a { color: var(--focus); }
+  .detail a, .card a { color: var(--focus); }
   .close { all: unset; cursor: pointer; float: right; color: var(--muted); padding: 0 2px; font-size: 18px; line-height: 1; }
 
-  .empty { position: fixed; inset: 0; display: grid; place-items: center; color: var(--muted); padding: 24px; text-align: center; }
-  @media (max-width: 640px) { .detail { top: auto; bottom: 16px; } }
+  /* sites */
+  #sitesmap { position: absolute; inset: 0; }
+  .leaflet-popup-content { font: 13px/1.4 system-ui, sans-serif; }
+
+  /* gaps */
+  .heat td, .heat th { border: 1px solid var(--line); padding: 6px 8px; text-align: center; min-width: 74px; }
+  .heat th { font-weight: 600; font-size: 12.5px; background: var(--panel); }
+  .heat th.row { text-align: left; }
+  .heat td { cursor: pointer; font-variant-numeric: tabular-nums; }
+  .heat td.zero { color: var(--gap); font-weight: 600; background: repeating-linear-gradient(45deg, transparent 0 5px, rgba(181,101,43,.08) 5px 10px); }
+  .papers-list { margin: 10px 0 0; padding-left: 18px; }
+
+  /* timeline */
+  .chartbox { position: relative; height: 320px; }
+  .milestones { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--line); }
+  .milestones li { position: relative; padding: 0 0 14px 16px; }
+  .milestones li::before { content: ""; position: absolute; left: -6px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+  .milestones li.external::before { background: var(--bg); border: 2px dashed var(--muted); width: 6px; height: 6px; }
+  .milestones .yr { font-variant-numeric: tabular-nums; font-weight: 600; margin-right: 6px; }
+  .tag { font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 4px; }
+  .cov td, .cov th { padding: 4px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+  .cov th:first-child, .cov td:first-child { text-align: left; }
+
+  /* screening */
+  .prisma { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; max-width: 760px; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .box b { font-size: 20px; font-variant-numeric: tabular-nums; display: block; }
+  .box.side { border-style: dashed; }
+  .stage { grid-column: 1 / -1; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .arrow { grid-column: 1 / 2; text-align: center; color: var(--muted); line-height: 1; }
+  .bar { height: 8px; background: rgba(var(--heat), .85); border-radius: 4px; }
+  .alert { border-left: 4px solid var(--gap); }
+  .runs td, .runs th { padding: 4px 8px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+  .runs th:first-child, .runs td:first-child { text-align: left; }
+  @media (max-width: 640px) { .prisma { grid-template-columns: 1fr; } .detail { top: auto; bottom: 12px; } }
 </style>
 </head>
 <body>
-<div id="map" role="img" aria-label="Citation map of the papers in your library"></div>
+<header>
+  <h1>Literature review</h1>
+  <span class="updated" id="updated"></span>
+</header>
+<nav role="tablist" aria-label="Dashboard sections">
+  <button role="tab" aria-selected="true" data-tab="t-map">Citation map</button>
+  <button role="tab" aria-selected="false" data-tab="t-sites">Study sites</button>
+  <button role="tab" aria-selected="false" data-tab="t-gaps">Evidence gaps</button>
+  <button role="tab" aria-selected="false" data-tab="t-time">Timeline</button>
+  <button role="tab" aria-selected="false" data-tab="t-screen">Screening</button>
+</nav>
+<main>
+  <section class="tab active" id="t-map" role="tabpanel">
+    <div id="graph" role="img" aria-label="Citation map of your library and suggested papers"></div>
+    <div class="overlay">
+      <input type="search" id="search" placeholder="Find a paper or author" aria-label="Find a paper or author">
+      <ul class="legend" id="legend"></ul>
+      <p class="hint">Bigger dot means more citations; a ring means you have read it. Arrows point to the cited paper, dashed lines join similar papers.</p>
+    </div>
+    <aside class="detail" id="detail" aria-live="polite"></aside>
+  </section>
 
-<section class="panel" aria-label="Map controls">
-  <h1>Literature map</h1>
-  <p class="counts" id="counts"></p>
-  <input type="search" id="search" placeholder="Find a paper or author" aria-label="Find a paper or author">
-  <ul class="legend" id="legend"></ul>
-  <p class="hint">Bigger dot means more citations. A ring means you have read it. Arrows point to the paper being cited; dashed lines join similar papers. Click a dot for details.</p>
-</section>
+  <section class="tab" id="t-sites" role="tabpanel">
+    <div id="sitesmap" role="img" aria-label="Map of study sites"></div>
+    <div class="overlay" style="z-index:500">
+      <strong>Where the evidence comes from</strong>
+      <p class="hint" id="sites-summary"></p>
+      <ul class="legend" id="sites-legend"></ul>
+      <p class="hint">Solid dot: exact site. Hollow: located at region level. Faint: country only. Sites are extracted by AI from abstracts and geocoded automatically, so check them before using the map in a figure.</p>
+    </div>
+  </section>
 
-<aside class="detail" id="detail" aria-live="polite"></aside>
+  <section class="tab" id="t-gaps" role="tabpanel"><div class="pad">
+    <h2>Evidence gap map</h2>
+    <p class="lead">How many papers in your library address each research question in each ecosystem. Hatched cells are gaps. Click a cell to see the papers.</p>
+    <div class="chips" id="gas-filter" role="group" aria-label="Filter by gas"></div>
+    <div class="scroll"><table class="heat" id="heat-rq"></table></div>
+    <div id="cell-papers"></div>
+    <h2>Study design by biome</h2>
+    <p class="lead">What kind of evidence you have, and where.</p>
+    <div class="scroll"><table class="heat" id="heat-design"></table></div>
+  </div></section>
+
+  <section class="tab" id="t-time" role="tabpanel"><div class="pad">
+    <h2>Your library against the field</h2>
+    <p class="lead" id="time-lead"></p>
+    <div class="card"><div class="chartbox"><canvas id="timechart" aria-label="Papers per year"></canvas></div></div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <h2>Milestones</h2>
+        <p class="lead">Landmark papers: highly cited, or cited by several of your papers. Notes are drafted by AI from abstracts: verify before quoting.</p>
+        <ul class="milestones" id="milestones"></ul>
+      </div>
+      <div class="card">
+        <h2>Coverage check</h2>
+        <p class="lead">Share of the field's papers vs. share of your library, per period. A period where your share is much lower than the field's may be underrepresented in your reading.</p>
+        <table class="cov" id="coverage"></table>
+      </div>
+    </div>
+  </div></section>
+
+  <section class="tab" id="t-screen" role="tabpanel"><div class="pad">
+    <div id="alerts"></div>
+    <h2>Screening flow</h2>
+    <p class="lead">PRISMA 2020-style flow of everything the pipeline has surfaced since it started logging.</p>
+    <div class="prisma" id="prisma"></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card">
+        <h2>Saturation curve</h2>
+        <p class="lead">Cumulative suggestions vs. relevant ones (AI relevance 4 or 5). When the relevant curve flattens while suggestions keep coming, your search is approaching saturation.</p>
+        <div class="chartbox" style="height:240px"><canvas id="satchart" aria-label="Saturation curve"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>What your decisions say you value</h2>
+        <div id="prefs"></div>
+      </div>
+    </div>
+    <h2>Recent runs</h2>
+    <div class="scroll"><table class="runs" id="runs"></table></div>
+  </div></section>
+</main>
 
 <script>
-const DATA = {"generated": "2026-10-02", "nodes": [{"id": "W3157926142", "label": "Knox et al., 2021", "title": "Identifying dominant environmental predictors of freshwater wetland methane fluxes across diurnal to seasonal time scales", "year": 2021, "citations": 181, "percentile": 99.5, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1111/gcb.15661", "notion": "https://app.notion.com/p/Knox-et-al-2021-3ec4954a4928817fad88c0f7d0db5dfb", "kind": "library"}, {"id": "W2102797593", "label": "Turetsky et al., 2014", "title": "A synthesis of methane emissions from 71 northern, temperate, and subtropical wetlands", "year": 2014, "citations": 605, "percentile": 99.9, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1111/gcb.12580", "notion": "https://app.notion.com/p/Turetsky-et-al-2014-3ec4954a492881ce91b1c2ab80515ef2", "kind": "library"}, {"id": "W4405433894", "label": "Zhao et al., 2025", "title": "Predicting CO2 and CH4 fluxes and their seasonal variations in a subarctic wetland under two shared socioeconomic pathway climate scenarios", "year": 2025, "citations": 3, "percentile": 76.6, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1016/j.agrformet.2024.110359", "notion": "https://app.notion.com/p/Zhao-et-al-2025-3eb4954a492881958245d461953a6d34", "kind": "library"}, {"id": "W2127406525", "label": "Grant et al., 2012", "title": "Modelling contrasting responses of wetland productivity to changes in water table depth", "year": 2012, "citations": 45, "percentile": 94.8, "category": "Hydrology & biogeochemistry", "read": false, "doi": "https://doi.org/10.5194/bg-9-4215-2012", "notion": "https://app.notion.com/p/Grant-et-al-2012-3eb4954a492881c59e23cf843686f116", "kind": "library"}, {"id": "W3044067219", "label": "Domeignoz-Horta et al., 2020", "title": "Microbial diversity drives carbon use efficiency in a model soil", "year": 2020, "citations": 610, "percentile": 99.9, "category": "Soil & water microbes", "read": false, "doi": "https://doi.org/10.1038/s41467-020-17502-z", "notion": "https://app.notion.com/p/Domeignoz-Horta-et-al-2020-3eb4954a492881028f48e67c45b54f24", "kind": "library"}, {"id": "W4400949455", "label": "Gauci et al., 2024", "title": "Global atmospheric methane uptake by upland tree woody surfaces", "year": 2024, "citations": 96, "percentile": 99.7, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1038/s41586-024-07592-w", "notion": "https://app.notion.com/p/Gauci-et-al-2024-3eb4954a492881c98964f63be4933d52", "kind": "library"}, {"id": "W2117108522", "label": "Siegenthaler et al., 2016", "title": "Technical Note: Semi-rigid chambers for methane gas flux measurements on tree stems", "year": 2016, "citations": 40, "percentile": 85.4, "category": "Vegetation & tree stems", "read": false, "doi": "https://doi.org/10.5194/bg-13-1197-2016", "notion": "https://app.notion.com/p/Siegenthaler-et-al-2016-3eb4954a49288130b15bde61a2b12cbe", "kind": "library"}, {"id": "W7163060485", "label": "Borton et al., 2026", "title": "Mapping the soil microbiome functions shaping wetland methane emissions", "year": 2026, "citations": 0, "percentile": 41.2, "category": "Soil & water microbes", "read": false, "doi": "https://doi.org/10.1128/msystems.00680-25", "notion": "https://app.notion.com/p/Borton-et-al-2026-3eb4954a492881f9a347feb1137bde54", "kind": "library"}, {"id": "W4416791020", "label": "Schmidt et al., 2025", "title": "Quantifying Carbon Pools and Fluxes in Southern Ontario Temperate Swamps", "year": 2025, "citations": 0, "percentile": 26.7, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.19189/001c.151276", "notion": "https://app.notion.com/p/Schmidt-et-al-2025-3eb4954a49288102bdaad94ee69edf19", "kind": "library"}, {"id": "W4396921939", "label": "Davidson et al., 2024", "title": "Carbon Stocks and Fluxes From a Boreal Conifer Swamp: Filling a Knowledge Gap for Understanding the Boreal C Cycle", "year": 2024, "citations": 5, "percentile": 81.1, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1029/2024jg008005", "notion": "https://app.notion.com/p/Davidson-et-al-2024-3eb4954a492881d1b897c1fb4d1bd018", "kind": "library"}, {"id": "W4226532763", "label": "Davidson et al., 2022", "title": "The unrecognized importance of carbon stocks and fluxes from swamps in Canada and the USA", "year": 2022, "citations": 30, "percentile": 93.5, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1088/1748-9326/ac63d5", "notion": "https://app.notion.com/p/Davidson-et-al-2022-3eb4954a492881caa365d4f130cac843", "kind": "library"}, {"id": "W2979924676", "label": "Davidson et al., 2019", "title": "Controls on soil carbon dioxide and methane fluxes from a peat swamp vary by hydrogeomorphic setting", "year": 2019, "citations": 20, "percentile": 82.5, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1002/eco.2162", "notion": "https://app.notion.com/p/Davidson-et-al-2019-3eb4954a49288175b7c1ee612a30493c", "kind": "library"}, {"id": "W2905026433", "label": "Covey et al., 2018", "title": "Methane production and emissions in trees and forests", "year": 2018, "citations": 269, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.15624", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Davidson et al., 2022). Cites 2 of your papers (Siegenthaler et al., 2016; Turetsky et al., 2014). Most similar to Siegenthaler et al., 2016 and Turetsky et al., 2014. Shares 16 references with your library.", "roles": ["Derivative work", "Similar work"], "similarity": 100, "relevance": 4, "global": 83}, {"id": "W2131640036", "label": "Pangala et al., 2015", "title": "The contribution of trees to ecosystem methane emissions in a temperate forested wetland", "year": 2015, "citations": 150, "percentile": 97.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.12891", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Davidson et al., 2022; Gauci et al., 2024). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 14 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 91, "relevance": 5, "global": 82}, {"id": "W2155847183", "label": "Pangala et al., 2012", "title": "Trees are major conduits for methane egress from tropical forested wetlands", "year": 2012, "citations": 243, "percentile": 96.1, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.12031", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Davidson et al., 2022; Gauci et al., 2024; Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 6 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 98, "relevance": 4, "global": 78}, {"id": "W2773800068", "label": "Pangala et al., 2017", "title": "Large emissions from floodplain trees close the Amazon methane budget", "year": 2017, "citations": 341, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1038/nature24639", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Gauci et al., 2024). Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 5 references with your library.", "roles": ["Similar work"], "similarity": 91, "relevance": 4, "global": 76}, {"id": "W2972407136", "label": "Saunois et al., 2019", "title": "The Global Methane Budget 2000-2017", "year": 2019, "citations": 2779, "percentile": 100.0, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-12-1561-2020", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Gauci et al., 2024; Knox et al., 2021; Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 24 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 87, "relevance": 3, "global": 75}, {"id": "W4200274615", "label": "Gauci et al., 2021", "title": "Non-flooded riparian Amazon trees are a regionally significant methane source", "year": 2021, "citations": 46, "percentile": 91.4, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1098/rsta.2020.0446", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Gauci et al., 2024). Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Gauci et al., 2024 and Siegenthaler et al., 2016. Shares 14 references with your library.", "roles": ["Similar work"], "similarity": 83, "relevance": 4, "global": 75}, {"id": "W2156872309", "label": "Bridgham et al., 2012", "title": "Methane emissions from wetlands: biogeochemical, microbial, and modeling perspectives from local to global scales", "year": 2012, "citations": 1286, "percentile": 99.8, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.12131", "notion": null, "kind": "suggested", "why": "Cited by 4 of your papers (Borton et al., 2026; Davidson et al., 2019; Knox et al., 2021; Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 28 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 91, "relevance": 3, "global": 73}, {"id": "W2956252856", "label": "Knox et al., 2019", "title": "FLUXNET-CH4 Synthesis Activity: Objectives, Observations, and Future Directions", "year": 2019, "citations": 279, "percentile": 99.6, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1175/bams-d-18-0268.1", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Knox et al., 2021; Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 50 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 80, "relevance": 3, "global": 70}, {"id": "W2900315497", "label": "Barba et al., 2018", "title": "Methane emissions from tree stems: a new frontier in the global carbon cycle", "year": 2018, "citations": 194, "percentile": 98.5, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.15582", "notion": null, "kind": "suggested", "why": "Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 15 references with your library.", "roles": ["Similar work"], "similarity": 75, "relevance": 4, "global": 69}, {"id": "W3125357239", "label": "Delwiche et al., 2021", "title": "FLUXNET-CH 4 : a global, multi-ecosystem dataset and analysis of methane seasonality from freshwater wetlands", "year": 2021, "citations": 213, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-13-3607-2021", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Borton et al., 2026). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 56 references with your library.", "roles": ["Similar work"], "similarity": 79, "relevance": 3, "global": 68}, {"id": "W2785174985", "label": "Pitz et al., 2018", "title": "Methane fluxes from tree stems and soils along a habitat gradient", "year": 2018, "citations": 88, "percentile": 95.7, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1007/s10533-017-0400-3", "notion": null, "kind": "suggested", "why": "Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 17 references with your library.", "roles": ["Similar work"], "similarity": 71, "relevance": 4, "global": 68}, {"id": "W2767350041", "label": "Angle et al., 2017", "title": "Methanogenesis in oxygenated soils is a substantial fraction of wetland methane emissions", "year": 2017, "citations": 316, "percentile": 99.7, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1038/s41467-017-01753-4", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Borton et al., 2026; Knox et al., 2021). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 4 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 58, "relevance": 4, "global": 67}, {"id": "W3165084586", "label": "Kuhn et al., 2021", "title": "BAWLD-CH 4 : a comprehensive dataset of methane fluxes from boreal and arctic ecosystems", "year": 2021, "citations": 138, "percentile": 98.4, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-13-5151-2021", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Davidson et al., 2022). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 21 references with your library.", "roles": ["Similar work"], "similarity": 73, "relevance": 3, "global": 66}, {"id": "W2427928079", "label": "Saunois et al., 2016", "title": "The global methane budget 2000–2012", "year": 2016, "citations": 1124, "percentile": 100.0, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-8-697-2016", "notion": null, "kind": "suggested", "why": "Cites 3 of your papers (Gauci et al., 2024; Knox et al., 2021; Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Gauci et al., 2024. Shares 42 references with your library.", "roles": ["Derivative work", "Similar work"], "similarity": 71, "relevance": 3, "global": 66}, {"id": "W2789910841", "label": "Treat et al., 2018", "title": "Nongrowing season methane emissions–a significant component of annual emissions across northern ecosystems", "year": 2018, "citations": 193, "percentile": 98.7, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.14137", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Knox et al., 2021; Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 21 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 57, "relevance": 3, "global": 63}, {"id": "W2520021624", "label": "Abdalla et al., 2016", "title": "Emissions of methane from northern peatlands: a review of management impacts and implications for future management options", "year": 2016, "citations": 231, "percentile": 98.2, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1002/ece3.2469", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Davidson et al., 2022). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Davidson et al., 2019. Shares 47 references with your library.", "roles": ["Similar work"], "similarity": 71, "relevance": 3, "global": 63}, {"id": "W2918145442", "label": "Peltola et al., 2019", "title": "Monthly gridded data product of northern wetland methane emissions based on upscaling eddy covariance observations", "year": 2019, "citations": 167, "percentile": 98.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-11-1263-2019", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Knox et al., 2021). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 35 references with your library.", "roles": ["Similar work"], "similarity": 61, "relevance": 3, "global": 61}, {"id": "W2155211093", "label": "Olefeldt et al., 2012", "title": "Environmental and physical controls on northern terrestrial methane emissions across permafrost zones", "year": 2012, "citations": 388, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.12071", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Knox et al., 2021; Turetsky et al., 2014; Zhao et al., 2025). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 19 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 53, "relevance": 3, "global": 58}, {"id": "W2790444922", "label": "Dean et al., 2018", "title": "Methane Feedbacks to the Global Climate System in a Warmer World", "year": 2018, "citations": 673, "percentile": 99.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1002/2017rg000559", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 37 references with your library.", "roles": ["Similar work"], "similarity": 52, "relevance": null, "global": 55}, {"id": "W3026801075", "label": "Bansal et al., 2020", "title": "Vegetation Affects Timing and Location of Wetland Methane Emissions", "year": 2020, "citations": 66, "percentile": 94.8, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1029/2020jg005777", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Knox et al., 2021). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 20 references with your library.", "roles": ["Similar work"], "similarity": 52, "relevance": null, "global": 55}, {"id": "W2152976421", "label": "Loisel et al., 2014", "title": "A database and synthesis of northern peatland soil properties and Holocene carbon and nitrogen accumulation", "year": 2014, "citations": 607, "percentile": 99.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1177/0959683614538073", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Davidson et al., 2022; Davidson et al., 2024). Most similar to Davidson et al., 2019 and Davidson et al., 2022. Shares 8 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 59, "relevance": null, "global": 55}, {"id": "W2093051994", "label": "Moore et al., 1989", "title": "THE INFLUENCE OF WATER TABLE LEVELS ON METHANE AND CARBON DIOXIDE EMISSIONS FROM PEATLAND SOILS", "year": 1989, "citations": 477, "percentile": 98.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.4141/cjss89-004", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Davidson et al., 2019; Davidson et al., 2022; Knox et al., 2021). Most similar to Davidson et al., 2019 and Turetsky et al., 2014.", "roles": ["Prior work", "Similar work"], "similarity": 54, "relevance": null, "global": 55}, {"id": "W2599349901", "label": "Pitz et al., 2017", "title": "Temperate forest methane sink diminished by tree emissions", "year": 2017, "citations": 124, "percentile": 97.2, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.14559", "notion": null, "kind": "suggested", "why": "Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 9 references with your library.", "roles": ["Similar work"], "similarity": 71, "relevance": null, "global": 54}, {"id": "W2323435089", "label": "Sturtevant et al., 2015", "title": "Identifying scale‐emergent, nonlinear, asynchronous processes of wetland methane exchange", "year": 2015, "citations": 152, "percentile": 98.5, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1002/2015jg003054", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Knox et al., 2021). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 20 references with your library.", "roles": ["Similar work"], "similarity": 52, "relevance": null, "global": 53}, {"id": "W3156004002", "label": "Chang et al., 2021", "title": "Substantial hysteresis in emergent temperature sensitivity of global wetland CH4 emissions", "year": 2021, "citations": 107, "percentile": 97.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1038/s41467-021-22452-1", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Knox et al., 2021). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 21 references with your library.", "roles": ["Similar work"], "similarity": 50, "relevance": null, "global": 53}], "edges": [{"from": "W3157926142", "to": "W2102797593", "kind": "cites"}, {"from": "W4400949455", "to": "W2117108522", "kind": "cites"}, {"from": "W4396921939", "to": "W2102797593", "kind": "cites"}, {"from": "W4226532763", "to": "W2979924676", "kind": "cites"}, {"from": "W2979924676", "to": "W2102797593", "kind": "cites"}, {"from": "W4226532763", "to": "W2905026433", "kind": "cites"}, {"from": "W2905026433", "to": "W2102797593", "kind": "cites"}, {"from": "W2905026433", "to": "W2117108522", "kind": "cites"}, {"from": "W2905026433", "to": "W2117108522", "kind": "similar"}, {"from": "W2905026433", "to": "W2102797593", "kind": "similar"}, {"from": "W4226532763", "to": "W2131640036", "kind": "cites"}, {"from": "W4400949455", "to": "W2131640036", "kind": "cites"}, {"from": "W2131640036", "to": "W2117108522", "kind": "similar"}, {"from": "W2131640036", "to": "W4400949455", "kind": "similar"}, {"from": "W2117108522", "to": "W2155847183", "kind": "cites"}, {"from": "W4226532763", "to": "W2155847183", "kind": "cites"}, {"from": "W4400949455", "to": "W2155847183", "kind": "cites"}, {"from": "W2155847183", "to": "W2117108522", "kind": "similar"}, {"from": "W2155847183", "to": "W4400949455", "kind": "similar"}, {"from": "W4400949455", "to": "W2773800068", "kind": "cites"}, {"from": "W2773800068", "to": "W2117108522", "kind": "cites"}, {"from": "W2773800068", "to": "W2117108522", "kind": "similar"}, {"from": "W2773800068", "to": "W4400949455", "kind": "similar"}, {"from": "W3157926142", "to": "W2972407136", "kind": "cites"}, {"from": "W4405433894", "to": "W2972407136", "kind": "cites"}, {"from": "W4400949455", "to": "W2972407136", "kind": "cites"}, {"from": "W2972407136", "to": "W2102797593", "kind": "cites"}, {"from": "W2972407136", "to": "W3157926142", "kind": "similar"}, {"from": "W2972407136", "to": "W2102797593", "kind": "similar"}, {"from": "W4400949455", "to": "W4200274615", "kind": "cites"}, {"from": "W4200274615", "to": "W2117108522", "kind": "cites"}, {"from": "W4200274615", "to": "W4400949455", "kind": "similar"}, {"from": "W4200274615", "to": "W2117108522", "kind": "similar"}, {"from": "W2102797593", "to": "W2156872309", "kind": "cites"}, {"from": "W2979924676", "to": "W2156872309", "kind": "cites"}, {"from": "W7163060485", "to": "W2156872309", "kind": "cites"}, {"from": "W3157926142", "to": "W2156872309", "kind": "cites"}, {"from": "W2156872309", "to": "W2102797593", "kind": "similar"}, {"from": "W2156872309", "to": "W3157926142", "kind": "similar"}, {"from": "W3157926142", "to": "W2956252856", "kind": "cites"}, {"from": "W4405433894", "to": "W2956252856", "kind": "cites"}, {"from": "W2956252856", "to": "W2102797593", "kind": "cites"}, {"from": "W2956252856", "to": "W3157926142", "kind": "similar"}, {"from": "W2956252856", "to": "W2102797593", "kind": "similar"}, {"from": "W2900315497", "to": "W2117108522", "kind": "cites"}, {"from": "W2900315497", "to": "W2117108522", "kind": "similar"}, {"from": "W2900315497", "to": "W4400949455", "kind": "similar"}, {"from": "W7163060485", "to": "W3125357239", "kind": "cites"}, {"from": "W3125357239", "to": "W2102797593", "kind": "cites"}, {"from": "W3125357239", "to": "W3157926142", "kind": "similar"}, {"from": "W3125357239", "to": "W2102797593", "kind": "similar"}, {"from": "W2785174985", "to": "W2117108522", "kind": "cites"}, {"from": "W2785174985", "to": "W2117108522", "kind": "similar"}, {"from": "W2785174985", "to": "W4400949455", "kind": "similar"}, {"from": "W3157926142", "to": "W2767350041", "kind": "cites"}, {"from": "W7163060485", "to": "W2767350041", "kind": "cites"}, {"from": "W2767350041", "to": "W3157926142", "kind": "similar"}, {"from": "W2767350041", "to": "W2102797593", "kind": "similar"}, {"from": "W4226532763", "to": "W3165084586", "kind": "cites"}, {"from": "W3165084586", "to": "W2102797593", "kind": "cites"}, {"from": "W3165084586", "to": "W2102797593", "kind": "similar"}, {"from": "W3165084586", "to": "W3157926142", "kind": "similar"}, {"from": "W2427928079", "to": "W2102797593", "kind": "cites"}, {"from": "W2427928079", "to": "W3157926142", "kind": "cites"}, {"from": "W2427928079", "to": "W4400949455", "kind": "cites"}, {"from": "W2427928079", "to": "W2102797593", "kind": "similar"}, {"from": "W2427928079", "to": "W4400949455", "kind": "similar"}, {"from": "W3157926142", "to": "W2789910841", "kind": "cites"}, {"from": "W4405433894", "to": "W2789910841", "kind": "cites"}, {"from": "W2789910841", "to": "W2102797593", "kind": "cites"}, {"from": "W2789910841", "to": "W2102797593", "kind": "similar"}, {"from": "W2789910841", "to": "W3157926142", "kind": "similar"}, {"from": "W4226532763", "to": "W2520021624", "kind": "cites"}, {"from": "W2520021624", "to": "W2102797593", "kind": "cites"}, {"from": "W2520021624", "to": "W2102797593", "kind": "similar"}, {"from": "W2520021624", "to": "W2979924676", "kind": "similar"}, {"from": "W3157926142", "to": "W2918145442", "kind": "cites"}, {"from": "W2918145442", "to": "W2102797593", "kind": "cites"}, {"from": "W2918145442", "to": "W3157926142", "kind": "similar"}, {"from": "W2918145442", "to": "W2102797593", "kind": "similar"}, {"from": "W2102797593", "to": "W2155211093", "kind": "cites"}, {"from": "W4405433894", "to": "W2155211093", "kind": "cites"}, {"from": "W3157926142", "to": "W2155211093", "kind": "cites"}, {"from": "W2155211093", "to": "W2102797593", "kind": "similar"}, {"from": "W2155211093", "to": "W3157926142", "kind": "similar"}, {"from": "W4405433894", "to": "W2790444922", "kind": "cites"}, {"from": "W2790444922", "to": "W2102797593", "kind": "cites"}, {"from": "W2790444922", "to": "W2102797593", "kind": "similar"}, {"from": "W2790444922", "to": "W3157926142", "kind": "similar"}, {"from": "W3157926142", "to": "W3026801075", "kind": "cites"}, {"from": "W3026801075", "to": "W2102797593", "kind": "cites"}, {"from": "W3026801075", "to": "W3157926142", "kind": "similar"}, {"from": "W3026801075", "to": "W2102797593", "kind": "similar"}, {"from": "W4396921939", "to": "W2152976421", "kind": "cites"}, {"from": "W4226532763", "to": "W2152976421", "kind": "cites"}, {"from": "W2152976421", "to": "W2979924676", "kind": "similar"}, {"from": "W2152976421", "to": "W4226532763", "kind": "similar"}, {"from": "W3157926142", "to": "W2093051994", "kind": "cites"}, {"from": "W4226532763", "to": "W2093051994", "kind": "cites"}, {"from": "W2979924676", "to": "W2093051994", "kind": "cites"}, {"from": "W2093051994", "to": "W2979924676", "kind": "similar"}, {"from": "W2093051994", "to": "W2102797593", "kind": "similar"}, {"from": "W2599349901", "to": "W2117108522", "kind": "similar"}, {"from": "W2599349901", "to": "W4400949455", "kind": "similar"}, {"from": "W3157926142", "to": "W2323435089", "kind": "cites"}, {"from": "W2323435089", "to": "W2102797593", "kind": "cites"}, {"from": "W2323435089", "to": "W3157926142", "kind": "similar"}, {"from": "W2323435089", "to": "W2102797593", "kind": "similar"}, {"from": "W3157926142", "to": "W3156004002", "kind": "cites"}, {"from": "W3156004002", "to": "W3157926142", "kind": "similar"}, {"from": "W3156004002", "to": "W2102797593", "kind": "similar"}]};
+const DATA = {"generated": "2026-10-02", "graph": {"nodes": [{"id": "W3157926142", "label": "Knox et al., 2021", "title": "Identifying dominant environmental predictors of freshwater wetland methane fluxes across diurnal to seasonal time scales", "year": 2021, "citations": 181, "percentile": 99.5, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1111/gcb.15661", "notion": "https://app.notion.com/p/Knox-et-al-2021-3ec4954a4928817fad88c0f7d0db5dfb", "kind": "library"}, {"id": "W2102797593", "label": "Turetsky et al., 2014", "title": "A synthesis of methane emissions from 71 northern, temperate, and subtropical wetlands", "year": 2014, "citations": 605, "percentile": 99.9, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1111/gcb.12580", "notion": "https://app.notion.com/p/Turetsky-et-al-2014-3ec4954a492881ce91b1c2ab80515ef2", "kind": "library"}, {"id": "W4405433894", "label": "Zhao et al., 2025", "title": "Predicting CO2 and CH4 fluxes and their seasonal variations in a subarctic wetland under two shared socioeconomic pathway climate scenarios", "year": 2025, "citations": 3, "percentile": 76.6, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1016/j.agrformet.2024.110359", "notion": "https://app.notion.com/p/Zhao-et-al-2025-3eb4954a492881958245d461953a6d34", "kind": "library"}, {"id": "W2127406525", "label": "Grant et al., 2012", "title": "Modelling contrasting responses of wetland productivity to changes in water table depth", "year": 2012, "citations": 45, "percentile": 94.8, "category": "Hydrology & biogeochemistry", "read": false, "doi": "https://doi.org/10.5194/bg-9-4215-2012", "notion": "https://app.notion.com/p/Grant-et-al-2012-3eb4954a492881c59e23cf843686f116", "kind": "library"}, {"id": "W3044067219", "label": "Domeignoz-Horta et al., 2020", "title": "Microbial diversity drives carbon use efficiency in a model soil", "year": 2020, "citations": 610, "percentile": 99.9, "category": "Soil & water microbes", "read": false, "doi": "https://doi.org/10.1038/s41467-020-17502-z", "notion": "https://app.notion.com/p/Domeignoz-Horta-et-al-2020-3eb4954a492881028f48e67c45b54f24", "kind": "library"}, {"id": "W4400949455", "label": "Gauci et al., 2024", "title": "Global atmospheric methane uptake by upland tree woody surfaces", "year": 2024, "citations": 96, "percentile": 99.7, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1038/s41586-024-07592-w", "notion": "https://app.notion.com/p/Gauci-et-al-2024-3eb4954a492881c98964f63be4933d52", "kind": "library"}, {"id": "W2117108522", "label": "Siegenthaler et al., 2016", "title": "Technical Note: Semi-rigid chambers for methane gas flux measurements on tree stems", "year": 2016, "citations": 40, "percentile": 85.4, "category": "Vegetation & tree stems", "read": false, "doi": "https://doi.org/10.5194/bg-13-1197-2016", "notion": "https://app.notion.com/p/Siegenthaler-et-al-2016-3eb4954a49288130b15bde61a2b12cbe", "kind": "library"}, {"id": "W7163060485", "label": "Borton et al., 2026", "title": "Mapping the soil microbiome functions shaping wetland methane emissions", "year": 2026, "citations": 0, "percentile": 41.2, "category": "Soil & water microbes", "read": false, "doi": "https://doi.org/10.1128/msystems.00680-25", "notion": "https://app.notion.com/p/Borton-et-al-2026-3eb4954a492881f9a347feb1137bde54", "kind": "library"}, {"id": "W4416791020", "label": "Schmidt et al., 2025", "title": "Quantifying Carbon Pools and Fluxes in Southern Ontario Temperate Swamps", "year": 2025, "citations": 0, "percentile": 26.7, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.19189/001c.151276", "notion": "https://app.notion.com/p/Schmidt-et-al-2025-3eb4954a49288102bdaad94ee69edf19", "kind": "library"}, {"id": "W4396921939", "label": "Davidson et al., 2024", "title": "Carbon Stocks and Fluxes From a Boreal Conifer Swamp: Filling a Knowledge Gap for Understanding the Boreal C Cycle", "year": 2024, "citations": 5, "percentile": 81.3, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1029/2024jg008005", "notion": "https://app.notion.com/p/Davidson-et-al-2024-3eb4954a492881d1b897c1fb4d1bd018", "kind": "library"}, {"id": "W4226532763", "label": "Davidson et al., 2022", "title": "The unrecognized importance of carbon stocks and fluxes from swamps in Canada and the USA", "year": 2022, "citations": 30, "percentile": 93.5, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1088/1748-9326/ac63d5", "notion": "https://app.notion.com/p/Davidson-et-al-2022-3eb4954a492881caa365d4f130cac843", "kind": "library"}, {"id": "W2979924676", "label": "Davidson et al., 2019", "title": "Controls on soil carbon dioxide and methane fluxes from a peat swamp vary by hydrogeomorphic setting", "year": 2019, "citations": 20, "percentile": 82.5, "category": "Fluxes & microclimate", "read": false, "doi": "https://doi.org/10.1002/eco.2162", "notion": "https://app.notion.com/p/Davidson-et-al-2019-3eb4954a49288175b7c1ee612a30493c", "kind": "library"}, {"id": "W2905026433", "label": "Covey et al., 2018", "title": "Methane production and emissions in trees and forests", "year": 2018, "citations": 269, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.15624", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Davidson et al., 2022). Cites 2 of your papers (Siegenthaler et al., 2016; Turetsky et al., 2014). Most similar to Siegenthaler et al., 2016 and Turetsky et al., 2014. Shares 16 references with your library.", "roles": ["Derivative work", "Similar work"], "similarity": 100, "relevance": 4, "global": 83}, {"id": "W2131640036", "label": "Pangala et al., 2015", "title": "The contribution of trees to ecosystem methane emissions in a temperate forested wetland", "year": 2015, "citations": 150, "percentile": 97.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.12891", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Davidson et al., 2022; Gauci et al., 2024). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 14 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 91, "relevance": 5, "global": 82}, {"id": "W2155847183", "label": "Pangala et al., 2012", "title": "Trees are major conduits for methane egress from tropical forested wetlands", "year": 2012, "citations": 243, "percentile": 96.1, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.12031", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Davidson et al., 2022; Gauci et al., 2024; Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 6 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 98, "relevance": 4, "global": 78}, {"id": "W2773800068", "label": "Pangala et al., 2017", "title": "Large emissions from floodplain trees close the Amazon methane budget", "year": 2017, "citations": 341, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1038/nature24639", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Gauci et al., 2024). Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 5 references with your library.", "roles": ["Similar work"], "similarity": 91, "relevance": 4, "global": 76}, {"id": "W2972407136", "label": "Saunois et al., 2019", "title": "The Global Methane Budget 2000-2017", "year": 2019, "citations": 2779, "percentile": 100.0, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-12-1561-2020", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Gauci et al., 2024; Knox et al., 2021; Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 24 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 87, "relevance": 3, "global": 75}, {"id": "W4200274615", "label": "Gauci et al., 2021", "title": "Non-flooded riparian Amazon trees are a regionally significant methane source", "year": 2021, "citations": 46, "percentile": 91.4, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1098/rsta.2020.0446", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Gauci et al., 2024). Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Gauci et al., 2024 and Siegenthaler et al., 2016. Shares 14 references with your library.", "roles": ["Similar work"], "similarity": 83, "relevance": 4, "global": 75}, {"id": "W2156872309", "label": "Bridgham et al., 2012", "title": "Methane emissions from wetlands: biogeochemical, microbial, and modeling perspectives from local to global scales", "year": 2012, "citations": 1286, "percentile": 99.8, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.12131", "notion": null, "kind": "suggested", "why": "Cited by 4 of your papers (Borton et al., 2026; Davidson et al., 2019; Knox et al., 2021; Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 28 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 91, "relevance": 3, "global": 73}, {"id": "W2003875103", "label": "Gauci et al., 2010", "title": "Woody stem methane emission in mature wetland alder trees", "year": 2010, "citations": 122, "percentile": 93.8, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1016/j.atmosenv.2010.02.034", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Davidson et al., 2022; Gauci et al., 2024; Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 3 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 78, "relevance": 4, "global": 72}, {"id": "W2956252856", "label": "Knox et al., 2019", "title": "FLUXNET-CH4 Synthesis Activity: Objectives, Observations, and Future Directions", "year": 2019, "citations": 279, "percentile": 99.6, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1175/bams-d-18-0268.1", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Knox et al., 2021; Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 50 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 80, "relevance": 3, "global": 70}, {"id": "W2900315497", "label": "Barba et al., 2018", "title": "Methane emissions from tree stems: a new frontier in the global carbon cycle", "year": 2018, "citations": 194, "percentile": 98.5, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.15582", "notion": null, "kind": "suggested", "why": "Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 15 references with your library.", "roles": ["Similar work"], "similarity": 75, "relevance": 4, "global": 69}, {"id": "W3125357239", "label": "Delwiche et al., 2021", "title": "FLUXNET-CH 4 : a global, multi-ecosystem dataset and analysis of methane seasonality from freshwater wetlands", "year": 2021, "citations": 213, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-13-3607-2021", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Borton et al., 2026). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 56 references with your library.", "roles": ["Similar work"], "similarity": 79, "relevance": 3, "global": 68}, {"id": "W2785174985", "label": "Pitz et al., 2018", "title": "Methane fluxes from tree stems and soils along a habitat gradient", "year": 2018, "citations": 88, "percentile": 95.7, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1007/s10533-017-0400-3", "notion": null, "kind": "suggested", "why": "Cites 1 of your papers (Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 17 references with your library.", "roles": ["Similar work"], "similarity": 71, "relevance": 4, "global": 68}, {"id": "W2767350041", "label": "Angle et al., 2017", "title": "Methanogenesis in oxygenated soils is a substantial fraction of wetland methane emissions", "year": 2017, "citations": 316, "percentile": 99.7, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1038/s41467-017-01753-4", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Borton et al., 2026; Knox et al., 2021). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 4 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 58, "relevance": 4, "global": 67}, {"id": "W2427928079", "label": "Saunois et al., 2016", "title": "The global methane budget 2000–2012", "year": 2016, "citations": 1124, "percentile": 100.0, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-8-697-2016", "notion": null, "kind": "suggested", "why": "Cites 3 of your papers (Gauci et al., 2024; Knox et al., 2021; Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Gauci et al., 2024. Shares 42 references with your library.", "roles": ["Derivative work", "Similar work"], "similarity": 71, "relevance": 3, "global": 66}, {"id": "W3165084586", "label": "Kuhn et al., 2021", "title": "BAWLD-CH 4 : a comprehensive dataset of methane fluxes from boreal and arctic ecosystems", "year": 2021, "citations": 138, "percentile": 98.4, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-13-5151-2021", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Davidson et al., 2022). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 21 references with your library.", "roles": ["Similar work"], "similarity": 73, "relevance": 3, "global": 66}, {"id": "W3026801075", "label": "Bansal et al., 2020", "title": "Vegetation Affects Timing and Location of Wetland Methane Emissions", "year": 2020, "citations": 66, "percentile": 94.8, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1029/2020jg005777", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Knox et al., 2021). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 20 references with your library.", "roles": ["Similar work"], "similarity": 52, "relevance": 4, "global": 66}, {"id": "W2093051994", "label": "Moore et al., 1989", "title": "THE INFLUENCE OF WATER TABLE LEVELS ON METHANE AND CARBON DIOXIDE EMISSIONS FROM PEATLAND SOILS", "year": 1989, "citations": 477, "percentile": 98.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.4141/cjss89-004", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Davidson et al., 2019; Davidson et al., 2022; Knox et al., 2021). Most similar to Davidson et al., 2019 and Turetsky et al., 2014.", "roles": ["Prior work", "Similar work"], "similarity": 54, "relevance": 4, "global": 65}, {"id": "W2599349901", "label": "Pitz et al., 2017", "title": "Temperate forest methane sink diminished by tree emissions", "year": 2017, "citations": 124, "percentile": 97.2, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.14559", "notion": null, "kind": "suggested", "why": "Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 9 references with your library.", "roles": ["Similar work"], "similarity": 71, "relevance": 4, "global": 64}, {"id": "W2789910841", "label": "Treat et al., 2018", "title": "Nongrowing season methane emissions–a significant component of annual emissions across northern ecosystems", "year": 2018, "citations": 193, "percentile": 98.7, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.14137", "notion": null, "kind": "suggested", "why": "Cited by 2 of your papers (Knox et al., 2021; Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 21 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 57, "relevance": 3, "global": 63}, {"id": "W2520021624", "label": "Abdalla et al., 2016", "title": "Emissions of methane from northern peatlands: a review of management impacts and implications for future management options", "year": 2016, "citations": 231, "percentile": 98.2, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1002/ece3.2469", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Davidson et al., 2022). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Davidson et al., 2019. Shares 47 references with your library.", "roles": ["Similar work"], "similarity": 71, "relevance": 3, "global": 63}, {"id": "W2045098605", "label": "Terazawa et al., 2007", "title": "Methane emissions from stems of Fraxinus mandshurica var. japonica trees in a floodplain forest", "year": 2007, "citations": 119, "percentile": 92.2, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1016/j.soilbio.2007.05.013", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Siegenthaler et al., 2016). Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 4 references with your library.", "roles": ["Similar work"], "similarity": 68, "relevance": 4, "global": 62}, {"id": "W2918145442", "label": "Peltola et al., 2019", "title": "Monthly gridded data product of northern wetland methane emissions based on upscaling eddy covariance observations", "year": 2019, "citations": 167, "percentile": 98.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.5194/essd-11-1263-2019", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Knox et al., 2021). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Knox et al., 2021 and Turetsky et al., 2014. Shares 35 references with your library.", "roles": ["Similar work"], "similarity": 61, "relevance": 3, "global": 61}, {"id": "W2286609366", "label": "Wang et al., 2016", "title": "Methane emissions from the trunks of living trees on upland soils", "year": 2016, "citations": 122, "percentile": 97.1, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/nph.13909", "notion": null, "kind": "suggested", "why": "Most similar to Siegenthaler et al., 2016 and Gauci et al., 2024. Shares 8 references with your library.", "roles": ["Similar work"], "similarity": 63, "relevance": 4, "global": 61}, {"id": "W2155211093", "label": "Olefeldt et al., 2012", "title": "Environmental and physical controls on northern terrestrial methane emissions across permafrost zones", "year": 2012, "citations": 388, "percentile": 99.3, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1111/gcb.12071", "notion": null, "kind": "suggested", "why": "Cited by 3 of your papers (Knox et al., 2021; Turetsky et al., 2014; Zhao et al., 2025). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 19 references with your library.", "roles": ["Prior work", "Similar work"], "similarity": 53, "relevance": 3, "global": 58}, {"id": "W2790444922", "label": "Dean et al., 2018", "title": "Methane Feedbacks to the Global Climate System in a Warmer World", "year": 2018, "citations": 673, "percentile": 99.9, "category": "Suggested", "read": false, "doi": "https://doi.org/10.1002/2017rg000559", "notion": null, "kind": "suggested", "why": "Cited by 1 of your papers (Zhao et al., 2025). Cites 1 of your papers (Turetsky et al., 2014). Most similar to Turetsky et al., 2014 and Knox et al., 2021. Shares 37 references with your library.", "roles": ["Similar work"], "similarity": 52, "relevance": 3, "global": 58}], "edges": [{"from": "W3157926142", "to": "W2102797593", "kind": "cites"}, {"from": "W4400949455", "to": "W2117108522", "kind": "cites"}, {"from": "W4396921939", "to": "W2102797593", "kind": "cites"}, {"from": "W4226532763", "to": "W2979924676", "kind": "cites"}, {"from": "W2979924676", "to": "W2102797593", "kind": "cites"}, {"from": "W4226532763", "to": "W2905026433", "kind": "cites"}, {"from": "W2905026433", "to": "W2102797593", "kind": "cites"}, {"from": "W2905026433", "to": "W2117108522", "kind": "cites"}, {"from": "W2905026433", "to": "W2117108522", "kind": "similar"}, {"from": "W2905026433", "to": "W2102797593", "kind": "similar"}, {"from": "W4400949455", "to": "W2131640036", "kind": "cites"}, {"from": "W4226532763", "to": "W2131640036", "kind": "cites"}, {"from": "W2131640036", "to": "W2117108522", "kind": "similar"}, {"from": "W2131640036", "to": "W4400949455", "kind": "similar"}, {"from": "W4400949455", "to": "W2155847183", "kind": "cites"}, {"from": "W2117108522", "to": "W2155847183", "kind": "cites"}, {"from": "W4226532763", "to": "W2155847183", "kind": "cites"}, {"from": "W2155847183", "to": "W2117108522", "kind": "similar"}, {"from": "W2155847183", "to": "W4400949455", "kind": "similar"}, {"from": "W4400949455", "to": "W2773800068", "kind": "cites"}, {"from": "W2773800068", "to": "W2117108522", "kind": "cites"}, {"from": "W2773800068", "to": "W2117108522", "kind": "similar"}, {"from": "W2773800068", "to": "W4400949455", "kind": "similar"}, {"from": "W4400949455", "to": "W2972407136", "kind": "cites"}, {"from": "W4405433894", "to": "W2972407136", "kind": "cites"}, {"from": "W3157926142", "to": "W2972407136", "kind": "cites"}, {"from": "W2972407136", "to": "W2102797593", "kind": "cites"}, {"from": "W2972407136", "to": "W3157926142", "kind": "similar"}, {"from": "W2972407136", "to": "W2102797593", "kind": "similar"}, {"from": "W4400949455", "to": "W4200274615", "kind": "cites"}, {"from": "W4200274615", "to": "W2117108522", "kind": "cites"}, {"from": "W4200274615", "to": "W4400949455", "kind": "similar"}, {"from": "W4200274615", "to": "W2117108522", "kind": "similar"}, {"from": "W2102797593", "to": "W2156872309", "kind": "cites"}, {"from": "W2979924676", "to": "W2156872309", "kind": "cites"}, {"from": "W7163060485", "to": "W2156872309", "kind": "cites"}, {"from": "W3157926142", "to": "W2156872309", "kind": "cites"}, {"from": "W2156872309", "to": "W2102797593", "kind": "similar"}, {"from": "W2156872309", "to": "W3157926142", "kind": "similar"}, {"from": "W4400949455", "to": "W2003875103", "kind": "cites"}, {"from": "W2117108522", "to": "W2003875103", "kind": "cites"}, {"from": "W4226532763", "to": "W2003875103", "kind": "cites"}, {"from": "W2003875103", "to": "W2117108522", "kind": "similar"}, {"from": "W2003875103", "to": "W4400949455", "kind": "similar"}, {"from": "W4405433894", "to": "W2956252856", "kind": "cites"}, {"from": "W3157926142", "to": "W2956252856", "kind": "cites"}, {"from": "W2956252856", "to": "W2102797593", "kind": "cites"}, {"from": "W2956252856", "to": "W3157926142", "kind": "similar"}, {"from": "W2956252856", "to": "W2102797593", "kind": "similar"}, {"from": "W2900315497", "to": "W2117108522", "kind": "cites"}, {"from": "W2900315497", "to": "W2117108522", "kind": "similar"}, {"from": "W2900315497", "to": "W4400949455", "kind": "similar"}, {"from": "W7163060485", "to": "W3125357239", "kind": "cites"}, {"from": "W3125357239", "to": "W2102797593", "kind": "cites"}, {"from": "W3125357239", "to": "W3157926142", "kind": "similar"}, {"from": "W3125357239", "to": "W2102797593", "kind": "similar"}, {"from": "W2785174985", "to": "W2117108522", "kind": "cites"}, {"from": "W2785174985", "to": "W2117108522", "kind": "similar"}, {"from": "W2785174985", "to": "W4400949455", "kind": "similar"}, {"from": "W7163060485", "to": "W2767350041", "kind": "cites"}, {"from": "W3157926142", "to": "W2767350041", "kind": "cites"}, {"from": "W2767350041", "to": "W3157926142", "kind": "similar"}, {"from": "W2767350041", "to": "W2102797593", "kind": "similar"}, {"from": "W2427928079", "to": "W4400949455", "kind": "cites"}, {"from": "W2427928079", "to": "W2102797593", "kind": "cites"}, {"from": "W2427928079", "to": "W3157926142", "kind": "cites"}, {"from": "W2427928079", "to": "W2102797593", "kind": "similar"}, {"from": "W2427928079", "to": "W4400949455", "kind": "similar"}, {"from": "W4226532763", "to": "W3165084586", "kind": "cites"}, {"from": "W3165084586", "to": "W2102797593", "kind": "cites"}, {"from": "W3165084586", "to": "W2102797593", "kind": "similar"}, {"from": "W3165084586", "to": "W3157926142", "kind": "similar"}, {"from": "W3157926142", "to": "W3026801075", "kind": "cites"}, {"from": "W3026801075", "to": "W2102797593", "kind": "cites"}, {"from": "W3026801075", "to": "W3157926142", "kind": "similar"}, {"from": "W3026801075", "to": "W2102797593", "kind": "similar"}, {"from": "W4226532763", "to": "W2093051994", "kind": "cites"}, {"from": "W2979924676", "to": "W2093051994", "kind": "cites"}, {"from": "W3157926142", "to": "W2093051994", "kind": "cites"}, {"from": "W2093051994", "to": "W2979924676", "kind": "similar"}, {"from": "W2093051994", "to": "W2102797593", "kind": "similar"}, {"from": "W2599349901", "to": "W2117108522", "kind": "similar"}, {"from": "W2599349901", "to": "W4400949455", "kind": "similar"}, {"from": "W4405433894", "to": "W2789910841", "kind": "cites"}, {"from": "W3157926142", "to": "W2789910841", "kind": "cites"}, {"from": "W2789910841", "to": "W2102797593", "kind": "cites"}, {"from": "W2789910841", "to": "W2102797593", "kind": "similar"}, {"from": "W2789910841", "to": "W3157926142", "kind": "similar"}, {"from": "W4226532763", "to": "W2520021624", "kind": "cites"}, {"from": "W2520021624", "to": "W2102797593", "kind": "cites"}, {"from": "W2520021624", "to": "W2102797593", "kind": "similar"}, {"from": "W2520021624", "to": "W2979924676", "kind": "similar"}, {"from": "W2117108522", "to": "W2045098605", "kind": "cites"}, {"from": "W2045098605", "to": "W2117108522", "kind": "similar"}, {"from": "W2045098605", "to": "W4400949455", "kind": "similar"}, {"from": "W3157926142", "to": "W2918145442", "kind": "cites"}, {"from": "W2918145442", "to": "W2102797593", "kind": "cites"}, {"from": "W2918145442", "to": "W3157926142", "kind": "similar"}, {"from": "W2918145442", "to": "W2102797593", "kind": "similar"}, {"from": "W2286609366", "to": "W2117108522", "kind": "similar"}, {"from": "W2286609366", "to": "W4400949455", "kind": "similar"}, {"from": "W2102797593", "to": "W2155211093", "kind": "cites"}, {"from": "W4405433894", "to": "W2155211093", "kind": "cites"}, {"from": "W3157926142", "to": "W2155211093", "kind": "cites"}, {"from": "W2155211093", "to": "W2102797593", "kind": "similar"}, {"from": "W2155211093", "to": "W3157926142", "kind": "similar"}, {"from": "W4405433894", "to": "W2790444922", "kind": "cites"}, {"from": "W2790444922", "to": "W2102797593", "kind": "cites"}, {"from": "W2790444922", "to": "W2102797593", "kind": "similar"}, {"from": "W2790444922", "to": "W3157926142", "kind": "similar"}]}, "library": [{"name": "Knox et al., 2021", "title": "Identifying dominant environmental predictors of freshwater wetland methane fluxes across diurnal to seasonal time scales", "year": 2021, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls"], "ecosystems": ["Peatland / bog / fen", "Other wetland"], "gases": ["CH4"], "biome": "Not stated", "design": "Meta-analysis / synthesis", "relevance": 3, "read": false, "sites": [], "doi": "https://doi.org/10.1111/gcb.15661"}, {"name": "Turetsky et al., 2014", "title": "A synthesis of methane emissions from 71 northern, temperate, and subtropical wetlands", "year": 2014, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls", "RQ2 Disturbed vs intact"], "ecosystems": ["Forested swamp", "Peatland / bog / fen", "Other wetland"], "gases": ["CH4"], "biome": "Multiple / global", "design": "Meta-analysis / synthesis", "relevance": 4, "read": false, "sites": [], "doi": "https://doi.org/10.1111/gcb.12580"}, {"name": "Zhao et al., 2025", "title": "Predicting CO2 and CH4 fluxes and their seasonal variations in a subarctic wetland under two shared socioeconomic pathway climate scenarios", "year": 2025, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls"], "ecosystems": ["Other wetland"], "gases": ["CO2", "CH4"], "biome": "Arctic / tundra", "design": "Modelling", "relevance": 3, "read": false, "sites": [], "doi": "https://doi.org/10.1016/j.agrformet.2024.110359"}, {"name": "Grant et al., 2012", "title": "Modelling contrasting responses of wetland productivity to changes in water table depth", "year": 2012, "category": "Hydrology & biogeochemistry", "rqs": ["RQ1 Source/sink controls"], "ecosystems": ["Peatland / bog / fen"], "gases": ["CO2"], "biome": "Boreal", "design": "Modelling", "relevance": 3, "read": false, "sites": [{"label": "Lost Creek, WI, United States", "lat": 44.4717007, "lon": -92.1791073, "precision": "site"}], "doi": "https://doi.org/10.5194/bg-9-4215-2012"}, {"name": "Domeignoz-Horta et al., 2020", "title": "Microbial diversity drives carbon use efficiency in a model soil", "year": 2020, "category": "Soil & water microbes", "rqs": ["RQ5 Microbial taxonomy & function"], "ecosystems": ["Other"], "gases": [], "biome": "Not stated", "design": "Lab / incubation", "relevance": 3, "read": false, "sites": [], "doi": "https://doi.org/10.1038/s41467-020-17502-z"}, {"name": "Gauci et al., 2024", "title": "Global atmospheric methane uptake by upland tree woody surfaces", "year": 2024, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls", "RQ5 Microbial taxonomy & function"], "ecosystems": ["Upland forest"], "gases": ["CH4"], "biome": "Multiple / global", "design": "Field observation", "relevance": 4, "read": false, "sites": [], "doi": "https://doi.org/10.1038/s41586-024-07592-w"}, {"name": "Siegenthaler et al., 2016", "title": "Technical Note: Semi-rigid chambers for methane gas flux measurements on tree stems", "year": 2016, "category": "Vegetation & tree stems", "rqs": ["RQ1 Source/sink controls"], "ecosystems": ["Other wetland", "Upland forest"], "gases": ["CH4"], "biome": "Not stated", "design": "Methods", "relevance": 5, "read": false, "sites": [], "doi": "https://doi.org/10.5194/bg-13-1197-2016"}, {"name": "Borton et al., 2026", "title": "Mapping the soil microbiome functions shaping wetland methane emissions", "year": 2026, "category": "Soil & water microbes", "rqs": ["RQ5 Microbial taxonomy & function"], "ecosystems": ["Other wetland"], "gases": ["CH4"], "biome": "Temperate", "design": "Field observation", "relevance": 4, "read": false, "sites": [{"label": "United States wetlands, Not stated, United States", "lat": 39.7837304, "lon": -100.445882, "precision": "country"}], "doi": "https://doi.org/10.1128/msystems.00680-25"}, {"name": "Schmidt et al., 2025", "title": "Quantifying Carbon Pools and Fluxes in Southern Ontario Temperate Swamps", "year": 2025, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls", "RQ4 Soil vs water C sources"], "ecosystems": ["Forested swamp"], "gases": ["CO2", "CH4"], "biome": "Temperate", "design": "Field observation", "relevance": 5, "read": false, "sites": [{"label": "Southern Ontario swamps, Southern Ontario, Canada", "lat": 43.2231351, "lon": -79.9798581, "precision": "region"}], "doi": "https://doi.org/10.19189/001c.151276"}, {"name": "Davidson et al., 2024", "title": "Carbon Stocks and Fluxes From a Boreal Conifer Swamp: Filling a Knowledge Gap for Understanding the Boreal C Cycle", "year": 2024, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls", "RQ4 Soil vs water C sources"], "ecosystems": ["Forested swamp"], "gases": ["CO2", "CH4"], "biome": "Boreal", "design": "Field observation", "relevance": 4, "read": false, "sites": [{"label": "northern Alberta, Alberta, Canada", "lat": 58.7131298, "lon": -111.1591342, "precision": "site"}], "doi": "https://doi.org/10.1029/2024jg008005"}, {"name": "Davidson et al., 2022", "title": "The unrecognized importance of carbon stocks and fluxes from swamps in Canada and the USA", "year": 2022, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls", "RQ4 Soil vs water C sources"], "ecosystems": ["Forested swamp"], "gases": ["CO2", "CH4"], "biome": "Not stated", "design": "Meta-analysis / synthesis", "relevance": 5, "read": false, "sites": [], "doi": "https://doi.org/10.1088/1748-9326/ac63d5"}, {"name": "Davidson et al., 2019", "title": "Controls on soil carbon dioxide and methane fluxes from a peat swamp vary by hydrogeomorphic setting", "year": 2019, "category": "Fluxes & microclimate", "rqs": ["RQ1 Source/sink controls"], "ecosystems": ["Forested swamp"], "gases": ["CO2", "CH4"], "biome": "Temperate", "design": "Field observation", "relevance": 5, "read": false, "sites": [{"label": "southern Ontario, Ontario, Canada", "lat": 43.2231351, "lon": -79.9798581, "precision": "site"}], "doi": "https://doi.org/10.1002/eco.2162"}], "field_trend": {"2021": 84, "2024": 79, "2026": 77, "2023": 75, "2020": 74, "2025": 72, "2017": 70, "2019": 57, "2022": 55, "2016": 54, "2018": 54, "2014": 48, "2013": 45, "2015": 41, "2011": 39, "2012": 38, "2010": 34, "2008": 22, "2007": 17, "2009": 16, "2002": 15, "2005": 14, "2006": 14, "1998": 13, "1993": 12, "1996": 12, "2003": 12, "1994": 11, "1997": 10, "2000": 10, "1992": 9, "1995": 9, "2004": 9, "2001": 8, "1986": 6, "1988": 6, "1989": 6, "1999": 6, "1991": 5, "1977": 4, "1990": 4, "1968": 3, "1981": 3, "1987": 3, "1963": 2, "1965": 2, "1967": 2, "1969": 2, "1971": 2, "1973": 2, "1975": 2, "1982": 2, "1983": 2, "1984": 2, "1985": 2, "1960": 1, "1974": 1, "1978": 1, "1979": 1}, "field_query": "(swamp OR \"forested wetland\" OR \"forested wetlands\") AND (methane OR \"carbon dioxide\" OR \"nitrous oxide\" OR \"greenhouse gas\")", "milestones": [{"id": "W2093051994", "label": "Moore et al., 1989", "title": "THE INFLUENCE OF WATER TABLE LEVELS ON METHANE AND CARBON DIOXIDE EMISSIONS FROM PEATLAND SOILS", "year": 1989, "citations": 477, "percentile": 98.9, "in_library": false, "links": 3, "note": "This laboratory study measured carbon dioxide and methane emissions from columns packed with surface soils from a fen, a bog, and a swamp under varying water table levels", "doi": "https://doi.org/10.4141/cjss89-004"}, {"id": "W2023906603", "label": "Gorham et al., 1991", "title": "Northern Peatlands: Role in the Carbon Cycle and Probable Responses to Climatic Warming", "year": 1991, "citations": 3840, "percentile": 99.9, "in_library": false, "links": 2, "note": "Foundational: cited by 2 of your papers.", "doi": "https://doi.org/10.2307/1941811"}, {"id": "W2114323104", "label": "Lai et al., 2009", "title": "Methane Dynamics in Northern Peatlands: A Review", "year": 2009, "citations": 445, "percentile": 99.4, "in_library": false, "links": 2, "note": "This paper is a review of methane dynamics in northern peatlands", "doi": "https://doi.org/10.1016/s1002-0160(09)00003-4"}, {"id": "W2156872309", "label": "Bridgham et al., 2012", "title": "Methane emissions from wetlands: biogeochemical, microbial, and modeling perspectives from local to global scales", "year": 2012, "citations": 1286, "percentile": 99.8, "in_library": false, "links": 4, "note": "This review paper provides a comprehensive synthesis of wetland methane emissions, integrating biogeochemical, molecular microbial, and modeling perspectives from local to global scales", "doi": "https://doi.org/10.1111/gcb.12131"}, {"id": "W2155211093", "label": "Olefeldt et al., 2012", "title": "Environmental and physical controls on northern terrestrial methane emissions across permafrost zones", "year": 2012, "citations": 388, "percentile": 99.3, "in_library": false, "links": 3, "note": "This study compiled a database of growing-season methane emissions across northern permafrost zones to assess environmental and physical controls", "doi": "https://doi.org/10.1111/gcb.12071"}, {"id": "W2155847183", "label": "Pangala et al., 2012", "title": "Trees are major conduits for methane egress from tropical forested wetlands", "year": 2012, "citations": 243, "percentile": 96.1, "in_library": false, "links": 3, "note": "This study quantified in situ methane emissions from tree stems, peatland surfaces, and pneumatophores in a tropical forested peatland in Southeast Asia using static chambers", "doi": "https://doi.org/10.1111/nph.12031"}, {"id": "W2102797593", "label": "Turetsky et al., 2014", "title": "A synthesis of methane emissions from 71 northern, temperate, and subtropical wetlands", "year": 2014, "citations": 605, "percentile": 99.9, "in_library": true, "links": 3, "note": "Wetland methane emissions are driven by soil temperature and water table in swamps and bogs, but these relationships are strongly modified by wetland type, region, and disturbance history.", "doi": "https://doi.org/10.1111/gcb.12580"}, {"id": "W2152976421", "label": "Loisel et al., 2014", "title": "A database and synthesis of northern peatland soil properties and Holocene carbon and nitrogen accumulation", "year": 2014, "citations": 607, "percentile": 99.9, "in_library": false, "links": 2, "note": "This study presents a comprehensive global database of northern peatland soil properties, including 268 peat cores from 215 sites north of 45°N to estimate Holocene carbon and nitrogen accumulation rates", "doi": "https://doi.org/10.1177/0959683614538073"}, {"id": "W2564065614", "label": "Etminan et al., 2016", "title": "Radiative forcing of carbon dioxide, methane, and nitrous oxide: A significant revision of the methane radiative forcing", "year": 2016, "citations": 1107, "percentile": 99.9, "in_library": false, "links": 2, "note": "This study recalculates the radiative forcing of carbon dioxide, methane, and nitrous oxide using updated models, finding that methane's radiative forcing is about 25% higher due to shortwave forcing inclusion", "doi": "https://doi.org/10.1002/2016gl071930"}, {"id": "W2767350041", "label": "Angle et al., 2017", "title": "Methanogenesis in oxygenated soils is a substantial fraction of wetland methane emissions", "year": 2017, "citations": 316, "percentile": 99.7, "in_library": false, "links": 2, "note": "This study challenges the paradigm that methanogenesis only occurs in anoxic habitats by demonstrating substantial methane production in well-oxygenated wetland soils", "doi": "https://doi.org/10.1038/s41467-017-01753-4"}, {"id": "W2972407136", "label": "Saunois et al., 2019", "title": "The Global Methane Budget 2000-2017", "year": 2019, "citations": 2779, "percentile": 100.0, "in_library": false, "links": 3, "note": "This study synthesizes global methane budgets for 2000-2017 using a combination of top-down atmospheric inversions and bottom-up models, highlighting that anthropogenic sources account for about 60% of total emissions", "doi": "https://doi.org/10.5194/essd-12-1561-2020"}, {"id": "W2956252856", "label": "Knox et al., 2019", "title": "FLUXNET-CH4 Synthesis Activity: Objectives, Observations, and Future Directions", "year": 2019, "citations": 279, "percentile": 99.6, "in_library": false, "links": 2, "note": "This paper introduces the FLUXNET-CH4 synthesis activity, which coordinates ecosystem-scale methane flux measurements across 60 global sites using eddy covariance techniques", "doi": "https://doi.org/10.1175/bams-d-18-0268.1"}], "prisma": {"identified_automation": 24839, "removed_by_ranking": 24777, "suggested": 62, "screened": 0, "pending": 62, "excluded": 0, "exclusion_reasons": {}, "retained_network": 0, "own_searches": 12, "library": 12, "retracted": []}, "saturation": [{"date": "2026-10-01", "suggested": 40, "relevant": 6}, {"date": "2026-10-02", "suggested": 62, "relevant": 14}], "preferences": {"ready": false, "n": 0, "added": 0, "excluded": 0, "needed": 12, "features": ["AI relevance", "Similarity", "Direct citation links", "Citation impact", "Recency"]}, "runs": [{"date": "2026-10-02", "library": 12, "candidates_evaluated": 24839, "unique_candidates": 24839, "suggested_to_date": 62, "new_suggestions": 2, "new_relevant": 0, "pending": 62, "retained": 0, "excluded": 0, "decisions": 0, "triaged": 20, "extracted": 12, "retractions": 0, "model": "gemini-flash-lite-latest", "notes": ""}], "options": {"rqs": ["RQ1 Source/sink controls", "RQ2 Disturbed vs intact", "RQ3 Anthropogenic impact", "RQ4 Soil vs water C sources", "RQ5 Microbial taxonomy & function"], "ecosystems": ["Forested swamp", "Peatland / bog / fen", "Marsh", "Upland forest", "Other wetland", "Other"], "gases": ["CO2", "CH4", "N2O"], "biomes": ["Boreal", "Temperate", "Subtropical", "Tropical", "Arctic / tundra", "Multiple / global", "Not stated"], "categories": ["Fluxes & microclimate", "Vegetation & tree stems", "Soil & water microbes", "Hydrology & biogeochemistry", "Methods & instrumentation", "Nature-based solutions & policy"]}};
 
 const PALETTE = {
-  "Fluxes & microclimate": "#2e6f8e",
-  "Vegetation & tree stems": "#4f7a32",
-  "Soil & water microbes": "#7b5a8f",
-  "Hydrology & biogeochemistry": "#b5652b",
-  "Methods & instrumentation": "#6c7479",
-  "Nature-based solutions & policy": "#b38f1e",
-  "Uncategorized": "#a3aea6",
-  "Suggested": "transparent"
+  "Fluxes & microclimate": "#2e6f8e", "Vegetation & tree stems": "#4f7a32", "Soil & water microbes": "#7b5a8f",
+  "Hydrology & biogeochemistry": "#b5652b", "Methods & instrumentation": "#6c7479",
+  "Nature-based solutions & policy": "#b38f1e", "Uncategorized": "#a3aea6", "Suggested": "transparent"
 };
-
 const css = getComputedStyle(document.documentElement);
-const INK = css.getPropertyValue("--ink").trim();
-const MUTED = css.getPropertyValue("--muted").trim();
-const EDGE = css.getPropertyValue("--edge").trim();
-const BG = css.getPropertyValue("--bg").trim();
+const V = n => css.getPropertyValue(n).trim();
+const INK = V("--ink"), MUTED = V("--muted"), EDGE = V("--edge"), BG = V("--bg"), LINE = V("--line"), HEAT = V("--heat");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const colorOf = cat => PALETTE[cat] || PALETTE.Uncategorized;
 
-if (!DATA || !DATA.nodes.length) {
-  document.getElementById("map").innerHTML =
-    '<p class="empty">No papers yet. Run the pipeline once your Notero database has papers with a DOI.</p>';
+// ---------- tabs (each tab is drawn the first time it is opened)
+const drawn = {};
+const drawers = {};
+function openTab(id) {
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.id === id));
+  if (!drawn[id] && drawers[id]) { drawers[id](); drawn[id] = true; }
+  if (id === "t-sites" && window._sitesMap) setTimeout(() => window._sitesMap.invalidateSize(), 50);
+  history.replaceState(null, "", "#" + id.slice(2));
+}
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => openTab(b.dataset.tab)));
+
+if (!DATA) {
+  document.querySelector("main").innerHTML = '<p class="pad muted">No data yet. Run the pipeline once to fill this dashboard.</p>';
 } else {
-  const lib = DATA.nodes.filter(n => n.kind === "library").length;
-  const sug = DATA.nodes.length - lib;
-  document.getElementById("counts").textContent =
-    `${lib} papers in your library, ${sug} suggested. Updated ${DATA.generated}.`;
+  document.getElementById("updated").textContent = `Updated ${DATA.generated}`;
 
-  const size = c => 9 + Math.min(26, Math.sqrt(c || 0) * 1.6);
-  const nodes = new vis.DataSet(DATA.nodes.map(n => ({
-    id: n.id,
-    label: n.label,
-    raw: n,
-    size: size(n.citations),
-    shape: "dot",
-    color: n.kind === "suggested"
-      ? { background: BG, border: MUTED, highlight: { background: BG, border: INK } }
-      : { background: PALETTE[n.category] || PALETTE.Uncategorized,
-          border: n.read ? INK : (PALETTE[n.category] || PALETTE.Uncategorized),
-          highlight: { background: PALETTE[n.category] || PALETTE.Uncategorized, border: INK } },
-    borderWidth: n.read ? 3 : (n.kind === "suggested" ? 1.5 : 1),
-    shapeProperties: { borderDashes: n.kind === "suggested" ? [4, 3] : false },
-    font: { color: n.kind === "suggested" ? MUTED : INK, size: 12, face: "system-ui" }
-  })));
-  const edges = new vis.DataSet(DATA.edges.map((e, i) => e.kind === "similar"
-    ? { id: i, from: e.from, to: e.to, dashes: [3, 4], arrows: { to: { enabled: false } },
-        color: { color: EDGE, highlight: MUTED }, width: 1, smooth: { type: "continuous" } }
-    : { id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
-        color: { color: EDGE, highlight: INK }, width: 1, smooth: { type: "continuous" } }));
-
-  const network = new vis.Network(document.getElementById("map"), { nodes, edges }, {
-    physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -60, springLength: 110 },
-               stabilization: { iterations: 250 } },
-    interaction: { hover: true, tooltipDelay: 150, navigationButtons: false, keyboard: true }
-  });
-
-  // Legend with category toggles
-  const counts = {};
-  DATA.nodes.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
-  const hidden = new Set();
-  const legend = document.getElementById("legend");
-  Object.keys(PALETTE).filter(c => counts[c]).forEach(cat => {
-    const li = document.createElement("li");
-    const b = document.createElement("button");
-    b.setAttribute("aria-pressed", "true");
-    b.innerHTML = `<span class="dot ${cat === "Suggested" ? "suggested" : ""}" style="background:${cat === "Suggested" ? "transparent" : PALETTE[cat]}"></span>
-                   <span>${cat === "Suggested" ? "Suggested papers" : cat}</span><span class="n">${counts[cat]}</span>`;
-    b.addEventListener("click", () => {
-      hidden.has(cat) ? hidden.delete(cat) : hidden.add(cat);
-      b.setAttribute("aria-pressed", String(!hidden.has(cat)));
-      nodes.update(DATA.nodes.map(n => ({ id: n.id, hidden: hidden.has(n.category) })));
+  // ---------- 1. citation map
+  drawers["t-map"] = () => {
+    const G = DATA.graph;
+    if (!G.nodes.length) { document.getElementById("graph").innerHTML = '<p class="pad muted">No papers matched yet.</p>'; return; }
+    const size = c => 9 + Math.min(26, Math.sqrt(c || 0) * 1.6);
+    const nodes = new vis.DataSet(G.nodes.map(n => ({
+      id: n.id, label: n.label, raw: n, size: size(n.citations), shape: "dot",
+      color: n.kind === "suggested"
+        ? { background: BG, border: MUTED, highlight: { background: BG, border: INK } }
+        : { background: colorOf(n.category), border: n.read ? INK : colorOf(n.category),
+            highlight: { background: colorOf(n.category), border: INK } },
+      borderWidth: n.read ? 3 : (n.kind === "suggested" ? 1.5 : 1),
+      shapeProperties: { borderDashes: n.kind === "suggested" ? [4, 3] : false },
+      font: { color: n.kind === "suggested" ? MUTED : INK, size: 12, face: "system-ui" }
+    })));
+    const edges = new vis.DataSet(G.edges.map((e, i) => e.kind === "similar"
+      ? { id: i, from: e.from, to: e.to, dashes: [3, 4], arrows: { to: { enabled: false } },
+          color: { color: EDGE, highlight: MUTED }, width: 1, smooth: { type: "continuous" } }
+      : { id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
+          color: { color: EDGE, highlight: INK }, width: 1, smooth: { type: "continuous" } }));
+    const network = new vis.Network(document.getElementById("graph"), { nodes, edges }, {
+      physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -60, springLength: 110 },
+                 stabilization: { iterations: 250 } },
+      interaction: { hover: true, keyboard: true }
     });
-    li.appendChild(b);
-    legend.appendChild(li);
-  });
+    const counts = {};
+    G.nodes.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
+    const hidden = new Set();
+    const legend = document.getElementById("legend");
+    Object.keys(PALETTE).filter(c => counts[c]).forEach(cat => {
+      const li = document.createElement("li"), b = document.createElement("button");
+      b.setAttribute("aria-pressed", "true");
+      b.innerHTML = `<span class="dot ${cat === "Suggested" ? "suggested" : ""}" style="background:${cat === "Suggested" ? "transparent" : colorOf(cat)}"></span>
+        <span>${cat === "Suggested" ? "Suggested papers" : cat}</span><span class="n">${counts[cat]}</span>`;
+      b.addEventListener("click", () => {
+        hidden.has(cat) ? hidden.delete(cat) : hidden.add(cat);
+        b.setAttribute("aria-pressed", String(!hidden.has(cat)));
+        nodes.update(G.nodes.map(n => ({ id: n.id, hidden: hidden.has(n.category) })));
+      });
+      li.appendChild(b); legend.appendChild(li);
+    });
+    const detail = document.getElementById("detail");
+    function show(n) {
+      const pct = n.percentile != null ? `, ${n.percentile}th citation percentile` : "";
+      detail.innerHTML = `<button class="close" aria-label="Close details">×</button>
+        <h3>${esc(n.title || n.label)}</h3>
+        <p class="muted">${esc(n.label)}. ${n.citations} citations${pct}.</p>
+        ${n.kind === "suggested"
+          ? `<p><strong>${esc((n.roles || []).join(", "))}</strong>. Global score ${n.global}/100, similarity ${n.similarity}/100${n.relevance ? `, relevance ${n.relevance}/5` : ""}.</p>
+             <p class="muted">${esc(n.why)}</p>`
+          : `<p class="muted">${esc(n.category)}${n.read ? ", read" : ", not read yet"}.</p>`}
+        <p>${n.doi ? `<a href="${esc(n.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""}
+           ${n.notion ? ` &nbsp; <a href="${esc(n.notion)}" target="_blank" rel="noopener">Open in Notion</a>` : ""}</p>`;
+      detail.classList.add("open");
+      detail.querySelector(".close").addEventListener("click", () => detail.classList.remove("open"));
+    }
+    network.on("click", p => p.nodes.length ? show(nodes.get(p.nodes[0]).raw) : detail.classList.remove("open"));
+    document.getElementById("search").addEventListener("input", e => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) { network.unselectAll(); return; }
+      const hit = G.nodes.find(n => (n.label + " " + (n.title || "")).toLowerCase().includes(q));
+      if (hit) { network.selectNodes([hit.id]); network.focus(hit.id, { scale: 1.2, animation: { duration: 400 } }); show(hit); }
+    });
+  };
 
-  // Search
-  document.getElementById("search").addEventListener("input", e => {
-    const q = e.target.value.trim().toLowerCase();
-    if (!q) { network.unselectAll(); return; }
-    const hit = DATA.nodes.find(n => (n.label + " " + (n.title || "")).toLowerCase().includes(q));
-    if (hit) { network.selectNodes([hit.id]); network.focus(hit.id, { scale: 1.2, animation: { duration: 400 } }); show(hit); }
-  });
+  // ---------- 2. study sites
+  drawers["t-sites"] = () => {
+    const map = L.map("sitesmap", { worldCopyJump: true }).setView([45, -40], 2);
+    window._sitesMap = map;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    const bounds = [], perCat = {};
+    let mapped = 0, unmapped = 0;
+    DATA.library.forEach(p => {
+      if (!p.sites.length) { unmapped++; return; }
+      mapped++;
+      perCat[p.category] = (perCat[p.category] || 0) + 1;
+      p.sites.forEach(s => {
+        const c = colorOf(p.category);
+        const style = s.precision === "site" ? { radius: 7, fillOpacity: 0.9, weight: 1.5, color: INK }
+          : s.precision === "region" ? { radius: 8, fillOpacity: 0.15, weight: 2, color: c }
+          : { radius: 9, fillOpacity: 0.1, weight: 1, color: c, opacity: 0.6, dashArray: "3 3" };
+        L.circleMarker([s.lat, s.lon], { ...style, fillColor: c })
+          .bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(p.title)}<br><span style="opacity:.7">${esc(s.label)} (${s.precision})</span>`
+            + (p.doi ? `<br><a href="${esc(p.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""))
+          .addTo(map);
+        bounds.push([s.lat, s.lon]);
+      });
+    });
+    if (bounds.length) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
+    document.getElementById("sites-summary").textContent =
+      `${mapped} papers placed on the map. ${unmapped} without a site (reviews, models, global studies, or not yet extracted).`;
+    document.getElementById("sites-legend").innerHTML = Object.entries(perCat).map(([c, n]) =>
+      `<li><span style="display:flex;gap:8px;align-items:center"><span class="dot" style="background:${colorOf(c)}"></span>${esc(c)}<span class="n">${n}</span></span></li>`).join("");
+  };
 
-  // Detail panel
-  const detail = document.getElementById("detail");
-  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  function show(n) {
-    const pct = n.percentile != null ? `, ${n.percentile}th citation percentile` : "";
-    detail.innerHTML = `
-      <button class="close" aria-label="Close details">×</button>
-      <h2>${esc(n.title || n.label)}</h2>
-      <p class="meta">${esc(n.label)}. ${n.citations} citations${pct}.</p>
-      ${n.kind === "suggested"
-        ? `<p><strong>${esc((n.roles || []).join(", "))}</strong>. Global score ${n.global}/100,
-             similarity ${n.similarity}/100${n.relevance ? `, relevance ${n.relevance}/5` : ""}.</p>
-           <p class="meta">${esc(n.why)}</p>`
-        : `<p class="meta">${esc(n.category)}${n.read ? ", read" : ", not read yet"}.</p>`}
-      <p>${n.doi ? `<a href="${esc(n.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""}
-         ${n.notion ? ` &nbsp; <a href="${esc(n.notion)}" target="_blank" rel="noopener">Open in Notion</a>` : ""}</p>`;
-    detail.classList.add("open");
-    detail.querySelector(".close").addEventListener("click", () => detail.classList.remove("open"));
-  }
-  network.on("click", params => {
-    if (params.nodes.length) show(nodes.get(params.nodes[0]).raw);
-    else detail.classList.remove("open");
-  });
+  // ---------- 3. evidence gaps
+  drawers["t-gaps"] = () => {
+    const O = DATA.options;
+    let gas = "All";
+    const filter = document.getElementById("gas-filter");
+    ["All", ...O.gases].forEach(g => {
+      const b = document.createElement("button");
+      b.className = "chip"; b.textContent = g; b.setAttribute("aria-pressed", String(g === gas));
+      b.addEventListener("click", () => { gas = g; filter.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); });
+      filter.appendChild(b);
+    });
+    function heat(table, rows, cols, rowKey, colKey, papers) {
+      const max = Math.max(1, ...rows.flatMap(r => cols.map(c => papers.filter(p => rowKey(p, r) && colKey(p, c)).length)));
+      table.innerHTML = `<tr><th></th>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr>` + rows.map(r =>
+        `<tr><th class="row">${esc(r)}</th>${cols.map(c => {
+          const hits = papers.filter(p => rowKey(p, r) && colKey(p, c));
+          const a = hits.length ? 0.12 + 0.75 * hits.length / max : 0;
+          return `<td class="${hits.length ? "" : "zero"}" style="${hits.length ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}"
+                   data-r="${esc(r)}" data-c="${esc(c)}">${hits.length || "gap"}</td>`;
+        }).join("")}</tr>`).join("");
+      table.querySelectorAll("td").forEach(td => td.addEventListener("click", () => {
+        const hits = papers.filter(p => rowKey(p, td.dataset.r) && colKey(p, td.dataset.c));
+        document.getElementById("cell-papers").innerHTML = `<div class="card" style="margin-top:12px"><strong>${esc(td.dataset.r)} × ${esc(td.dataset.c)}</strong>${
+          hits.length ? `<ul class="papers-list">${hits.map(p => `<li>${esc(p.name)}: ${esc(p.title)}</li>`).join("")}</ul>`
+                      : `<p class="muted" style="margin:6px 0 0">No paper in your library covers this combination yet.</p>`}</div>`;
+      }));
+    }
+    function draw() {
+      const papers = DATA.library.filter(p => gas === "All" || p.gases.includes(gas));
+      heat(document.getElementById("heat-rq"), O.ecosystems, O.rqs, (p, r) => p.ecosystems.includes(r), (p, c) => p.rqs.includes(c), papers);
+      document.getElementById("cell-papers").innerHTML = "";
+    }
+    draw();
+    const designs = [...new Set(DATA.library.map(p => p.design).filter(Boolean))];
+    const biomes = O.biomes.filter(b => b !== "Not stated");
+    heat(document.getElementById("heat-design"), designs.length ? designs : ["(not extracted yet)"], biomes,
+      (p, r) => p.design === r, (p, c) => p.biome === c, DATA.library);
+  };
+
+  // ---------- 4. timeline
+  drawers["t-time"] = () => {
+    const lib = DATA.library.filter(p => p.year);
+    const field = DATA.field_trend || {};
+    const years = [...new Set([...lib.map(p => +p.year), ...Object.keys(field).map(Number)])].sort((a, b) => a - b);
+    const from = Math.min(...lib.map(p => +p.year), years.find(y => (field[y] || 0) > 0) || 9999);
+    const span = years.filter(y => y >= from);
+    const cats = [...new Set(lib.map(p => p.category))];
+    document.getElementById("time-lead").textContent = Object.keys(field).length
+      ? `Bars: your library by publication year and category. Line: papers per year in the whole field (OpenAlex search: ${DATA.field_query}).`
+      : "Bars: your library by publication year and category. (The field trend will appear once OpenAlex returns counts for your field query.)";
+    new Chart(document.getElementById("timechart"), {
+      data: { labels: span, datasets: [
+        ...cats.map(c => ({ type: "bar", label: c, data: span.map(y => lib.filter(p => +p.year === y && p.category === c).length),
+          backgroundColor: colorOf(c), stack: "lib", yAxisID: "y" })),
+        ...(Object.keys(field).length ? [{ type: "line", label: "Whole field", data: span.map(y => field[y] || 0),
+          borderColor: MUTED, backgroundColor: MUTED, pointRadius: 0, borderWidth: 1.5, tension: .25, yAxisID: "y2" }] : [])
+      ] },
+      options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+        plugins: { legend: { labels: { color: INK, boxWidth: 12 } } },
+        scales: { x: { stacked: true, ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
+          y: { stacked: true, title: { display: true, text: "Your papers", color: MUTED }, ticks: { color: MUTED, precision: 0 }, grid: { color: LINE } },
+          y2: { position: "right", display: Object.keys(field).length > 0, title: { display: true, text: "Field papers", color: MUTED },
+            ticks: { color: MUTED }, grid: { display: false } } } }
+    });
+    document.getElementById("milestones").innerHTML = DATA.milestones.map(m =>
+      `<li class="${m.in_library ? "" : "external"}"><span class="yr">${m.year}</span>${m.doi ? `<a href="${esc(m.doi)}" target="_blank" rel="noopener">${esc(m.label)}</a>` : esc(m.label)}
+        <span class="tag">${m.in_library ? "in your library" : "not in your library"}</span><span class="tag">${m.citations} citations</span>
+        <div class="muted">${esc(m.note || m.title)}</div></li>`).join("") || '<li class="muted">Not enough data yet.</li>';
+    // coverage by period
+    const periods = [[0, 1999, "Before 2000"], [2000, 2009, "2000s"], [2010, 2014, "2010-2014"], [2015, 2019, "2015-2019"], [2020, 9999, "2020 onwards"]];
+    const fTot = Object.values(field).reduce((a, b) => a + b, 0), lTot = lib.length;
+    document.getElementById("coverage").innerHTML = `<tr><th>Period</th><th>Field</th><th>Your library</th><th></th></tr>` +
+      periods.map(([a, b, name]) => {
+        const f = fTot ? Object.entries(field).filter(([y]) => y >= a && y <= b).reduce((s, [, n]) => s + n, 0) / fTot : null;
+        const l = lTot ? lib.filter(p => p.year >= a && p.year <= b).length / lTot : 0;
+        const flag = f !== null && f > 0.08 && l < f / 2 ? "⚠️ underrepresented" : "";
+        return `<tr><td>${name}</td><td>${f === null ? "n/a" : Math.round(f * 100) + "%"}</td><td>${Math.round(l * 100)}%</td><td class="muted">${flag}</td></tr>`;
+      }).join("");
+  };
+
+  // ---------- 5. screening
+  drawers["t-screen"] = () => {
+    const P = DATA.prisma;
+    const alerts = [];
+    if (P.retracted.length) alerts.push(`⚠️ Retracted papers in your library: ${P.retracted.map(esc).join("; ").replace(/\.$/, "")}. Check them before citing.`);
+    document.getElementById("alerts").innerHTML = alerts.map(a => `<div class="card alert" style="margin-bottom:12px">${a}</div>`).join("");
+    const reasons = Object.entries(P.exclusion_reasons).map(([r, n]) => `${esc(r)}: ${n}`).join("<br>") || "none yet";
+    document.getElementById("prisma").innerHTML = `
+      <div class="stage">Identification</div>
+      <div class="box"><span class="muted">Identified by citation network &amp; recommendations</span><b>${P.identified_automation}</b></div>
+      <div class="box"><span class="muted">Identified by your own searches (Zotero)</span><b>${P.own_searches}</b></div>
+      <div class="arrow">↓</div><div></div>
+      <div class="box"><span class="muted">Proposed for screening</span><b>${P.suggested}</b></div>
+      <div class="box side"><span class="muted">Marked ineligible by automation (ranked below the cut-off)</span><b>${P.removed_by_ranking}</b></div>
+      <div class="stage">Screening</div>
+      <div class="box"><span class="muted">Screened by you</span><b>${P.screened}</b><span class="muted">${P.pending} still pending</span></div>
+      <div class="box side"><span class="muted">Excluded, with reasons</span><b>${P.excluded}</b><span class="muted" style="font-size:12.5px">${reasons}</span></div>
+      <div class="stage">Included</div>
+      <div class="box"><span class="muted">Retained from suggestions</span><b>${P.retained_network}</b></div>
+      <div class="box"><span class="muted">Total papers in your library</span><b>${P.library}</b></div>`;
+    const S = DATA.saturation;
+    new Chart(document.getElementById("satchart"), {
+      type: "line",
+      data: { labels: S.map(s => s.date), datasets: [
+        { label: "Suggested (cumulative)", data: S.map(s => s.suggested), borderColor: MUTED, pointRadius: 2, borderWidth: 1.5 },
+        { label: "Relevant (cumulative)", data: S.map(s => s.relevant), borderColor: "#2e6f8e", backgroundColor: "rgba(46,111,142,.12)", fill: true, pointRadius: 2, borderWidth: 2 }
+      ] },
+      options: { maintainAspectRatio: false, plugins: { legend: { labels: { color: INK, boxWidth: 12 } } },
+        scales: { x: { ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 14 }, grid: { display: false } },
+                  y: { beginAtZero: true, ticks: { color: MUTED, precision: 0 }, grid: { color: LINE } } } }
+    });
+    const pr = DATA.preferences;
+    const prefs = document.getElementById("prefs");
+    if (!pr.ready) {
+      prefs.innerHTML = `<p class="lead">The tool will learn what you value from your screening decisions. It has ${pr.n} so far (${pr.added} added, ${pr.excluded} excluded) and needs ${pr.needed}, including at least 3 of each. Then every suggestion gets a <strong>Personal score</strong> in Notion.</p>`;
+    } else {
+      const max = Math.max(...pr.weights.map(Math.abs), 0.01);
+      prefs.innerHTML = `<p class="lead">Learned from ${pr.n} decisions. How strongly each criterion pushes a paper toward being kept (right) or excluded (left). Separation quality (AUC, 0.5 = chance, 1 = perfect): ${Number(pr.auc).toFixed(2)}.</p>` +
+        pr.features.map((f, i) => {
+          const w = pr.weights[i], pct = Math.abs(w) / max * 50;
+          return `<div style="display:grid;grid-template-columns:140px 1fr 48px;gap:8px;align-items:center;margin:4px 0">
+            <span>${esc(f)}</span>
+            <span style="position:relative;height:8px;background:${LINE};border-radius:4px">
+              <span class="bar" style="position:absolute;top:0;${w >= 0 ? `left:50%;width:${pct}%` : `right:50%;width:${pct}%;background:${V("--gap")}`}"></span></span>
+            <span class="muted" style="text-align:right">${w >= 0 ? "+" : ""}${w.toFixed(1)}</span></div>`;
+        }).join("");
+    }
+    const R = DATA.runs.slice(-10).reverse();
+    document.getElementById("runs").innerHTML = `<tr><th>Date</th><th>Library</th><th>Evaluated</th><th>New suggestions</th><th>New relevant</th><th>Decisions</th><th>Pending</th><th>Model</th></tr>` +
+      R.map(r => `<tr><td>${r.date}</td><td>${r.library}</td><td>${r.candidates_evaluated}</td><td>${r.new_suggestions}</td><td>${r.new_relevant}</td><td>${r.decisions}</td><td>${r.pending}</td><td class="muted">${esc(r.model)}</td></tr>`).join("");
+  };
+
+  const start = "t-" + (location.hash.slice(1) || "map");
+  openTab(document.getElementById(start) ? start : "t-map");
 }
 </script>
 </body>

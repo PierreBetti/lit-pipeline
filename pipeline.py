@@ -926,9 +926,15 @@ def main():
     triage_papers(papers, triager)
 
     log("3. Suggested papers")
-    existing = load_existing_suggestions()
-    top, refresh, lib_ids = build_suggestions(papers, existing)
-    sync_suggestions(top, refresh, lib_ids, existing, triager)
+    try:
+        existing = load_existing_suggestions()
+    except RuntimeError as e:
+        existing = None
+        log("   Could not open the Suggested papers database in Notion. Open it, click ••• > Connections")
+        log("   and add your integration (this happens when the database is moved). Details: " + str(e)[:200])
+    top, refresh, lib_ids = build_suggestions(papers, existing or {})
+    if existing is not None:
+        sync_suggestions(top, refresh, lib_ids, existing, triager)
 
     log("4. Literature map")
     build_graph(papers, top)

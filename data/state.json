@@ -8,6 +8,14 @@
    "To review",
    ""
   ],
+  "W1926244496": [
+   "To review",
+   ""
+  ],
+  "W1962835124": [
+   "To review",
+   ""
+  ],
   "W1963829225": [
    "To review",
    ""
@@ -129,6 +137,10 @@
    ""
   ],
   "W2625255878": [
+   "To review",
+   ""
+  ],
+  "W2749577835": [
    "To review",
    ""
   ],
@@ -489,6 +501,15 @@
   }
  },
  "geocode": {
+  "Alberta, Canada": [
+   55.001251,
+   -115.002136
+  ],
+  "Amapá, Brazil": [
+   1.3545442,
+   -51.9161977
+  ],
+  "Amazon basin, Peru": null,
   "Amazon, Peru": [
    -3.8932882,
    -73.1868553
@@ -521,6 +542,7 @@
   "Central Kalimantan peat dome, Central Kalimantan, Indonesia": null,
   "Central Kalimantan peat swamp forest, Central Kalimantan, Indonesia": null,
   "Central Kalimantan peatlands, Central Kalimantan, Indonesia": null,
+  "Central Kalimantan transects, Central Kalimantan, Indonesia": null,
   "Central Kalimantan, Central Kalimantan, Indonesia": [
    -2.2138314,
    113.9255363
@@ -533,11 +555,22 @@
    -2.2138314,
    113.9255363
   ],
+  "Central Siberia, Russia": [
+   65.2539737,
+   106.7898242
+  ],
   "Congo Basin, Central Africa, Democratic Republic of the Congo": null,
   "Congo Basin, Congo Basin, Not stated": null,
   "Congo Basin, Not stated": null,
+  "Cuvette Centrale, Cuvette Centrale, Democratic Republic of the Congo": null,
+  "Cuvette Centrale, Democratic Republic of the Congo": null,
   "Da Hinggan Mountains, Heilongjiang / Inner Mongolia, China": null,
+  "Danube National Park, Lower Austria, Austria": null,
   "Daxing'an Mountains, Northeast China, China": null,
+  "Democratic Republic of the Congo": [
+   -2.9814344,
+   23.8222636
+  ],
   "East Kalimantan peat swamp forest, East Kalimantan, Indonesia": null,
   "East Kalimantan, Indonesia": [
    0.7884397,
@@ -548,11 +581,23 @@
    25.3679443,
    -80.8783066
   ],
+  "Florida site, Florida, United States": [
+   27.3441959,
+   -81.0312841
+  ],
   "Florida, United States": [
    27.7567667,
    -81.4639835
   ],
+  "Georgia, USA": [
+   32.3293809,
+   -83.1137366
+  ],
   "Giam Siak Kecil–Bukit Batu Biosphere Reserve, Sumatra, Indonesia": null,
+  "Great Dismal Swamp, Virginia / North Carolina, USA": [
+   36.5375826,
+   -76.4204223
+  ],
   "Great Lakes–St. Lawrence forest region, Ontario, Canada": null,
   "Gulf of Carpentaria, Northern Australia, Australia": null,
   "Heilongjiang / Inner Mongolia, China": [
@@ -577,8 +622,18 @@
    -1.6123473,
    103.5186977
   ],
+  "Kalimantan Barat, West Kalimantan, Indonesia": [
+   -0.0596325,
+   109.3540116
+  ],
   "Kampar Peninsula, Riau Province, Indonesia": null,
   "Klyuch river, Western Siberia, Russia": null,
+  "Lago Piratuba Biosphere Reserve, Amapá, Brazil": null,
+  "Leyte Sab-A Basin peatland, Leyte, Philippines": null,
+  "Leyte, Philippines": [
+   10.7841157,
+   124.892321
+  ],
   "Loreto, Peru": [
    -5.0,
    -75.0
@@ -596,14 +651,34 @@
    30.8703881,
    -92.007126
   ],
+  "Lower Austria, Austria": [
+   48.2817813,
+   15.7632457
+  ],
+  "Lower Savannah River, Georgia, USA": [
+   32.0800487,
+   -81.0856252
+  ],
+  "Maine forested wetland, Maine, United States": null,
+  "Maine, United States": [
+   45.709097,
+   -68.8590201
+  ],
+  "Malaysia": [
+   4.5693754,
+   102.2656823
+  ],
   "Malaysia and Indonesia": null,
   "Malaysia and Indonesia, Malaysia and Indonesia": null,
+  "Malaysia peat swamp forest and oil palm plantation, Not stated, Malaysia": null,
   "Malaysia tropical peat swamp forest and oil palm plantation transects, Malaysia, Malaysia": null,
   "Malaysia, Malaysia": [
    5.2265873,
    100.4504672
   ],
+  "Malaysia, Southeast Asia, Malaysia": null,
   "Maludam National Park, Sarawak, Malaysia": null,
+  "Mauritia flexuosa palm swamp peat forest, Peruvian Amazon, Peru": null,
   "Mekong Delta, Vietnam": [
    9.7508958,
    105.2224602
@@ -613,6 +688,10 @@
   "Michigan, United States": [
    43.6211955,
    -84.6824346
+  ],
+  "Minnesota site, Minnesota, United States": [
+   44.0142802,
+   -92.4162336
   ],
   "Mississippi River deltaic plain, Louisiana, United States": null,
   "Mississippi deltaic plain, Louisiana, USA": null,
@@ -634,6 +713,15 @@
    40.7127281,
    -74.0060152
   ],
+  "Ngamiland, Botswana": [
+   -19.9875533,
+   23.4267468
+  ],
+  "North Carolina coastal plain, North Carolina, USA": null,
+  "North Carolina, USA": [
+   35.6729639,
+   -79.0392919
+  ],
   "North Florida swamp forest, Florida, United States": null,
   "North Selangor, Selangor, Malaysia": [
    2.9687015,
@@ -649,16 +737,32 @@
   ],
   "Northern Borneo peat swamp, Belait / Tutong / Temburong, Brunei Darussalam": null,
   "Northern Lower Michigan forested ecosystems, Michigan, United States": null,
+  "Northwest Territories, Canada": [
+   65.0000004,
+   -118.0
+  ],
   "Not stated": null,
+  "Not stated, Malaysia": null,
   "Not stated, United States": null,
   "Not stated, West Kalimantan, Indonesia": null,
   "Nova Scotia, Canada": [
    45.1960403,
    -63.1653789
   ],
+  "Ogeechee River floodplain, Georgia, USA": null,
+  "Okavango Delta, Ngamiland, Botswana": null,
+  "Okefenokee Swamp, Georgia, United States": [
+   30.6668928,
+   -82.3331791
+  ],
   "Ontario, Canada": [
    50.000678,
    -86.000977
+  ],
+  "PT. Rimba Makmur Utama, Central Kalimantan, Indonesia": null,
+  "Pahang, Malaysia": [
+   3.6168822,
+   102.5994547
   ],
   "Palangkaraya, Central Kalimantan, Indonesia": [
    -2.2072919,
@@ -669,11 +773,28 @@
    134.0755946
   ],
   "Pastaza-Marañon foreland basin, Amazon, Peru": null,
+  "Pastaza-Marañón foreland basin, Amazon basin, Peru": null,
   "Peat swamp forest sites in Indonesia, Southeast Asia, Indonesia": null,
   "Peat swamp forests of Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
+  "Pekan peat swamp forest, Pahang, Malaysia": null,
   "Peninsular Malaysia, Malaysia": [
    3.0839554,
    101.7442451
+  ],
+  "Peru": [
+   -6.8699697,
+   -75.0458515
+  ],
+  "Peruvian Amazon, Peru": null,
+  "Qinghai-Tibet, China": [
+   37.3371261,
+   97.4152619
+  ],
+  "Qinghai-Tibetan Plateau, Qinghai-Tibet, China": null,
+  "Quebec peatlands, Quebec, Canada": null,
+  "Quebec, Canada": [
+   52.4760892,
+   -71.8258668
   ],
   "Riau Province, Indonesia": null,
   "Riau Province, Riau, Indonesia": null,
@@ -682,7 +803,10 @@
    101.6548433
   ],
   "Sabaju, Southeast Asia, Not stated": null,
+  "Sanjiang Plain, Heilongjiang, China": null,
   "Sarawak peat dome, Sarawak, Malaysia": null,
+  "Sarawak peat ecosystems, Sarawak, Malaysia": null,
+  "Sarawak peat swamp forest and oil palm plantation, Sarawak, Malaysia": null,
   "Sarawak peat swamp forest, Sarawak, Malaysia": null,
   "Sarawak peatland, Sarawak, Malaysia": null,
   "Sarawak, Malaysia": [
@@ -693,11 +817,30 @@
    1.4668506,
    110.4331946
   ],
+  "Saskatchewan boreal forest wetland, Saskatchewan, Canada": null,
+  "Saskatchewan, Canada": [
+   55.5321257,
+   -106.141224
+  ],
+  "Savannah River, Georgia / South Carolina, USA": [
+   33.1478707,
+   -81.7516388
+  ],
   "Sebungan, Southeast Asia, Not stated": null,
+  "Selangor peat swamp forest and oil palm plantation, Selangor, Malaysia": null,
+  "Selangor, Malaysia": [
+   3.2083304,
+   101.304146
+  ],
   "Shaubac Wetlands, Nova Scotia, Canada": null,
   "South Bohemia, Czech Republic": [
    48.9766916,
    14.4507334
+  ],
+  "South Kalimantan coastal area, South Kalimantan, Indonesia": null,
+  "South Kalimantan, Indonesia": [
+   -2.9285686,
+   115.3700718
   ],
   "South Sumatra, Indonesia": [
    -3.1931356,
@@ -708,6 +851,10 @@
   "Southeast Asia, Indonesia": [
    -8.7287308,
    115.2365646
+  ],
+  "Southeast Asia, Malaysia": [
+   3.140489,
+   101.6834074
   ],
   "Southeast Asia, Not stated": null,
   "Southern Ontario swamps, Southern Ontario, Canada": null,
@@ -729,6 +876,15 @@
    -100.445882
   ],
   "United States wetlands, Not stated, United States": null,
+  "Veracruz coastal freshwater wetlands, Veracruz, Mexico": null,
+  "Veracruz, Mexico": [
+   19.333333,
+   -96.666667
+  ],
+  "Waccamaw River, South Carolina, USA": [
+   33.8874211,
+   -78.8190042
+  ],
   "West Aceh, Indonesia": null,
   "West Kalimantan, Indonesia": [
    -0.1322387,
@@ -748,9 +904,16 @@
    55.0959197,
    82.9627763
   ],
+  "XiaoXing'an Mountains, Heilongjiang, China": null,
   "Xiaoxing'an Mountains, Heilongjiang, China": null,
   "Xiaoxing’an Mountains, Northeast China, China": null,
+  "ZOTTO observatory, Central Siberia, Russia": null,
+  "central Ontario, Ontario, Canada": [
+   44.9376036,
+   -78.9925565
+  ],
   "forested swamp near Ithaca, New York, USA": null,
+  "northern Alberta study site, Alberta, Canada": null,
   "northern Alberta, Alberta, Canada": [
    58.7131298,
    -111.1591342
@@ -759,12 +922,130 @@
    60.1725502,
    24.9329194
   ],
+  "southern Ontario peat swamp, Ontario, Canada": null,
   "southern Ontario, Ontario, Canada": [
    43.2231351,
    -79.9798581
   ],
+  "southern Quebec drained swamp peatland sites, Quebec, Canada": null,
+  "southern Taiga Plains, Northwest Territories, Canada": null,
   "southwestern Nova Scotia swamps, Nova Scotia, Canada": null,
   "umava Mountains, South Bohemia, Czech Republic": null
+ },
+ "predictions": {},
+ "prompts": {
+  "3e91b1dd6340": {
+   "kind": "field",
+   "schema": {
+    "description": "Classify one paper for a systematic map of the research field.",
+    "input_schema": {
+     "properties": {
+      "biome": {
+       "enum": [
+        "Boreal",
+        "Temperate",
+        "Subtropical",
+        "Tropical",
+        "Arctic / tundra",
+        "Multiple / global",
+        "Not stated"
+       ],
+       "type": "string"
+      },
+      "ecosystems": {
+       "items": {
+        "enum": [
+         "Forested swamp",
+         "Peatland / bog / fen",
+         "Marsh",
+         "Upland forest",
+         "Other wetland",
+         "Other"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "gases": {
+       "items": {
+        "enum": [
+         "CO2",
+         "CH4",
+         "N2O"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "on_topic": {
+       "description": "True if the paper actually studies greenhouse gas or carbon exchange in wetland ecosystems (field, lab, model or review). False for papers that only mention these words.",
+       "type": "boolean"
+      },
+      "research_questions": {
+       "description": "Research questions of the PhD that this paper substantially informs. May be empty.",
+       "items": {
+        "enum": [
+         "RQ1 Source/sink controls",
+         "RQ2 Disturbed vs intact",
+         "RQ3 Anthropogenic impact",
+         "RQ4 Soil vs water C sources",
+         "RQ5 Microbial taxonomy & function"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "sites": {
+       "description": "Named field sites. Empty if none are named.",
+       "items": {
+        "properties": {
+         "country": {
+          "type": "string"
+         },
+         "name": {
+          "type": "string"
+         },
+         "region": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "name",
+         "region",
+         "country"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      },
+      "study_design": {
+       "enum": [
+        "Field observation",
+        "Field experiment",
+        "Lab / incubation",
+        "Modelling",
+        "Review",
+        "Meta-analysis / synthesis",
+        "Methods"
+       ],
+       "type": "string"
+      }
+     },
+     "required": [
+      "on_topic",
+      "research_questions",
+      "ecosystems",
+      "gases",
+      "biome",
+      "study_design",
+      "sites"
+     ],
+     "type": "object"
+    },
+    "name": "record_field_map"
+   },
+   "system": "You classify papers for a systematic map of a research field, so a PhD student can see what the field as a whole has and has not studied.\n\nThe student's research context, including the research questions to tag:\n<context>\n# PhD research context (used by the AI to judge relevance)\n\nEdit this file whenever your project evolves. The more specific it is, the better\nthe relevance scores and research-question tags will be.\n\n## Project\n\nPhD in biology (UQAM). Carbon and greenhouse gas dynamics (CO2, CH4, N2O) in\nforested wetlands, mainly forested swamps, of southern Québec, with the aim of\ninforming nature-based climate solutions.\n\nFluxes are measured with closed chambers on soil collars and on tree stems\n(LI-COR LI-7810 / LI-7820 trace gas analyzers). No aquatic (water surface)\nflux measurements.\n\n## Planned chapters\n\n1. Flux budget and microclimate controls (soil and stem fluxes, temperature,\n   water table, seasonal and spatial variability).\n2. Vegetation: role of trees and understory, stem fluxes, plant-mediated transport.\n3. Soil and water microbial communities: taxonomic and functional diversity,\n   methanogens, methanotrophs, nitrifiers / denitrifiers.\n4. Hydrology, biogeochemistry and contaminants (water chemistry, DOC, nutrients,\n   redox, anthropogenic inputs).\n\n## Research questions\n\n- RQ1: What controls whether a southern Québec forested swamp is a net GHG source or sink?\n- RQ2: How does a disturbed forested wetland compare to an intact one?\n- RQ3: How is anthropogenic impact expressed in forested wetlands?\n- RQ4: What is the distribution of carbon sources between soil and water in wetlands?\n- RQ5: What is the role of taxonomic and functional microbial diversity in the\n  belowground systems of forested wetlands in southern Québec?\n\n</context>\n\nClassify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome \"Not stated\" when there is no clue. Answer in the requested JSON format."
+  }
  },
  "runs": [
   {
@@ -803,6 +1084,26 @@
    "retractions": 0,
    "suggested_to_date": 65,
    "triaged": 9,
+   "unique_candidates": 24839
+  },
+  {
+   "candidates_evaluated": 24839,
+   "date": "2026-10-02",
+   "decisions": 0,
+   "excluded": 0,
+   "extracted": 0,
+   "field_classified": 200,
+   "field_progress": "Forested swamps 278/278; Forested wetlands 400/1383; All wetlands 37/1500",
+   "library": 12,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 65,
+   "retained": 0,
+   "retractions": 0,
+   "suggested_to_date": 65,
+   "triaged": 0,
    "unique_candidates": 24839
   }
  ],

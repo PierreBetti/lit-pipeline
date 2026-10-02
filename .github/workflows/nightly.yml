@@ -47,4 +47,5 @@ jobs:
           git add logs/ 2>/dev/null || true
           git add export/ 2>/dev/null || true
           git diff --cached --quiet || git commit -m "Nightly literature review update"
-          git push
+          # if something else was pushed meanwhile, replay this run on top (this run's files win any conflict)
+          git push || (git pull --rebase -X theirs origin main && git push)

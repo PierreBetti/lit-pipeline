@@ -40,6 +40,20 @@ jobs:
         run: |
           git config user.name "lit-pipeline"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ docs/ 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "Validation: ${{ inputs.task }}"
-          git pull --rebase && git push
+          # keep only what validation produced, then lay it on top of the latest version of the repo
+          mkdir -p /tmp/v
+          for f in validation.json validation_sample.json ai_log_validation.jsonl; do
+            [ -f "data/$f" ] && cp "data/$f" /tmp/v/ || true
+          done
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/v/* data/ 2>/dev/null || true
+            python validate.py render
+            git add data/ docs/
+            git diff --cached --quiet && exit 0
+            git commit -m "Validation: ${{ inputs.task }}"
+            git push && exit 0
+            sleep 10
+          done
+          exit 1

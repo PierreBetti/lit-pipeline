@@ -14,7 +14,13 @@ Every night, this runs a living literature review on top of your Notero database
 5. **Dashboard** (GitHub Pages, embed it in Notion) with five tabs: citation map, study site map,
    evidence gap map, timeline (your library vs. the whole field, milestones, coverage check), and
    screening (PRISMA 2020-style flow, exclusion reasons, saturation curve, learned preferences).
-6. **Audit trail**: one row per run in the Notion *Review log*, plus `logs/review_log.csv`,
+6. **Field-wide systematic map** (`scopes.json`): three nested searches of OpenAlex, from the most
+   specific (forested swamps) to the broadest (all wetlands). Every paper is classified once by the AI
+   (on-topic or not, research questions, ecosystem, gases, biome, design, sites), innermost scope first,
+   a batch per night. Scopes too large to classify fully are represented by a fixed random sample, and
+   their numbers become estimates with 95% confidence intervals. This powers the **Field rings** tab and
+   the field/compare modes of the gap map, site map and timeline.
+7. **Audit trail**: one row per run in the Notion *Review log*, plus `logs/review_log.csv`,
    `logs/decisions.csv` (every screening decision, dated) and `data/state.json`, all committed to the
    repository every night, so the whole review is timestamped and reproducible.
 
@@ -91,8 +97,13 @@ papers were matched, triaged and suggested. After that it runs by itself every n
 - **Screening a suggestion**: set *Exclusion reason* first, then *Decision* to Not relevant (the row leaves
   the To review view once the decision changes). The reason feeds the PRISMA flow.
 - **Re-extract sites and data for a paper**: clear its *Extraction date*.
-- **The field trend**: edit `FIELD_QUERY` at the top of `pipeline.py` to describe your field (OpenAlex
-  boolean search on titles and abstracts).
+- **Refine the field**: edit the queries in `scopes.json` (OpenAlex boolean search on titles and
+  abstracts; no commas inside a query). Only papers new to the corpus get classified, so refining is cheap.
+  Keep the scopes ordered from most specific to broadest.
+- **Reading the gap comparison**: a *research gap* means the field itself has almost nothing there; a
+  *reading gap* means the field has papers but your library has none of them.
+- **Field map speed**: `max_classify_per_run` in `scopes.json` (default 200 per night, within the free
+  Gemini quota). The field data lives in `data/corpus.json`, not in Notion.
 - **Test without writing anything**: `python pipeline.py --dry-run` (or `--no-ai` to skip the AI step).
 
 Good to know: the AI only sees titles and abstracts, so treat its relevance score as triage, not a

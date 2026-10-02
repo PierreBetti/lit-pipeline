@@ -20,6 +20,7 @@ Usage:
 """
 
 import datetime as dt
+import hashlib
 import json
 import math
 import os
@@ -53,9 +54,6 @@ LIBRARY_DS = os.environ.get("NOTERO_DATA_SOURCE_ID", "87a4954a-4928-8345-b3a8-87
 SUGGEST_DS = os.environ.get("SUGGESTED_DATA_SOURCE_ID", "444be872-ca23-4e7e-8d93-665568721b36")
 REVIEW_LOG_DS = os.environ.get("REVIEW_LOG_DATA_SOURCE_ID", "4e18753f-4ddc-4caa-911c-04eacc6a4d90")
 
-# OpenAlex search describing your field, used for the "field vs your library" timeline.
-FIELD_QUERY = os.environ.get("FIELD_QUERY",
-    '(swamp OR "forested wetland" OR "forested wetlands") AND (methane OR "carbon dioxide" OR "nitrous oxide" OR "greenhouse gas")')
 
 MAX_TRIAGE_PER_RUN = int(os.environ.get("MAX_TRIAGE_PER_RUN", "40"))
 MAX_SUGGESTIONS = int(os.environ.get("MAX_SUGGESTIONS", "40"))
@@ -533,6 +531,10 @@ class Triager:
                                               "Answer in the requested JSON format.")
             self.extract_system = self.extract_system.replace("Record your answer with the record_extraction tool.",
                                                               "Answer in the requested JSON format.")
+        self.field_system = FIELD_SYSTEM.format(context=context)
+        if self.provider == "gemini":
+            self.field_system = self.field_system.replace("Record your answer with the record_field_map tool.",
+                                                          "Answer in the requested JSON format.")
         self.calls = 0
 
     @property
@@ -549,7 +551,9 @@ class Triager:
         user = (f"Title: {title}\nYear: {year or 'unknown'}\n"
                 f"Journal: {journal or 'unknown'}\n"
                 f"Abstract: {abstract or '(no abstract available)'}")
-        system, tool = (self.system, TRIAGE_TOOL) if kind == "triage" else (self.extract_system, EXTRACT_TOOL)
+        system, tool = {"triage": (self.system, TRIAGE_TOOL),
+                        "extract": (self.extract_system, EXTRACT_TOOL),
+                        "field": (getattr(self, "field_system", ""), FIELD_TOOL)}[kind]
         try:
             self.calls += 1
             if self.provider == "gemini":
@@ -670,11 +674,22 @@ For sites, give the most specific place named; add region and country when they 
 Use biome "Not stated" when the abstract gives no clue. Record your answer with the record_extraction tool."""
 
 
+class GeocodeBudgetSpent(Exception):
+    pass
+
+
+_geo_budget = {"left": None}   # None = unlimited (library); a number during the field map step
+
+
 def geocode(query, state):
     """Free geocoding with OpenStreetMap Nominatim (max 1 request per second), cached between runs."""
     cache = state.setdefault("geocode", {})
     if query in cache:
         return cache[query]
+    if _geo_budget["left"] is not None:
+        if _geo_budget["left"] <= 0:
+            raise GeocodeBudgetSpent()
+        _geo_budget["left"] -= 1
     time.sleep(1.1)
     try:
         r = requests.get("https://nominatim.openstreetmap.org/search",
@@ -771,6 +786,11 @@ def append_csv(name, header, rows):
     import csv
     LOG_DIR.mkdir(exist_ok=True)
     path = LOG_DIR / name
+    if path.exists():
+        with path.open(encoding="utf-8") as f:
+            first = f.readline().strip()
+        if first != ",".join(header):   # columns changed: archive the old file instead of misaligning rows
+            path.rename(path.with_name(path.stem + f"_until_{TODAY}" + path.suffix))
     new = not path.exists()
     with path.open("a", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -1220,25 +1240,262 @@ def build_graph(papers, suggestions):
 
 
 # ----------------------------------------------------------------------------
-# Step 5: dashboard data, run log
+# Step 6: field-wide systematic map (nested scopes, see scopes.json)
 # ----------------------------------------------------------------------------
-def field_trend():
-    """Papers per year in the whole field (OpenAlex search), to compare with your library."""
-    if not FIELD_QUERY:
-        return {}
-    res = openalex("/works", {"filter": f"title_and_abstract.search:{FIELD_QUERY}",
-                              "group_by": "publication_year"})
-    out = {}
-    for g in (res or {}).get("group_by", []):
+FIELD_TOOL = {
+    "name": "record_field_map",
+    "description": "Classify one paper for a systematic map of the research field.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "on_topic": {"type": "boolean",
+                         "description": "True if the paper actually studies greenhouse gas or carbon exchange in wetland ecosystems (field, lab, model or review). False for papers that only mention these words."},
+            "research_questions": {"type": "array", "items": {"type": "string", "enum": RESEARCH_QUESTIONS},
+                                   "description": "Research questions of the PhD that this paper substantially informs. May be empty."},
+            "ecosystems": {"type": "array", "items": {"type": "string", "enum": ECOSYSTEMS}},
+            "gases": {"type": "array", "items": {"type": "string", "enum": GASES}},
+            "biome": {"type": "string", "enum": BIOMES},
+            "study_design": {"type": "string", "enum": STUDY_DESIGNS},
+            "sites": {"type": "array", "description": "Named field sites. Empty if none are named.",
+                      "items": {"type": "object",
+                                "properties": {"name": {"type": "string"}, "region": {"type": "string"},
+                                               "country": {"type": "string"}},
+                                "required": ["name", "region", "country"]}},
+        },
+        "required": ["on_topic", "research_questions", "ecosystems", "gases", "biome", "study_design", "sites"],
+    },
+}
+
+FIELD_SYSTEM = """You classify papers for a systematic map of a research field, so a PhD student can see what the field as a whole has and has not studied.
+
+The student's research context, including the research questions to tag:
+<context>
+{context}
+</context>
+
+Classify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome "Not stated" when there is no clue. Record your answer with the record_field_map tool."""
+
+FIELD_SELECT = "id,doi,display_name,publication_year,type,cited_by_count,abstract_inverted_index"
+
+
+def load_scopes():
+    path = ROOT / "scopes.json"
+    if not path.exists():
+        return None
+    cfg = json.loads(path.read_text(encoding="utf-8"))
+    cfg.setdefault("max_full", 4000)
+    cfg.setdefault("sample_size", 1500)
+    cfg.setdefault("max_classify_per_run", 200)
+    cfg.setdefault("max_new_geocodes_per_run", 120)
+    return cfg
+
+
+def load_corpus():
+    path = DATA_DIR / "corpus.json"
+    if path.exists():
         try:
-            year = int(g["key"])
-        except (TypeError, ValueError):
-            continue
-        if 1960 <= year <= dt.date.today().year:
-            out[year] = g["count"]
+            return json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            log("   warning: data/corpus.json unreadable, rebuilding the field corpus")
+    return {}
+
+
+def save_corpus(corpus):
+    if DRY_RUN:
+        return
+    DATA_DIR.mkdir(exist_ok=True)
+    (DATA_DIR / "corpus.json").write_text(json.dumps(corpus, ensure_ascii=False, separators=(",", ":")),
+                                          encoding="utf-8")
+
+
+def _scope_filter(query):
+    return f"title_and_abstract.search:{query},type:article|review"
+
+
+def fetch_scope(scope, cfg, corpus, state):
+    """Download the papers of one scope: all of them if it is small enough, otherwise a fixed random sample."""
+    meta = state.setdefault("field_scopes", {}).setdefault(scope["id"], {})
+    flt = _scope_filter(scope["query"])
+    res = openalex("/works", {"filter": flt, "per_page": 1, "select": "id"})
+    if not res:
+        log(f"   {scope['label']}: OpenAlex did not answer, keeping the previous corpus")
+        return
+    total = res.get("meta", {}).get("count", 0)
+    mode = "full" if total <= cfg["max_full"] else "sample"
+    key = hashlib.md5(f"{scope['query']}|{mode}|{cfg['sample_size']}".encode()).hexdigest()
+    last = meta.get("last_fetch")
+    age = (dt.date.today() - dt.date.fromisoformat(last)).days if last else 9999
+    stale = meta.get("key") != key or (age >= 7 if mode == "full" else age >= 120)
+    meta.update({"total": total, "mode": mode, "label": scope["label"]})
+    if not stale:
+        return
+    ids = set()
+
+    def add(w):
+        wid = short_id(w["id"])
+        ids.add(wid)
+        rec = corpus.setdefault(wid, {"t": w.get("display_name") or "", "y": w.get("publication_year"),
+                                      "d": w.get("doi"), "s": []})
+        rec["c"] = w.get("cited_by_count") or 0
+        if "k" not in rec and "a" not in rec:
+            rec["a"] = abstract_text(w.get("abstract_inverted_index"))[:4000]
+        if scope["id"] not in rec["s"]:
+            rec["s"].append(scope["id"])
+
+    if mode == "full":
+        cursor = "*"
+        while cursor:
+            page = openalex("/works", {"filter": flt, "per_page": 200, "cursor": cursor, "select": FIELD_SELECT})
+            if not page:
+                break
+            for w in page.get("results", []):
+                add(w)
+            cursor = page.get("meta", {}).get("next_cursor")
+            if not page.get("results"):
+                break
+    else:
+        size = min(cfg["sample_size"], 10000)
+        for pg in range(1, math.ceil(size / 200) + 1):
+            page = openalex("/works", {"filter": flt, "sample": size, "seed": 42, "per_page": 200,
+                                       "page": pg, "select": FIELD_SELECT})
+            for w in (page or {}).get("results", []):
+                add(w)
+    # papers that left this scope (query edited) lose its membership
+    for wid, rec in corpus.items():
+        if scope["id"] in rec["s"] and wid not in ids:
+            rec["s"].remove(scope["id"])
+    trend = openalex("/works", {"filter": flt, "group_by": "publication_year"})
+    meta["trend"] = {g["key"]: g["count"] for g in (trend or {}).get("group_by", [])
+                     if str(g.get("key", "")).isdigit()}
+    meta.update({"key": key, "last_fetch": TODAY, "fetched": len(ids), "query": scope["query"]})
+    log(f"   {scope['label']}: {total} papers in OpenAlex, {mode} mode, {len(ids)} in the corpus")
+
+
+def classify_field(corpus, cfg, triager, scopes):
+    """Classify pending papers, innermost scope first, within the per-run and AI quota limits."""
+    done = 0
+    if not triager.available:
+        return 0
+    for scope in scopes:
+        pending = [wid for wid, rec in corpus.items() if scope["id"] in rec["s"] and "k" not in rec]
+        for wid in pending:
+            if done >= cfg["max_classify_per_run"] or not triager.available:
+                return done
+            rec = corpus[wid]
+            result = triager.run(rec["t"][:80], rec["t"], rec["y"], "", rec.get("a", ""), kind="field")
+            if triager.exhausted:
+                return done
+            if not result:
+                continue
+            rec["k"] = {
+                "o": bool(result.get("on_topic")),
+                "q": keep(result.get("research_questions"), RESEARCH_QUESTIONS),
+                "e": keep(result.get("ecosystems"), ECOSYSTEMS),
+                "g": keep(result.get("gases"), GASES),
+                "b": result.get("biome") if result.get("biome") in BIOMES else "Not stated",
+                "z": result.get("study_design") if result.get("study_design") in STUDY_DESIGNS else None,
+                "l": [s for s in (result.get("sites") or []) if isinstance(s, dict)][:5],
+                "na": not rec.get("a"),          # classified from the title only
+                "m": triager.model, "dt": TODAY,
+            }
+            rec.pop("a", None)
+            done += 1
+    return done
+
+
+def geocode_field(corpus, cfg, state):
+    _geo_budget["left"] = cfg["max_new_geocodes_per_run"]
+    try:
+        for rec in corpus.values():
+            k = rec.get("k")
+            if not k or not k["o"] or "p" in k or not k["l"]:
+                continue
+            k["p"] = [[round(pt["lat"], 3), round(pt["lon"], 3), pt["precision"][0]]
+                      for pt in locate_sites(k["l"], state)]
+    except GeocodeBudgetSpent:
+        pass
+    finally:
+        _geo_budget["left"] = None
+
+
+def wilson(k, n, z=1.96):
+    if n == 0:
+        return (0.0, 0.0, 0.0)
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return (p, max(0.0, c - h), min(1.0, c + h))
+
+
+def field_stats(corpus, scopes, state, papers):
+    lib_ids = {short_id(p["work"]["id"]) for p in papers if p.get("work")}
+    out = []
+    for scope in scopes:
+        meta = state.get("field_scopes", {}).get(scope["id"], {})
+        members = [rec for rec in corpus.values() if scope["id"] in rec["s"]]
+        member_ids = {wid for wid, rec in corpus.items() if scope["id"] in rec["s"]}
+        classified = [r for r in members if "k" in r]
+        on = [r for r in classified if r["k"]["o"]]
+        total = meta.get("total", 0)
+        on_rate = len(on) / len(classified) if classified else None
+        est_on = round(total * on_rate) if on_rate is not None else None
+        scale = (est_on / len(on)) if on and est_on else 0
+
+        def dist(values, getter):
+            res = {}
+            for v in values:
+                k_ = sum(1 for r in on if v in getter(r))
+                p, lo, hi = wilson(k_, len(on))
+                res[v] = {"n": k_, "p": round(p, 4), "lo": round(lo, 4), "hi": round(hi, 4),
+                          "est": round(k_ * scale)}
+            return res
+
+        eco_rq = {}
+        for gas in ["All"] + GASES:
+            sub = on if gas == "All" else [r for r in on if gas in r["k"]["g"]]
+            eco_rq[gas] = {e: {q: round(sum(1 for r in sub if e in r["k"]["e"] and q in r["k"]["q"]) * scale)
+                               for q in RESEARCH_QUESTIONS} for e in ECOSYSTEMS}
+        design_biome = {d: {b: round(sum(1 for r in on if r["k"]["z"] == d and r["k"]["b"] == b) * scale)
+                            for b in BIOMES} for d in STUDY_DESIGNS}
+        points = [[pt[0], pt[1], pt[2], (r["t"] or "")[:110], r["y"], r.get("d")]
+                  for r in on for pt in r["k"].get("p", [])][:4000]
+        out.append({
+            "id": scope["id"], "label": scope["label"], "query": scope["query"],
+            "mode": meta.get("mode", "full"), "total": total, "fetched": len(members),
+            "classified": len(classified), "on_topic": len(on), "est_on_topic": est_on, "scale": round(scale, 3),
+            "title_only": sum(1 for r in classified if r["k"].get("na")),
+            "rq": dist(RESEARCH_QUESTIONS, lambda r: r["k"]["q"]),
+            "gases": dist(GASES, lambda r: r["k"]["g"]),
+            "ecosystems": dist(ECOSYSTEMS, lambda r: r["k"]["e"]),
+            "eco_rq": eco_rq, "design_biome": design_biome,
+            "years": meta.get("trend", {}), "points": points,
+            "library_in_scope": sorted(lib_ids & member_ids),
+        })
     return out
 
 
+def run_field_map(papers, triager, state):
+    cfg = load_scopes()
+    if not cfg or not cfg.get("scopes"):
+        log("   no scopes.json, skipping the field map")
+        return None, 0, ""
+    scopes = cfg["scopes"]
+    corpus = load_corpus()
+    for scope in scopes:
+        fetch_scope(scope, cfg, corpus, state)
+    done = classify_field(corpus, cfg, triager, scopes)
+    geocode_field(corpus, cfg, state)
+    save_corpus(corpus)
+    stats = field_stats(corpus, scopes, state, papers)
+    progress = "; ".join(f"{s['label']} {s['classified']}/{s['fetched']}" for s in stats)
+    log(f"   classified {done} field papers ({progress})")
+    return stats, done, progress
+
+
+# ----------------------------------------------------------------------------
+# Step 5: dashboard data, run log
+# ----------------------------------------------------------------------------
 def find_milestones(papers, suggestions, limit=12):
     """Landmark papers: highly cited and/or cited by several of your papers."""
     lib = [p for p in papers if p.get("work")]
@@ -1327,6 +1584,7 @@ def library_rows(papers, state):
             "rqs": p["rqs"], "ecosystems": p["ecosystems"], "gases": p["gases"],
             "biome": p.get("biome"), "design": p.get("design"),
             "relevance": p.get("relevance"), "read": p["status"] == "Read",
+            "oa": short_id((p.get("work") or {}).get("id")),
             "sites": sites.get(p["page_id"], []),
             "doi": (p.get("work") or {}).get("doi") or (f"https://doi.org/{p['doi']}" if p["doi"] else None),
         })
@@ -1336,7 +1594,7 @@ def library_rows(papers, state):
 def write_run_log(row):
     header = ["date", "library", "candidates_evaluated", "unique_candidates", "suggested_to_date",
               "new_suggestions", "new_relevant", "pending", "retained", "excluded", "decisions",
-              "triaged", "extracted", "retractions", "model"]
+              "triaged", "extracted", "retractions", "field_classified", "field_progress", "model"]
     append_csv("review_log.csv", header, [[row.get(k, "") for k in header]])
     if DRY_RUN or not REVIEW_LOG_DS:
         return
@@ -1357,6 +1615,8 @@ def write_run_log(row):
             "Papers triaged": p_num(row["triaged"]),
             "Papers extracted": p_num(row["extracted"]),
             "Retractions": p_num(row["retractions"]),
+            "Field papers classified": p_num(row.get("field_classified", 0)),
+            "Field progress": p_text(row.get("field_progress", "")),
             "Model": p_text(row["model"]),
             "Notes": p_text(row.get("notes", "")),
         })
@@ -1420,22 +1680,24 @@ def main():
         stats = sync_suggestions(top, refresh, lib_ids, existing, triager, model)
         existing = load_existing_suggestions()   # fresh view including today's additions
 
-    log("5. Dashboard and review log")
+    log("5. Field-wide systematic map")
+    field, field_done, field_progress = run_field_map(papers, triager, state)
+
+    log("6. Dashboard and review log")
     state["seen_candidates"] = sorted(set(state["seen_candidates"]) | set(existing or {}))
     prisma = prisma_counts(papers, existing or {}, state)
     data = {
         "generated": TODAY,
         "graph": build_graph(papers, top),
         "library": library_rows(papers, state),
-        "field_trend": field_trend(),
-        "field_query": FIELD_QUERY,
+        "field": field,
         "milestones": find_milestones(papers, top),
         "prisma": prisma,
         "saturation": saturation_series(existing or {}),
         "preferences": {**model, "features": FEATURES},
         "runs": state.get("runs", [])[-60:],
         "options": {"rqs": RESEARCH_QUESTIONS, "ecosystems": ECOSYSTEMS, "gases": GASES,
-                    "biomes": BIOMES, "categories": CATEGORIES},
+                    "biomes": BIOMES, "categories": CATEGORIES, "designs": STUDY_DESIGNS},
     }
     run = {
         "date": TODAY, "library": len(papers), "candidates_evaluated": len(candidates),
@@ -1444,6 +1706,7 @@ def main():
         "pending": prisma["pending"], "retained": prisma["retained_network"], "excluded": prisma["excluded"],
         "decisions": decisions, "triaged": (triaged or 0) + stats["triaged"], "extracted": extracted,
         "retractions": len(metrics["retractions"]), "model": triager.model,
+        "field_classified": field_done, "field_progress": field_progress,
         "notes": ("Retracted in library: " + "; ".join(metrics["retractions"])) if metrics["retractions"] else "",
     }
     state.setdefault("runs", []).append(run)

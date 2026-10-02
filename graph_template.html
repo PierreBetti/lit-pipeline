@@ -103,6 +103,16 @@
   .alert { border-left: 4px solid var(--gap); }
   .runs td, .runs th { padding: 4px 8px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
   .runs th:first-child, .runs td:first-child { text-align: left; }
+  .rings-wrap { display: grid; grid-template-columns: minmax(300px, 520px) minmax(260px, 1fr); gap: 16px; align-items: start; }
+  .rings-wrap svg path.sector { cursor: pointer; }
+  .rings-wrap svg path.sector:hover, .rings-wrap svg path.sector.sel { stroke: var(--ink); stroke-width: 1.5; }
+  .ringlegend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin: 8px 0 0; align-items: center; }
+  .sw { display: inline-block; width: 16px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+  .prog { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; min-width: 90px; }
+  .prog span { display: block; height: 100%; background: rgba(var(--heat), .9); }
+  .heat td.reading { box-shadow: inset 0 0 0 2px #c9952b; }
+  .heat td .sub { display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
+  @media (max-width: 760px) { .rings-wrap { grid-template-columns: 1fr; } }
   @media (max-width: 640px) { .prisma { grid-template-columns: 1fr; } .detail { top: auto; bottom: 12px; } }
 </style>
 </head>
@@ -115,6 +125,7 @@
   <button role="tab" aria-selected="true" data-tab="t-map">Citation map</button>
   <button role="tab" aria-selected="false" data-tab="t-sites">Study sites</button>
   <button role="tab" aria-selected="false" data-tab="t-gaps">Evidence gaps</button>
+  <button role="tab" aria-selected="false" data-tab="t-rings">Field rings</button>
   <button role="tab" aria-selected="false" data-tab="t-time">Timeline</button>
   <button role="tab" aria-selected="false" data-tab="t-screen">Screening</button>
 </nav>
@@ -135,13 +146,15 @@
       <strong>Where the evidence comes from</strong>
       <p class="hint" id="sites-summary"></p>
       <ul class="legend" id="sites-legend"></ul>
+      <div class="chips" id="field-layer" role="group" aria-label="Show the field's study sites" style="margin-top:6px"></div>
       <p class="hint">Solid dot: exact site. Hollow: located at region level. Faint: country only. Sites are extracted by AI from abstracts and geocoded automatically, so check them before using the map in a figure.</p>
     </div>
   </section>
 
   <section class="tab" id="t-gaps" role="tabpanel"><div class="pad">
     <h2>Evidence gap map</h2>
-    <p class="lead">How many papers in your library address each research question in each ecosystem. Hatched cells are gaps. Click a cell to see the papers.</p>
+    <p class="lead" id="gaps-lead">How many papers address each research question in each ecosystem. Hatched cells are gaps. Click a cell for details.</p>
+    <div class="chips" id="gap-source" role="group" aria-label="Data source"></div>
     <div class="chips" id="gas-filter" role="group" aria-label="Filter by gas"></div>
     <div class="scroll"><table class="heat" id="heat-rq"></table></div>
     <div id="cell-papers"></div>
@@ -150,9 +163,22 @@
     <div class="scroll"><table class="heat" id="heat-design"></table></div>
   </div></section>
 
+  <section class="tab" id="t-rings" role="tabpanel"><div class="pad">
+    <h2>Where the science is, from broad to specific</h2>
+    <p class="lead">Each ring is a scope of the literature, from all wetlands (outside) to forested swamps (inside); your library is the core. Each sector is one of your research questions, shaded by the share of that scope's papers addressing it. Hatched sectors are gaps. Click a sector for numbers and confidence intervals.</p>
+    <div class="rings-wrap">
+      <div><div id="rings"></div><div class="ringlegend" id="ringlegend"></div></div>
+      <div class="card" id="ring-detail"><p class="muted" style="margin:0">Click a sector to see its numbers.</p></div>
+    </div>
+    <h2>Field map progress</h2>
+    <p class="lead">Papers are classified a batch at a time each night, innermost scope first. Large scopes are represented by a fixed random sample, so their numbers are estimates.</p>
+    <div class="scroll"><table class="runs" id="field-progress"></table></div>
+  </div></section>
+
   <section class="tab" id="t-time" role="tabpanel"><div class="pad">
     <h2>Your library against the field</h2>
     <p class="lead" id="time-lead"></p>
+    <div class="chips" id="time-scope" role="group" aria-label="Field scope for the comparison"></div>
     <div class="card"><div class="chartbox"><canvas id="timechart" aria-label="Papers per year"></canvas></div></div>
     <div class="grid2" style="margin-top:14px">
       <div class="card">
@@ -202,6 +228,18 @@ const V = n => css.getPropertyValue(n).trim();
 const INK = V("--ink"), MUTED = V("--muted"), EDGE = V("--edge"), BG = V("--bg"), LINE = V("--line"), HEAT = V("--heat");
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const colorOf = cat => PALETTE[cat] || PALETTE.Uncategorized;
+const FIELD = (DATA && DATA.field) || [];
+const fmt = n => n == null ? "n/a" : n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "k" : String(n);
+const pctf = p => (p * 100).toFixed(p < 0.1 ? 1 : 0) + "%";
+function chipGroup(el, options, initial, onPick) {
+  el.innerHTML = "";
+  options.forEach(([value, label]) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = label; b.setAttribute("aria-pressed", String(value === initial));
+    b.addEventListener("click", () => { el.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); onPick(value); });
+    el.appendChild(b);
+  });
+}
 
 // ---------- tabs (each tab is drawn the first time it is opened)
 const drawn = {};
@@ -315,86 +353,207 @@ if (!DATA) {
       `${mapped} papers placed on the map. ${unmapped} without a site (reviews, models, global studies, or not yet extracted).`;
     document.getElementById("sites-legend").innerHTML = Object.entries(perCat).map(([c, n]) =>
       `<li><span style="display:flex;gap:8px;align-items:center"><span class="dot" style="background:${colorOf(c)}"></span>${esc(c)}<span class="n">${n}</span></span></li>`).join("");
+
+    if (FIELD.length) {
+      map.createPane("field"); map.getPane("field").style.zIndex = 350;
+      let layer = null;
+      chipGroup(document.getElementById("field-layer"), [["", "Your library only"], ...FIELD.map(f => [f.id, "+ " + f.label])], "", id => {
+        if (layer) { map.removeLayer(layer); layer = null; }
+        const f = FIELD.find(x => x.id === id);
+        if (!f) return;
+        layer = L.layerGroup(f.points.map(([lat, lon, prec, title, year, doi]) =>
+          L.circleMarker([lat, lon], { pane: "field", radius: 3.5, weight: 0, fillColor: MUTED, fillOpacity: prec === "s" ? 0.55 : 0.25 })
+            .bindPopup(`${esc(title)} (${year || "n.d."})` + (doi ? `<br><a href="${esc(doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""))));
+        layer.addTo(map);
+        document.getElementById("sites-summary").textContent =
+          `Grey: ${f.points.length} mapped sites from the ${f.label.toLowerCase()} literature (${f.classified} of ${f.fetched} papers classified so far). Coloured: your library.`;
+      });
+    }
   };
 
-  // ---------- 3. evidence gaps
+  // ---------- 3. evidence gaps (library, field, or comparison)
   drawers["t-gaps"] = () => {
     const O = DATA.options;
-    let gas = "All";
-    const filter = document.getElementById("gas-filter");
-    ["All", ...O.gases].forEach(g => {
-      const b = document.createElement("button");
-      b.className = "chip"; b.textContent = g; b.setAttribute("aria-pressed", String(g === gas));
-      b.addEventListener("click", () => { gas = g; filter.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); });
-      filter.appendChild(b);
-    });
-    function heat(table, rows, cols, rowKey, colKey, papers) {
-      const max = Math.max(1, ...rows.flatMap(r => cols.map(c => papers.filter(p => rowKey(p, r) && colKey(p, c)).length)));
-      table.innerHTML = `<tr><th></th>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr>` + rows.map(r =>
-        `<tr><th class="row">${esc(r)}</th>${cols.map(c => {
-          const hits = papers.filter(p => rowKey(p, r) && colKey(p, c));
-          const a = hits.length ? 0.12 + 0.75 * hits.length / max : 0;
-          return `<td class="${hits.length ? "" : "zero"}" style="${hits.length ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}"
-                   data-r="${esc(r)}" data-c="${esc(c)}">${hits.length || "gap"}</td>`;
-        }).join("")}</tr>`).join("");
-      table.querySelectorAll("td").forEach(td => td.addEventListener("click", () => {
-        const hits = papers.filter(p => rowKey(p, td.dataset.r) && colKey(p, td.dataset.c));
-        document.getElementById("cell-papers").innerHTML = `<div class="card" style="margin-top:12px"><strong>${esc(td.dataset.r)} × ${esc(td.dataset.c)}</strong>${
-          hits.length ? `<ul class="papers-list">${hits.map(p => `<li>${esc(p.name)}: ${esc(p.title)}</li>`).join("")}</ul>`
-                      : `<p class="muted" style="margin:6px 0 0">No paper in your library covers this combination yet.</p>`}</div>`;
-      }));
+    let gas = "All", source = "lib";
+    chipGroup(document.getElementById("gas-filter"), ["All", ...O.gases].map(g => [g, g]), "All", g => { gas = g; draw(); });
+    chipGroup(document.getElementById("gap-source"),
+      [["lib", "My library"], ...FIELD.map(f => ["f:" + f.id, f.label]), ...FIELD.map(f => ["c:" + f.id, "Compare with " + f.label.toLowerCase()])],
+      "lib", v => { source = v; draw(); });
+    const libCount = (e, q) => DATA.library.filter(p => (gas === "All" || p.gases.includes(gas)) && p.ecosystems.includes(e) && p.rqs.includes(q));
+    function cellsTable(table, rows, cols, cell) {
+      table.innerHTML = `<tr><th></th>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr>` +
+        rows.map(r => `<tr><th class="row">${esc(r)}</th>${cols.map(c => cell(r, c)).join("")}</tr>`).join("");
     }
     function draw() {
-      const papers = DATA.library.filter(p => gas === "All" || p.gases.includes(gas));
-      heat(document.getElementById("heat-rq"), O.ecosystems, O.rqs, (p, r) => p.ecosystems.includes(r), (p, c) => p.rqs.includes(c), papers);
-      document.getElementById("cell-papers").innerHTML = "";
+      const box = document.getElementById("cell-papers"); box.innerHTML = "";
+      const table = document.getElementById("heat-rq");
+      const [mode, sid] = source.includes(":") ? source.split(":") : ["lib", null];
+      const F = FIELD.find(f => f.id === sid);
+      const lead = document.getElementById("gaps-lead");
+      if (mode === "lib") {
+        lead.textContent = "How many papers in your library address each research question in each ecosystem. Hatched cells are gaps. Click a cell to see the papers.";
+        const max = Math.max(1, ...O.ecosystems.flatMap(e => O.rqs.map(q => libCount(e, q).length)));
+        cellsTable(table, O.ecosystems, O.rqs, (e, q) => {
+          const n = libCount(e, q).length, a = n ? 0.12 + 0.75 * n / max : 0;
+          return `<td class="${n ? "" : "zero"}" data-r="${esc(e)}" data-c="${esc(q)}" style="${n ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n || "gap"}</td>`;
+        });
+        table.querySelectorAll("td").forEach(td => td.addEventListener("click", () => {
+          const hits = libCount(td.dataset.r, td.dataset.c);
+          box.innerHTML = `<div class="card" style="margin-top:12px"><strong>${esc(td.dataset.r)} × ${esc(td.dataset.c)}</strong>${hits.length
+            ? `<ul class="papers-list">${hits.map(p => `<li>${esc(p.name)}: ${esc(p.title)}</li>`).join("")}</ul>`
+            : `<p class="muted" style="margin:6px 0 0">No paper in your library covers this combination yet.</p>`}</div>`;
+        }));
+      } else {
+        const M = F.eco_rq[gas] || F.eco_rq.All;
+        const rowsIn = O.ecosystems.filter(e => O.rqs.some(q => M[e][q] > 0));   // ecosystems outside the scope's search are hidden
+        const thr = Math.max(3, Math.round(0.02 * (F.est_on_topic || 0)));
+        const est = F.mode === "sample" ? "estimated " : "";
+        if (mode === "f") {
+          lead.textContent = `Number of ${est}papers in the ${F.label.toLowerCase()} literature per research question and ecosystem (${F.classified} of ${F.fetched} papers classified so far). Hatched cells are research gaps: fewer than ${thr} papers.`;
+          const max = Math.max(1, ...rowsIn.flatMap(e => O.rqs.map(q => M[e][q])));
+          cellsTable(table, rowsIn, O.rqs, (e, q) => {
+            const n = M[e][q], a = n ? 0.12 + 0.75 * n / max : 0;
+            return `<td class="${n < thr ? "zero" : ""}" style="${n >= thr ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n < thr ? (n ? fmt(n) : "gap") : fmt(n)}</td>`;
+          });
+        } else {
+          lead.textContent = `Your library vs. the ${F.label.toLowerCase()} literature. Hatched: research gap (the field itself has fewer than ${thr} papers). Gold outline: reading gap (the field has papers, your library has none). Shading: share of the field's papers you hold.`;
+          cellsTable(table, rowsIn, O.rqs, (e, q) => {
+            const field = M[e][q], lib = libCount(e, q).length;
+            if (field < thr) return `<td class="zero">research gap<span class="sub">${lib} / ${fmt(field)}</span></td>`;
+            if (!lib) return `<td class="reading">reading gap<span class="sub">0 / ${fmt(field)}</span></td>`;
+            const cov = Math.min(1, lib / field), a = 0.15 + 0.7 * cov;
+            return `<td style="background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}">${pctf(cov)}<span class="sub" style="${a > .5 ? "color:#fff" : ""}">${lib} / ${fmt(field)}</span></td>`;
+          });
+        }
+      }
+      const designs = DATA.options.designs || [...new Set(DATA.library.map(p => p.design).filter(Boolean))];
+      const biomes = O.biomes.filter(b => b !== "Not stated");
+      const dt = document.getElementById("heat-design");
+      if (mode === "lib") {
+        const max = Math.max(1, ...designs.flatMap(d => biomes.map(b => DATA.library.filter(p => p.design === d && p.biome === b).length)));
+        cellsTable(dt, designs, biomes, (d, b) => { const n = DATA.library.filter(p => p.design === d && p.biome === b).length, a = n ? 0.12 + 0.75 * n / max : 0;
+          return `<td class="${n ? "" : "zero"}" style="${n ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n || "gap"}</td>`; });
+      } else {
+        const DB = F.design_biome, max = Math.max(1, ...designs.flatMap(d => biomes.map(b => (DB[d] || {})[b] || 0)));
+        cellsTable(dt, designs, biomes, (d, b) => { const n = (DB[d] || {})[b] || 0, a = n ? 0.12 + 0.75 * n / max : 0;
+          return `<td class="${n ? "" : "zero"}" style="${n ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n ? fmt(n) : "gap"}</td>`; });
+      }
     }
     draw();
-    const designs = [...new Set(DATA.library.map(p => p.design).filter(Boolean))];
-    const biomes = O.biomes.filter(b => b !== "Not stated");
-    heat(document.getElementById("heat-design"), designs.length ? designs : ["(not extracted yet)"], biomes,
-      (p, r) => p.design === r, (p, c) => p.biome === c, DATA.library);
+  };
+
+  // ---------- 3b. field rings
+  drawers["t-rings"] = () => {
+    const host = document.getElementById("rings");
+    if (!FIELD.length || !FIELD.some(f => f.classified)) {
+      host.innerHTML = '<p class="muted">The field map is being built: the first papers will be classified on the next nightly run.</p>';
+    }
+    const Q = DATA.options.rqs, N = Q.length, cx = 260, cy = 250, core = 52, R = 220;
+    const w = FIELD.length ? (R - core) / FIELD.length : 0;
+    const arc = (r0, r1, a0, a1) => {
+      const p = (r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)].map(v => v.toFixed(1)).join(" ");
+      const large = a1 - a0 > Math.PI ? 1 : 0;
+      return `M${p(r1, a0)}A${r1} ${r1} 0 ${large} 1 ${p(r1, a1)}L${p(r0, a1)}A${r0} ${r0} 0 ${large} 0 ${p(r0, a0)}Z`;
+    };
+    const ang = k => -Math.PI / 2 + (2 * Math.PI * k) / N;
+    const gap = 0.012;
+    let svg = `<svg viewBox="0 0 520 510" width="100%" role="img" aria-label="Rings of the literature by research question">
+      <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="${BG}"/><line x1="0" y1="0" x2="0" y2="6" stroke="${V("--gap")}" stroke-width="1.6" opacity=".55"/></pattern></defs>`;
+    FIELD.forEach((f, i) => {
+      const r0 = core + i * w + 2, r1 = core + (i + 1) * w;
+      const ps = Q.map(q => f.rq[q].p), maxP = Math.max(0.01, ...ps);
+      Q.forEach((q, k) => {
+        const d = f.rq[q], enough = f.on_topic >= 20;
+        const isGap = enough && (d.p < 0.03 || d.est < 3);
+        const fill = !f.on_topic ? LINE : isGap ? "url(#hatch)" : `rgba(${HEAT},${(0.12 + 0.83 * d.p / maxP).toFixed(2)})`;
+        svg += `<path class="sector" data-s="${i}" data-q="${k}" d="${arc(r0, r1, ang(k) + gap, ang(k + 1) - gap)}" fill="${fill}" stroke="${isGap ? V("--gap") : "none"}" stroke-width="${isGap ? 1 : 0}"/>`;
+      });
+    });
+    const libN = Q.map(q => DATA.library.filter(p => p.rqs.includes(q)).length), maxL = Math.max(1, ...libN);
+    Q.forEach((q, k) => {
+      svg += `<path class="sector" data-s="lib" data-q="${k}" d="${arc(8, core - 2, ang(k) + gap * 3, ang(k + 1) - gap * 3)}" fill="rgba(181,101,43,${(0.12 + 0.8 * libN[k] / maxL).toFixed(2)})"/>`;
+      const a = (ang(k) + ang(k + 1)) / 2, lx = cx + (R + 20) * Math.cos(a), ly = cy + (R + 20) * Math.sin(a);
+      svg += `<text x="${lx.toFixed(0)}" y="${ly.toFixed(0)}" text-anchor="middle" dominant-baseline="central" fill="${INK}" font-size="13" font-weight="600">${esc(q.split(" ")[0])}</text>`;
+    });
+    host.innerHTML = svg + "</svg>";
+    document.getElementById("ringlegend").innerHTML =
+      `<span><span class="sw" style="background:rgba(181,101,43,.8)"></span>Core: your library</span>` +
+      FIELD.map((f, i) => `<span>Ring ${i + 1} from the centre: ${esc(f.label)}${f.mode === "sample" ? " (sampled)" : ""}</span>`).join("") +
+      `<span><span class="sw" style="background:url(#hatch);border:1px solid ${V("--gap")}"></span>Research gap</span>` +
+      `<span>${Q.map(q => esc(q)).join(" · ")}</span>`;
+    const detail = document.getElementById("ring-detail");
+    host.querySelectorAll("path.sector").forEach(el => el.addEventListener("click", () => {
+      host.querySelectorAll("path.sel").forEach(x => x.classList.remove("sel")); el.classList.add("sel");
+      const q = Q[+el.dataset.q];
+      if (el.dataset.s === "lib") {
+        const hits = DATA.library.filter(p => p.rqs.includes(q));
+        detail.innerHTML = `<h2 style="margin-top:0">Your library: ${esc(q)}</h2><p>${hits.length} papers.</p>` +
+          (hits.length ? `<ul class="papers-list">${hits.map(p => `<li>${esc(p.name)}</li>`).join("")}</ul>` : "");
+        return;
+      }
+      const f = FIELD[+el.dataset.s], d = f.rq[q];
+      const inScope = DATA.library.filter(p => p.rqs.includes(q) && f.library_in_scope.includes(p.oa)).length;
+      const estLo = Math.round(d.lo * (f.est_on_topic || 0)), estHi = Math.round(d.hi * (f.est_on_topic || 0));
+      const sample = f.mode === "sample";
+      detail.innerHTML = `<h2 style="margin-top:0">${esc(f.label)}: ${esc(q)}</h2>
+        <p><b style="font-size:20px">${pctf(d.p)}</b> of on-topic papers (95% CI ${pctf(d.lo)} to ${pctf(d.hi)}), based on ${d.n} of ${f.on_topic} classified papers.</p>
+        <p>${sample ? "Estimated" : "Projected"} number of papers in this scope: <b>${fmt(d.est)}</b> (${fmt(estLo)} to ${fmt(estHi)}).</p>
+        <p>In your library: <b>${inScope}</b> of them${d.est ? ` (about ${pctf(Math.min(1, inScope / d.est))} coverage)` : ""}.</p>
+        <p class="muted">${sample ? `This scope has ${fmt(f.total)} papers in OpenAlex; numbers come from a fixed random sample of ${f.fetched}.` : `All ${f.fetched} papers of this scope are in the corpus; ${f.classified} classified so far.`} ${f.title_only ? `${f.title_only} were classified from their title only (no abstract available).` : ""}</p>`;
+    }));
+    document.getElementById("field-progress").innerHTML = `<tr><th>Scope</th><th>In OpenAlex</th><th>Mode</th><th>In corpus</th><th>Classified</th><th></th><th>On-topic</th><th>Est. on-topic</th></tr>` +
+      FIELD.map(f => `<tr><td>${esc(f.label)}</td><td>${fmt(f.total)}</td><td>${f.mode}</td><td>${fmt(f.fetched)}</td><td>${fmt(f.classified)}</td>
+        <td><div class="prog"><span style="width:${f.fetched ? (100 * f.classified / f.fetched).toFixed(0) : 0}%"></span></div></td>
+        <td>${f.classified ? pctf(f.on_topic / f.classified) : "n/a"}</td><td>${fmt(f.est_on_topic)}</td></tr>`).join("");
   };
 
   // ---------- 4. timeline
   drawers["t-time"] = () => {
     const lib = DATA.library.filter(p => p.year);
-    const field = DATA.field_trend || {};
-    const years = [...new Set([...lib.map(p => +p.year), ...Object.keys(field).map(Number)])].sort((a, b) => a - b);
-    const from = Math.min(...lib.map(p => +p.year), years.find(y => (field[y] || 0) > 0) || 9999);
-    const span = years.filter(y => y >= from);
-    const cats = [...new Set(lib.map(p => p.category))];
-    document.getElementById("time-lead").textContent = Object.keys(field).length
-      ? `Bars: your library by publication year and category. Line: papers per year in the whole field (OpenAlex search: ${DATA.field_query}).`
-      : "Bars: your library by publication year and category. (The field trend will appear once OpenAlex returns counts for your field query.)";
-    new Chart(document.getElementById("timechart"), {
-      data: { labels: span, datasets: [
-        ...cats.map(c => ({ type: "bar", label: c, data: span.map(y => lib.filter(p => +p.year === y && p.category === c).length),
-          backgroundColor: colorOf(c), stack: "lib", yAxisID: "y" })),
-        ...(Object.keys(field).length ? [{ type: "line", label: "Whole field", data: span.map(y => field[y] || 0),
-          borderColor: MUTED, backgroundColor: MUTED, pointRadius: 0, borderWidth: 1.5, tension: .25, yAxisID: "y2" }] : [])
-      ] },
-      options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
-        plugins: { legend: { labels: { color: INK, boxWidth: 12 } } },
-        scales: { x: { stacked: true, ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
-          y: { stacked: true, title: { display: true, text: "Your papers", color: MUTED }, ticks: { color: MUTED, precision: 0 }, grid: { color: LINE } },
-          y2: { position: "right", display: Object.keys(field).length > 0, title: { display: true, text: "Field papers", color: MUTED },
-            ticks: { color: MUTED }, grid: { display: false } } } }
-    });
+    let chart = null;
+    function draw(sid) {
+      const F = FIELD.find(f => f.id === sid);
+      const field = F ? Object.fromEntries(Object.entries(F.years).map(([y, n]) => [+y, n])) : {};
+      const years = [...new Set([...lib.map(p => +p.year), ...Object.keys(field).map(Number)])].filter(y => y <= new Date().getFullYear()).sort((a, b) => a - b);
+      const from = Math.min(...lib.map(p => +p.year), years.find(y => (field[y] || 0) > 0) || 9999);
+      const span = years.filter(y => y >= from);
+      const cats = [...new Set(lib.map(p => p.category))];
+      document.getElementById("time-lead").textContent = F
+        ? `Bars: your library by publication year and category. Line: papers per year in the ${F.label.toLowerCase()} literature (all matches of its OpenAlex search, before on-topic filtering).`
+        : "Bars: your library by publication year and category.";
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById("timechart"), {
+        data: { labels: span, datasets: [
+          ...cats.map(c => ({ type: "bar", label: c, data: span.map(y => lib.filter(p => +p.year === y && p.category === c).length),
+            backgroundColor: colorOf(c), stack: "lib", yAxisID: "y" })),
+          ...(F ? [{ type: "line", label: F.label, data: span.map(y => field[y] || 0),
+            borderColor: MUTED, backgroundColor: MUTED, pointRadius: 0, borderWidth: 1.5, tension: .25, yAxisID: "y2" }] : [])
+        ] },
+        options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+          plugins: { legend: { labels: { color: INK, boxWidth: 12 } } },
+          scales: { x: { stacked: true, ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
+            y: { stacked: true, title: { display: true, text: "Your papers", color: MUTED }, ticks: { color: MUTED, precision: 0 }, grid: { color: LINE } },
+            y2: { position: "right", display: !!F, title: { display: true, text: "Field papers", color: MUTED },
+              ticks: { color: MUTED }, grid: { display: false } } } }
+      });
+      const periods = [[0, 1999, "Before 2000"], [2000, 2009, "2000s"], [2010, 2014, "2010-2014"], [2015, 2019, "2015-2019"], [2020, 9999, "2020 onwards"]];
+      const fTot = Object.values(field).reduce((a, b) => a + b, 0), lTot = lib.length;
+      document.getElementById("coverage").innerHTML = `<tr><th>Period</th><th>${F ? esc(F.label) : "Field"}</th><th>Your library</th><th></th></tr>` +
+        periods.map(([a, b, name]) => {
+          const f = fTot ? Object.entries(field).filter(([y]) => y >= a && y <= b).reduce((s, [, n]) => s + n, 0) / fTot : null;
+          const l = lTot ? lib.filter(p => p.year >= a && p.year <= b).length / lTot : 0;
+          const flag = f !== null && f > 0.08 && l < f / 2 ? "⚠️ underrepresented" : "";
+          return `<tr><td>${name}</td><td>${f === null ? "n/a" : Math.round(f * 100) + "%"}</td><td>${Math.round(l * 100)}%</td><td class="muted">${flag}</td></tr>`;
+        }).join("");
+    }
+    const first = FIELD.length ? FIELD[0].id : null;
+    if (FIELD.length) chipGroup(document.getElementById("time-scope"), FIELD.map(f => [f.id, f.label]), first, draw);
+    draw(first);
     document.getElementById("milestones").innerHTML = DATA.milestones.map(m =>
       `<li class="${m.in_library ? "" : "external"}"><span class="yr">${m.year}</span>${m.doi ? `<a href="${esc(m.doi)}" target="_blank" rel="noopener">${esc(m.label)}</a>` : esc(m.label)}
         <span class="tag">${m.in_library ? "in your library" : "not in your library"}</span><span class="tag">${m.citations} citations</span>
         <div class="muted">${esc(m.note || m.title)}</div></li>`).join("") || '<li class="muted">Not enough data yet.</li>';
-    // coverage by period
-    const periods = [[0, 1999, "Before 2000"], [2000, 2009, "2000s"], [2010, 2014, "2010-2014"], [2015, 2019, "2015-2019"], [2020, 9999, "2020 onwards"]];
-    const fTot = Object.values(field).reduce((a, b) => a + b, 0), lTot = lib.length;
-    document.getElementById("coverage").innerHTML = `<tr><th>Period</th><th>Field</th><th>Your library</th><th></th></tr>` +
-      periods.map(([a, b, name]) => {
-        const f = fTot ? Object.entries(field).filter(([y]) => y >= a && y <= b).reduce((s, [, n]) => s + n, 0) / fTot : null;
-        const l = lTot ? lib.filter(p => p.year >= a && p.year <= b).length / lTot : 0;
-        const flag = f !== null && f > 0.08 && l < f / 2 ? "⚠️ underrepresented" : "";
-        return `<tr><td>${name}</td><td>${f === null ? "n/a" : Math.round(f * 100) + "%"}</td><td>${Math.round(l * 100)}%</td><td class="muted">${flag}</td></tr>`;
-      }).join("");
   };
 
   // ---------- 5. screening

@@ -1,0 +1,24 @@
+{
+  "_help": "Nested searches defining 'the field', from most specific to broadest. Edit the queries freely: only new papers get processed. Syntax is OpenAlex boolean search on titles and abstracts (AND, OR, NOT, \"exact phrases\", parentheses). Avoid commas inside queries. A scope with more matching papers than max_full is sampled at random (sample_size papers) and its numbers become estimates with confidence intervals.",
+  "max_full": 4000,
+  "sample_size": 1500,
+  "max_classify_per_run": 200,
+  "max_new_geocodes_per_run": 120,
+  "scopes": [
+    {
+      "id": "swamps",
+      "label": "Forested swamps",
+      "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")"
+    },
+    {
+      "id": "forested",
+      "label": "Forested wetlands",
+      "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")"
+    },
+    {
+      "id": "wetlands",
+      "label": "All wetlands",
+      "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")"
+    }
+  ]
+}

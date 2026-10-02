@@ -16,7 +16,15 @@
    "To review",
    ""
   ],
+  "W2023906603": [
+   "To review",
+   ""
+  ],
   "W2038170600": [
+   "To review",
+   ""
+  ],
+  "W2042843036": [
    "To review",
    ""
   ],
@@ -241,30 +249,522 @@
    ""
   ]
  },
+ "field_scopes": {
+  "forested": {
+   "fetched": 1383,
+   "key": "0c914aa32b38422626f6ef84289a96d9",
+   "label": "Forested wetlands",
+   "last_fetch": "2026-10-02",
+   "mode": "full",
+   "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")",
+   "total": 1383,
+   "trend": {
+    "1930": 1,
+    "1934": 1,
+    "1949": 1,
+    "1954": 1,
+    "1957": 1,
+    "1963": 3,
+    "1966": 1,
+    "1967": 2,
+    "1968": 2,
+    "1969": 2,
+    "1971": 2,
+    "1972": 1,
+    "1973": 1,
+    "1975": 1,
+    "1977": 3,
+    "1978": 1,
+    "1979": 1,
+    "1980": 2,
+    "1981": 4,
+    "1982": 3,
+    "1983": 2,
+    "1984": 4,
+    "1986": 6,
+    "1987": 5,
+    "1988": 7,
+    "1989": 7,
+    "1990": 4,
+    "1991": 8,
+    "1992": 10,
+    "1993": 14,
+    "1994": 13,
+    "1995": 12,
+    "1996": 14,
+    "1997": 14,
+    "1998": 24,
+    "1999": 15,
+    "2000": 18,
+    "2001": 13,
+    "2002": 15,
+    "2003": 15,
+    "2004": 15,
+    "2005": 21,
+    "2006": 23,
+    "2007": 22,
+    "2008": 25,
+    "2009": 20,
+    "2010": 44,
+    "2011": 42,
+    "2012": 47,
+    "2013": 45,
+    "2014": 57,
+    "2015": 59,
+    "2016": 55,
+    "2017": 78,
+    "2018": 63,
+    "2019": 59,
+    "2020": 58,
+    "2021": 70,
+    "2022": 66,
+    "2023": 65,
+    "2024": 68,
+    "2025": 67,
+    "2026": 58
+   }
+  },
+  "swamps": {
+   "fetched": 278,
+   "key": "c14ec6551e75aa818f5ff221605f1788",
+   "label": "Forested swamps",
+   "last_fetch": "2026-10-02",
+   "mode": "full",
+   "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")",
+   "total": 278,
+   "trend": {
+    "1968": 2,
+    "1988": 2,
+    "1991": 1,
+    "1992": 1,
+    "1993": 1,
+    "1994": 1,
+    "1995": 2,
+    "1996": 1,
+    "1997": 1,
+    "1998": 5,
+    "1999": 2,
+    "2000": 2,
+    "2001": 1,
+    "2002": 1,
+    "2004": 2,
+    "2005": 2,
+    "2006": 4,
+    "2007": 3,
+    "2008": 6,
+    "2009": 2,
+    "2010": 8,
+    "2011": 11,
+    "2012": 8,
+    "2013": 15,
+    "2014": 14,
+    "2015": 12,
+    "2016": 11,
+    "2017": 15,
+    "2018": 17,
+    "2019": 13,
+    "2020": 18,
+    "2021": 10,
+    "2022": 13,
+    "2023": 14,
+    "2024": 21,
+    "2025": 17,
+    "2026": 17
+   }
+  },
+  "wetlands": {
+   "fetched": 1500,
+   "key": "85f57b05e5f570a007a99a51ab58b69f",
+   "label": "All wetlands",
+   "last_fetch": "2026-10-02",
+   "mode": "sample",
+   "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")",
+   "total": 14887,
+   "trend": {
+    "1828": 1,
+    "1830": 1,
+    "1870": 1,
+    "1872": 1,
+    "1874": 1,
+    "1876": 1,
+    "1877": 2,
+    "1878": 1,
+    "1880": 1,
+    "1887": 1,
+    "1897": 1,
+    "1898": 1,
+    "1901": 1,
+    "1903": 1,
+    "1907": 1,
+    "1912": 1,
+    "1915": 2,
+    "1916": 1,
+    "1917": 1,
+    "1925": 1,
+    "1926": 1,
+    "1927": 2,
+    "1928": 2,
+    "1929": 1,
+    "1930": 1,
+    "1932": 1,
+    "1933": 2,
+    "1934": 1,
+    "1936": 2,
+    "1947": 1,
+    "1948": 1,
+    "1949": 1,
+    "1951": 1,
+    "1954": 3,
+    "1955": 1,
+    "1956": 1,
+    "1957": 6,
+    "1958": 1,
+    "1961": 2,
+    "1962": 2,
+    "1963": 6,
+    "1964": 1,
+    "1965": 1,
+    "1966": 3,
+    "1967": 7,
+    "1968": 3,
+    "1969": 6,
+    "1970": 9,
+    "1971": 4,
+    "1972": 4,
+    "1973": 3,
+    "1974": 6,
+    "1975": 5,
+    "1976": 6,
+    "1977": 11,
+    "1978": 8,
+    "1979": 15,
+    "1980": 14,
+    "1981": 22,
+    "1982": 22,
+    "1983": 27,
+    "1984": 30,
+    "1985": 35,
+    "1986": 35,
+    "1987": 31,
+    "1988": 42,
+    "1989": 34,
+    "1990": 44,
+    "1991": 51,
+    "1992": 66,
+    "1993": 85,
+    "1994": 90,
+    "1995": 95,
+    "1996": 120,
+    "1997": 115,
+    "1998": 147,
+    "1999": 134,
+    "2000": 150,
+    "2001": 140,
+    "2002": 164,
+    "2003": 191,
+    "2004": 172,
+    "2005": 217,
+    "2006": 241,
+    "2007": 260,
+    "2008": 331,
+    "2009": 384,
+    "2010": 411,
+    "2011": 416,
+    "2012": 453,
+    "2013": 544,
+    "2014": 576,
+    "2015": 568,
+    "2016": 623,
+    "2017": 590,
+    "2018": 601,
+    "2019": 627,
+    "2020": 714,
+    "2021": 736,
+    "2022": 764,
+    "2023": 757,
+    "2024": 904,
+    "2025": 996,
+    "2026": 954
+   }
+  }
+ },
  "geocode": {
+  "Amazon, Peru": [
+   -3.8932882,
+   -73.1868553
+  ],
+  "Bacho, Narathiwat Province, Thailand": [
+   6.5532944,
+   101.6579885
+  ],
+  "Belait / Tutong / Temburong, Brunei Darussalam": null,
+  "Belait or Temburong, Brunei": null,
+  "Belize coastal and terrestrial peatlands, National, Belize": null,
+  "Big Cypress National Preserve, Florida, United States": [
+   25.9361216,
+   -81.0951271
+  ],
+  "Brunei": [
+   4.4137155,
+   114.5653908
+  ],
+  "Brunei Darussalam": [
+   4.4137155,
+   114.5653908
+  ],
+  "Brunei degraded tropical peatland, Southeast Asia, Brunei": null,
+  "Brunei peat swamp forests, Belait or Temburong, Brunei": null,
+  "Central Africa, Democratic Republic of the Congo": [
+   -4.3027436,
+   15.310832
+  ],
+  "Central Kalimantan peat dome, Central Kalimantan, Indonesia": null,
+  "Central Kalimantan peat swamp forest, Central Kalimantan, Indonesia": null,
+  "Central Kalimantan peatlands, Central Kalimantan, Indonesia": null,
+  "Central Kalimantan, Central Kalimantan, Indonesia": [
+   -2.2138314,
+   113.9255363
+  ],
+  "Central Kalimantan, Indonesia": [
+   -1.499583,
+   113.2903307
+  ],
+  "Central Kalimantan, Kalimantan, Indonesia": [
+   -2.2138314,
+   113.9255363
+  ],
+  "Congo Basin, Central Africa, Democratic Republic of the Congo": null,
+  "Congo Basin, Congo Basin, Not stated": null,
+  "Congo Basin, Not stated": null,
+  "Da Hinggan Mountains, Heilongjiang / Inner Mongolia, China": null,
+  "Daxing'an Mountains, Northeast China, China": null,
+  "East Kalimantan peat swamp forest, East Kalimantan, Indonesia": null,
+  "East Kalimantan, Indonesia": [
+   0.7884397,
+   116.2419977
+  ],
+  "Eastern Great Xing'an Mountains, Heilongjiang / Inner Mongolia, China": null,
+  "Everglades National Park, Florida, United States": [
+   25.3679443,
+   -80.8783066
+  ],
+  "Florida, United States": [
+   27.7567667,
+   -81.4639835
+  ],
+  "Giam Siak Kecil–Bukit Batu Biosphere Reserve, Sumatra, Indonesia": null,
+  "Great Lakes–St. Lawrence forest region, Ontario, Canada": null,
+  "Gulf of Carpentaria, Northern Australia, Australia": null,
+  "Heilongjiang / Inner Mongolia, China": [
+   51.4168549,
+   125.5884656
+  ],
+  "Heilongjiang, China": [
+   48.0000047,
+   127.999992
+  ],
+  "Indonesia": [
+   -2.4833826,
+   117.8902853
+  ],
+  "Indonesia, Southeast Asia, Indonesia": null,
+  "Iquitos region, Loreto, Peru": null,
+  "Jambi, Jambi, Indonesia": [
+   -1.6296917,
+   103.6077806
+  ],
+  "Jambi, Sumatra, Indonesia": [
+   -1.6123473,
+   103.5186977
+  ],
+  "Kampar Peninsula, Riau Province, Indonesia": null,
+  "Klyuch river, Western Siberia, Russia": null,
+  "Loreto, Peru": [
+   -5.0,
+   -75.0
+  ],
   "Lost Creek, WI, United States": [
    44.4717007,
    -92.1791073
   ],
+  "Louisiana gulf coast swamp forest, Louisiana, USA": null,
+  "Louisiana, USA": [
+   30.8703881,
+   -92.007126
+  ],
+  "Louisiana, United States": [
+   30.8703881,
+   -92.007126
+  ],
+  "Malaysia and Indonesia": null,
+  "Malaysia and Indonesia, Malaysia and Indonesia": null,
+  "Malaysia tropical peat swamp forest and oil palm plantation transects, Malaysia, Malaysia": null,
+  "Malaysia, Malaysia": [
+   5.2265873,
+   100.4504672
+  ],
+  "Maludam National Park, Sarawak, Malaysia": null,
+  "Mekong Delta, Vietnam": [
+   9.7508958,
+   105.2224602
+  ],
+  "Merang peat swamp forest, South Sumatra, Indonesia": null,
+  "Meulaboh, West Aceh, Indonesia": null,
+  "Michigan, United States": [
+   43.6211955,
+   -84.6824346
+  ],
+  "Mississippi River deltaic plain, Louisiana, United States": null,
+  "Mississippi deltaic plain, Louisiana, USA": null,
+  "Mississippi river deltaic plain, Louisiana, USA": null,
+  "Moscow region, Moscow Oblast, Russia": [
+   55.8858149,
+   37.4562282
+  ],
+  "Narathiwat province swamp forest, Narathiwat, Thailand": null,
+  "Narathiwat, Thailand": [
+   6.3210758,
+   101.5972971
+  ],
+  "National, Belize": [
+   17.4999116,
+   -88.2113735
+  ],
+  "New York, USA": [
+   40.7127281,
+   -74.0060152
+  ],
+  "North Florida swamp forest, Florida, United States": null,
+  "North Selangor, Selangor, Malaysia": [
+   2.9687015,
+   101.7415901
+  ],
+  "Northeast China, China": [
+   45.965277,
+   126.756667
+  ],
+  "Northern Australia, Australia": [
+   -30.9737292,
+   116.2124733
+  ],
+  "Northern Borneo peat swamp, Belait / Tutong / Temburong, Brunei Darussalam": null,
+  "Northern Lower Michigan forested ecosystems, Michigan, United States": null,
+  "Not stated": null,
   "Not stated, United States": null,
+  "Not stated, West Kalimantan, Indonesia": null,
+  "Nova Scotia, Canada": [
+   45.1960403,
+   -63.1653789
+  ],
+  "Ontario, Canada": [
+   50.000678,
+   -86.000977
+  ],
+  "Palangkaraya, Central Kalimantan, Indonesia": [
+   -2.2072919,
+   113.9164372
+  ],
+  "Papua Barat, West Papua, Indonesia": [
+   -0.86573,
+   134.0755946
+  ],
+  "Pastaza-Marañon foreland basin, Amazon, Peru": null,
+  "Peat swamp forest sites in Indonesia, Southeast Asia, Indonesia": null,
+  "Peat swamp forests of Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
+  "Peninsular Malaysia, Malaysia": [
+   3.0839554,
+   101.7442451
+  ],
+  "Riau Province, Indonesia": null,
+  "Riau Province, Riau, Indonesia": null,
+  "Riau, Indonesia": [
+   1.0498079,
+   101.6548433
+  ],
+  "Sabaju, Southeast Asia, Not stated": null,
+  "Sarawak peat dome, Sarawak, Malaysia": null,
+  "Sarawak peat swamp forest, Sarawak, Malaysia": null,
+  "Sarawak peatland, Sarawak, Malaysia": null,
+  "Sarawak, Malaysia": [
+   2.5023855,
+   112.9547283
+  ],
+  "Sarawak, Sarawak, Malaysia": [
+   1.4668506,
+   110.4331946
+  ],
+  "Sebungan, Southeast Asia, Not stated": null,
+  "Shaubac Wetlands, Nova Scotia, Canada": null,
+  "South Bohemia, Czech Republic": [
+   48.9766916,
+   14.4507334
+  ],
+  "South Sumatra, Indonesia": [
+   -3.1931356,
+   104.0181254
+  ],
+  "Southeast Asia tropical peatlands, Malaysia and Indonesia, Malaysia and Indonesia": null,
+  "Southeast Asia, Brunei": null,
+  "Southeast Asia, Indonesia": [
+   -8.7287308,
+   115.2365646
+  ],
+  "Southeast Asia, Not stated": null,
   "Southern Ontario swamps, Southern Ontario, Canada": null,
   "Southern Ontario, Canada": [
    43.2231351,
    -79.9798581
   ],
+  "Sumatra, Indonesia": [
+   -0.1432941,
+   101.6241024
+  ],
+  "To-Daeng, Narathiwat Province, Thailand": [
+   6.3656142,
+   101.7654954
+  ],
+  "U Minh Thuong National Park, Mekong Delta, Vietnam": null,
   "United States": [
    39.7837304,
    -100.445882
   ],
   "United States wetlands, Not stated, United States": null,
+  "West Aceh, Indonesia": null,
+  "West Kalimantan, Indonesia": [
+   -0.1322387,
+   111.0968901
+  ],
+  "West Kalimantan, West Kalimantan, Indonesia": [
+   -0.0596325,
+   109.3540116
+  ],
+  "West Siberia, Russia": [
+   62.0,
+   76.0
+  ],
+  "West Siberian plain, West Siberia, Russia": null,
+  "Western Siberia taiga, Western Siberia, Russia": null,
+  "Western Siberia, Russia": [
+   55.0959197,
+   82.9627763
+  ],
+  "Xiaoxing'an Mountains, Heilongjiang, China": null,
+  "Xiaoxing’an Mountains, Northeast China, China": null,
+  "forested swamp near Ithaca, New York, USA": null,
   "northern Alberta, Alberta, Canada": [
    58.7131298,
    -111.1591342
   ],
+  "southern Finland, Southern Finland, Finland": [
+   60.1725502,
+   24.9329194
+  ],
   "southern Ontario, Ontario, Canada": [
    43.2231351,
    -79.9798581
-  ]
+  ],
+  "southwestern Nova Scotia swamps, Nova Scotia, Canada": null,
+  "umava Mountains, South Bohemia, Czech Republic": null
  },
  "runs": [
   {
@@ -283,6 +783,26 @@
    "retractions": 0,
    "suggested_to_date": 62,
    "triaged": 20,
+   "unique_candidates": 24839
+  },
+  {
+   "candidates_evaluated": 24839,
+   "date": "2026-10-02",
+   "decisions": 0,
+   "excluded": 0,
+   "extracted": 0,
+   "field_classified": 200,
+   "field_progress": "Forested swamps 200/278; Forested wetlands 200/1383; All wetlands 16/1500",
+   "library": 12,
+   "model": "gemini-flash-lite-latest",
+   "new_relevant": 1,
+   "new_suggestions": 3,
+   "notes": "",
+   "pending": 65,
+   "retained": 0,
+   "retractions": 0,
+   "suggested_to_date": 65,
+   "triaged": 9,
    "unique_candidates": 24839
   }
  ],

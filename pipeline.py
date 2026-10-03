@@ -428,7 +428,14 @@ def enrich_metrics(papers):
             update_page(p["page_id"], props)
         p["retracted"] = retracted
     log(f"   {found}/{len(papers)} papers matched on OpenAlex")
-    return {"retractions": [p["name"] for p in papers if p["retracted"]]}
+    by_work = defaultdict(list)
+    for p in papers:
+        if p.get("work"):
+            by_work[short_id(p["work"]["id"])].append(p["name"])
+    duplicates = [names[0] for names in by_work.values() if len(names) > 1]
+    for d in duplicates:
+        log(f"   duplicate in your library (same paper twice): {d}. Merge it in Zotero.")
+    return {"retractions": [p["name"] for p in papers if p["retracted"]], "duplicates": duplicates}
 
 
 # ----------------------------------------------------------------------------
@@ -1131,6 +1138,7 @@ def personal_score(model, relevance, similarity, connections, pct, year):
 
 
 PREDICTIONS = {}   # bound to state["predictions"] in main()
+DUPLICATES = []    # papers present twice in the library (reported on the dashboard)
 
 
 def prospective_eval(existing, state):
@@ -1279,8 +1287,12 @@ def build_graph(papers, suggestions):
             seen.add(key)
             edges.append({"from": a, "to": b, "kind": kind})
 
+    seen_ids = set()
     for p in lib:
         w = p["work"]
+        if short_id(w["id"]) in seen_ids:      # the same paper twice in the library: one node only
+            continue
+        seen_ids.add(short_id(w["id"]))
         nodes.append({
             "id": short_id(w["id"]),
             "label": p["name"],
@@ -1301,6 +1313,9 @@ def build_graph(papers, suggestions):
 
     shown = sorted(suggestions, key=lambda c: c["global"], reverse=True)[:GRAPH_SUGGESTIONS]
     for c in shown:
+        if c["id"] in seen_ids:
+            continue
+        seen_ids.add(c["id"])
         w = c["work"]
         nodes.append({
             "id": c["id"],
@@ -1661,6 +1676,7 @@ def prisma_counts(papers, existing, state):
         "own_searches": max(0, library - added),
         "library": library,
         "retracted": [p["name"] for p in papers if p.get("retracted")],
+        "duplicates": sorted({n for n in DUPLICATES}),
     }
 
 
@@ -1785,6 +1801,7 @@ def main():
 
     log("1. Citation metrics (OpenAlex)")
     metrics = enrich_metrics(papers)
+    DUPLICATES[:] = metrics["duplicates"]
 
     log("2. AI triage of your papers")
     triager = Triager()

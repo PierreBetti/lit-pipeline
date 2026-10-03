@@ -290,7 +290,8 @@ if (!DATA) {
     const G = DATA.graph;
     if (!G.nodes.length) { document.getElementById("graph").innerHTML = '<p class="pad muted">No papers matched yet.</p>'; return; }
     const size = c => 9 + Math.min(26, Math.sqrt(c || 0) * 1.6);
-    const nodes = new vis.DataSet(G.nodes.map(n => ({
+    const uniq = [...new Map(G.nodes.map(n => [n.id, n])).values()];   // never let a duplicate blank the map
+    const nodes = new vis.DataSet(uniq.map(n => ({
       id: n.id, label: n.label, raw: n, size: size(n.citations), shape: "dot",
       color: n.kind === "suggested"
         ? { background: BG, border: MUTED, highlight: { background: BG, border: INK } }
@@ -311,7 +312,7 @@ if (!DATA) {
       interaction: { hover: true, keyboard: true }
     });
     const counts = {};
-    G.nodes.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
+    uniq.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
     const hidden = new Set();
     const legend = document.getElementById("legend");
     Object.keys(PALETTE).filter(c => counts[c]).forEach(cat => {
@@ -596,6 +597,7 @@ if (!DATA) {
   drawers["t-screen"] = () => {
     const P = DATA.prisma;
     const alerts = [];
+    if ((P.duplicates || []).length) alerts.push(`Duplicates in your library (the same paper twice): ${P.duplicates.map(esc).join("; ")}. Merge them in Zotero (Duplicate Items).`);
     if (P.retracted.length) alerts.push(`⚠️ Retracted papers in your library: ${P.retracted.map(esc).join("; ").replace(/\.$/, "")}. Check them before citing.`);
     document.getElementById("alerts").innerHTML = alerts.map(a => `<div class="card alert" style="margin-bottom:12px">${a}</div>`).join("");
     const reasons = Object.entries(P.exclusion_reasons).map(([r, n]) => `${esc(r)}: ${n}`).join("<br>") || "none yet";

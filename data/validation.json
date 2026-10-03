@@ -202,7 +202,7 @@
  },
  "preferences": {
   "status": "waiting",
-  "n": 0,
+  "n": 8,
   "auc_in_sample": null,
   "auc_cross_validated": null,
   "prospective": {
@@ -215,5 +215,5 @@
   "status": "waiting",
   "message": "Add benchmarks/<name>.json files (see benchmarks/_TEMPLATE.json)."
  },
- "updated": "2026-10-02"
+ "updated": "2026-10-03"
 }

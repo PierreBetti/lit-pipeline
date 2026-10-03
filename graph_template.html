@@ -274,6 +274,19 @@ if (!DATA) {
 
   // ---------- 1. citation map
   drawers["t-map"] = () => {
+    // The physics layout breaks if it runs in a 0x0 frame (e.g. an embed not yet sized by Notion):
+    // wait until the container really has a size, then draw.
+    const host = document.getElementById("graph");
+    if (!host.clientWidth || !host.clientHeight) {
+      const ro = new ResizeObserver(() => {
+        if (host.clientWidth && host.clientHeight) { ro.disconnect(); drawMap(); }
+      });
+      ro.observe(host);
+      return;
+    }
+    drawMap();
+  };
+  function drawMap() {
     const G = DATA.graph;
     if (!G.nodes.length) { document.getElementById("graph").innerHTML = '<p class="pad muted">No papers matched yet.</p>'; return; }
     const size = c => 9 + Math.min(26, Math.sqrt(c || 0) * 1.6);
@@ -329,13 +342,22 @@ if (!DATA) {
       detail.querySelector(".close").addEventListener("click", () => detail.classList.remove("open"));
     }
     network.on("click", p => p.nodes.length ? show(nodes.get(p.nodes[0]).raw) : detail.classList.remove("open"));
+    network.once("stabilizationIterationsDone", () => network.fit());
+    let lastW = 0, lastH = 0;
+    new ResizeObserver(() => {
+      const el = document.getElementById("graph");
+      if (el.clientWidth && el.clientHeight && (el.clientWidth !== lastW || el.clientHeight !== lastH)) {
+        lastW = el.clientWidth; lastH = el.clientHeight;
+        network.setSize(lastW + "px", lastH + "px"); network.redraw(); network.fit();
+      }
+    }).observe(document.getElementById("graph"));
     document.getElementById("search").addEventListener("input", e => {
       const q = e.target.value.trim().toLowerCase();
       if (!q) { network.unselectAll(); return; }
       const hit = G.nodes.find(n => (n.label + " " + (n.title || "")).toLowerCase().includes(q));
       if (hit) { network.selectNodes([hit.id]); network.focus(hit.id, { scale: 1.2, animation: { duration: 400 } }); show(hit); }
     });
-  };
+  }
 
   // ---------- 2. study sites
   drawers["t-sites"] = () => {

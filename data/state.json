@@ -4,10 +4,15 @@
   "W2131640036": "2026-10-03",
   "W2155847183": "2026-10-03",
   "W2156872309": "2026-10-03",
+  "W2427928079": "2026-10-04",
   "W2520021624": "2026-10-03",
+  "W2599349901": "2026-10-04",
+  "W2767350041": "2026-10-04",
   "W2900315497": "2026-10-03",
   "W2905026433": "2026-10-03",
-  "W2972407136": "2026-10-03"
+  "W2972407136": "2026-10-03",
+  "W3125357239": "2026-10-04",
+  "W4308456928": "2026-10-04"
  },
  "decisions": {
   "W1688224942": [
@@ -30,11 +35,19 @@
    "To review",
    ""
   ],
+  "W1966313307": [
+   "To review",
+   ""
+  ],
   "W2003875103": [
    "To review",
    ""
   ],
   "W2023906603": [
+   "To review",
+   ""
+  ],
+  "W2036826963": [
    "To review",
    ""
   ],
@@ -58,7 +71,15 @@
    "To review",
    ""
   ],
+  "W2068676456": [
+   "To review",
+   ""
+  ],
   "W2076170179": [
+   "To review",
+   ""
+  ],
+  "W2089201803": [
    "To review",
    ""
   ],
@@ -74,6 +95,10 @@
    "To review",
    ""
   ],
+  "W2100256561": [
+   "To review",
+   ""
+  ],
   "W2109730769": [
    "To review",
    ""
@@ -82,15 +107,31 @@
    "To review",
    ""
   ],
+  "W2126326154": [
+   "To review",
+   ""
+  ],
   "W2131640036": [
    "Added to Zotero",
+   ""
+  ],
+  "W2135036391": [
+   "To review",
    ""
   ],
   "W2136925844": [
    "To review",
    ""
   ],
+  "W2148837059": [
+   "To review",
+   ""
+  ],
   "W2150253566": [
+   "To review",
+   ""
+  ],
+  "W2152613879": [
    "To review",
    ""
   ],
@@ -110,6 +151,10 @@
    "Added to Zotero",
    ""
   ],
+  "W2168684237": [
+   "To review",
+   ""
+  ],
   "W2286609366": [
    "To review",
    ""
@@ -123,11 +168,15 @@
    ""
   ],
   "W2427928079": [
-   "To review",
-   ""
+   "Not relevant",
+   "Duplicate or superseded"
   ],
   "W2520021624": [
    "Added to Zotero",
+   ""
+  ],
+  "W2529477055": [
+   "To review",
    ""
   ],
   "W2564065614": [
@@ -138,11 +187,19 @@
    "To review",
    ""
   ],
+  "W2568214707": [
+   "To review",
+   ""
+  ],
   "W2582743722": [
    "To review",
    ""
   ],
   "W2599349901": [
+   "Added to Zotero",
+   ""
+  ],
+  "W2605860189": [
    "To review",
    ""
   ],
@@ -155,7 +212,7 @@
    ""
   ],
   "W2767350041": [
-   "To review",
+   "Added to Zotero",
    ""
   ],
   "W2769374057": [
@@ -178,11 +235,19 @@
    "To review",
    ""
   ],
+  "W2794985864": [
+   "To review",
+   ""
+  ],
   "W2798268396": [
    "To review",
    ""
   ],
   "W2810816703": [
+   "To review",
+   ""
+  ],
+  "W2831285705": [
    "To review",
    ""
   ],
@@ -214,6 +279,10 @@
    "To review",
    ""
   ],
+  "W2995331807": [
+   "To review",
+   ""
+  ],
   "W3026801075": [
    "To review",
    ""
@@ -226,6 +295,10 @@
    "To review",
    ""
   ],
+  "W3092666742": [
+   "To review",
+   ""
+  ],
   "W3096991870": [
    "To review",
    ""
@@ -235,7 +308,7 @@
    ""
   ],
   "W3125357239": [
-   "To review",
+   "Added to Zotero",
    ""
   ],
   "W3145447959": [
@@ -252,6 +325,10 @@
   ],
   "W4200274615": [
    "To review",
+   ""
+  ],
+  "W4308456928": [
+   "Added to Zotero",
    ""
   ],
   "W4319591135": [
@@ -271,89 +348,134 @@
    ""
   ]
  },
+ "digest": {
+  "cells": [
+   "Forested swamp | RQ1 Source/sink controls",
+   "Forested swamp | RQ2 Disturbed vs intact",
+   "Forested swamp | RQ4 Soil vs water C sources",
+   "Other wetland | RQ1 Source/sink controls",
+   "Other wetland | RQ2 Disturbed vs intact",
+   "Other wetland | RQ5 Microbial taxonomy & function",
+   "Other | RQ5 Microbial taxonomy & function",
+   "Peatland / bog / fen | RQ1 Source/sink controls",
+   "Peatland / bog / fen | RQ2 Disturbed vs intact",
+   "Peatland / bog / fen | RQ5 Microbial taxonomy & function",
+   "Upland forest | RQ1 Source/sink controls",
+   "Upland forest | RQ5 Microbial taxonomy & function"
+  ],
+  "last": "2026-10-04",
+  "library": [
+   "3ed4954a-4928-81f4-a556-c90ba2c5ffbc",
+   "3ed4954a-4928-8167-9c1b-cdc15d29cb12",
+   "3ed4954a-4928-81e8-b858-d28e3035137d",
+   "3ed4954a-4928-810e-9f52-d51c9905f97a",
+   "3ed4954a-4928-8111-9a01-ec5eec364a95",
+   "3ed4954a-4928-8115-b861-f76585c32bdb",
+   "3ed4954a-4928-81c7-bc37-e6a8f24d900e",
+   "3ed4954a-4928-8143-9788-d5eb4a36411a",
+   "3ed4954a-4928-817a-af38-cd60291b97ed",
+   "3ec4954a-4928-817f-ad88-c0f7d0db5dfb",
+   "3ec4954a-4928-81ce-91b1-c2ab80515ef2",
+   "3eb4954a-4928-8195-8245-d461953a6d34",
+   "3eb4954a-4928-81c5-9e23-cf843686f116",
+   "3eb4954a-4928-8102-8f48-e67c45b54f24",
+   "3eb4954a-4928-81c9-8964-f63be4933d52",
+   "3eb4954a-4928-8130-b15b-de61a2b12cbe",
+   "3eb4954a-4928-81f9-a347-feb1137bde54",
+   "3eb4954a-4928-8102-bdaa-d94ee69edf19",
+   "3eb4954a-4928-81d1-b897-c1fb4d1bd018",
+   "3eb4954a-4928-81ca-a365-d4f130cac843",
+   "3eb4954a-4928-8175-b7c1-ee612a30493c"
+  ]
+ },
  "field_scopes": {
   "forested": {
-   "fetched": 1383,
-   "key": "0c914aa32b38422626f6ef84289a96d9",
+   "fetched": 1748,
+   "key": "1d89c2f230f3ffa3b1ec9125d6dde0c3",
    "label": "Forested wetlands",
-   "last_fetch": "2026-10-02",
+   "last_fetch": "2026-10-04",
    "mode": "full",
-   "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")",
-   "total": 1383,
+   "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
+   "total": 1748,
    "trend": {
     "1930": 1,
     "1934": 1,
+    "1937": 1,
     "1949": 1,
     "1954": 1,
     "1957": 1,
+    "1960": 1,
     "1963": 3,
+    "1964": 1,
     "1966": 1,
     "1967": 2,
-    "1968": 2,
+    "1968": 3,
     "1969": 2,
-    "1971": 2,
+    "1971": 3,
     "1972": 1,
-    "1973": 1,
-    "1975": 1,
-    "1977": 3,
+    "1973": 2,
+    "1974": 1,
+    "1975": 3,
+    "1976": 2,
+    "1977": 4,
     "1978": 1,
     "1979": 1,
-    "1980": 2,
+    "1980": 3,
     "1981": 4,
     "1982": 3,
     "1983": 2,
     "1984": 4,
-    "1986": 6,
+    "1986": 7,
     "1987": 5,
-    "1988": 7,
-    "1989": 7,
+    "1988": 8,
+    "1989": 8,
     "1990": 4,
-    "1991": 8,
+    "1991": 9,
     "1992": 10,
-    "1993": 14,
-    "1994": 13,
+    "1993": 16,
+    "1994": 16,
     "1995": 12,
-    "1996": 14,
+    "1996": 15,
     "1997": 14,
-    "1998": 24,
+    "1998": 25,
     "1999": 15,
-    "2000": 18,
+    "2000": 19,
     "2001": 13,
-    "2002": 15,
-    "2003": 15,
-    "2004": 15,
-    "2005": 21,
-    "2006": 23,
-    "2007": 22,
-    "2008": 25,
-    "2009": 20,
-    "2010": 44,
-    "2011": 42,
-    "2012": 47,
-    "2013": 45,
-    "2014": 57,
-    "2015": 59,
-    "2016": 55,
-    "2017": 78,
-    "2018": 63,
-    "2019": 59,
-    "2020": 58,
-    "2021": 70,
-    "2022": 66,
-    "2023": 65,
-    "2024": 68,
-    "2025": 67,
-    "2026": 58
+    "2002": 20,
+    "2003": 17,
+    "2004": 19,
+    "2005": 24,
+    "2006": 27,
+    "2007": 28,
+    "2008": 30,
+    "2009": 29,
+    "2010": 54,
+    "2011": 59,
+    "2012": 56,
+    "2013": 58,
+    "2014": 74,
+    "2015": 73,
+    "2016": 72,
+    "2017": 101,
+    "2018": 77,
+    "2019": 78,
+    "2020": 77,
+    "2021": 93,
+    "2022": 81,
+    "2023": 90,
+    "2024": 96,
+    "2025": 87,
+    "2026": 76
    }
   },
   "swamps": {
-   "fetched": 278,
-   "key": "c14ec6551e75aa818f5ff221605f1788",
+   "fetched": 346,
+   "key": "ff2918429632d0a97498ce10e5e858a9",
    "label": "Forested swamps",
-   "last_fetch": "2026-10-02",
+   "last_fetch": "2026-10-04",
    "mode": "full",
-   "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")",
-   "total": 278,
+   "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
+   "total": 346,
    "trend": {
     "1968": 2,
     "1988": 2,
@@ -374,34 +496,34 @@
     "2006": 4,
     "2007": 3,
     "2008": 6,
-    "2009": 2,
-    "2010": 8,
-    "2011": 11,
-    "2012": 8,
-    "2013": 15,
-    "2014": 14,
-    "2015": 12,
-    "2016": 11,
-    "2017": 15,
-    "2018": 17,
-    "2019": 13,
-    "2020": 18,
-    "2021": 10,
-    "2022": 13,
-    "2023": 14,
-    "2024": 21,
-    "2025": 17,
-    "2026": 17
+    "2009": 3,
+    "2010": 10,
+    "2011": 14,
+    "2012": 9,
+    "2013": 18,
+    "2014": 18,
+    "2015": 14,
+    "2016": 16,
+    "2017": 18,
+    "2018": 24,
+    "2019": 20,
+    "2020": 21,
+    "2021": 16,
+    "2022": 17,
+    "2023": 17,
+    "2024": 29,
+    "2025": 20,
+    "2026": 20
    }
   },
   "wetlands": {
    "fetched": 1500,
-   "key": "85f57b05e5f570a007a99a51ab58b69f",
+   "key": "18964a5fededa94ccc5939afdd42f04f",
    "label": "All wetlands",
-   "last_fetch": "2026-10-02",
+   "last_fetch": "2026-10-04",
    "mode": "sample",
-   "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\")",
-   "total": 14887,
+   "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
+   "total": 18854,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -432,6 +554,7 @@
     "1933": 2,
     "1934": 1,
     "1936": 2,
+    "1937": 1,
     "1947": 1,
     "1948": 1,
     "1949": 1,
@@ -441,81 +564,87 @@
     "1956": 1,
     "1957": 6,
     "1958": 1,
+    "1960": 1,
     "1961": 2,
     "1962": 2,
     "1963": 6,
-    "1964": 1,
+    "1964": 2,
     "1965": 1,
     "1966": 3,
     "1967": 7,
-    "1968": 3,
+    "1968": 5,
     "1969": 6,
-    "1970": 9,
-    "1971": 4,
+    "1970": 10,
+    "1971": 5,
     "1972": 4,
-    "1973": 3,
-    "1974": 6,
-    "1975": 5,
-    "1976": 6,
-    "1977": 11,
-    "1978": 8,
-    "1979": 15,
-    "1980": 14,
-    "1981": 22,
-    "1982": 22,
-    "1983": 27,
-    "1984": 30,
-    "1985": 35,
-    "1986": 35,
-    "1987": 31,
-    "1988": 42,
-    "1989": 34,
-    "1990": 44,
-    "1991": 51,
-    "1992": 66,
-    "1993": 85,
-    "1994": 90,
-    "1995": 95,
-    "1996": 120,
-    "1997": 115,
-    "1998": 147,
-    "1999": 134,
-    "2000": 150,
-    "2001": 140,
-    "2002": 164,
-    "2003": 191,
-    "2004": 172,
-    "2005": 217,
-    "2006": 241,
-    "2007": 260,
-    "2008": 331,
-    "2009": 384,
-    "2010": 411,
-    "2011": 416,
-    "2012": 453,
-    "2013": 544,
-    "2014": 576,
-    "2015": 568,
-    "2016": 623,
-    "2017": 590,
-    "2018": 601,
-    "2019": 627,
-    "2020": 714,
-    "2021": 736,
-    "2022": 764,
-    "2023": 757,
-    "2024": 904,
-    "2025": 996,
-    "2026": 954
+    "1973": 4,
+    "1974": 8,
+    "1975": 9,
+    "1976": 10,
+    "1977": 15,
+    "1978": 10,
+    "1979": 19,
+    "1980": 18,
+    "1981": 24,
+    "1982": 25,
+    "1983": 28,
+    "1984": 48,
+    "1985": 37,
+    "1986": 37,
+    "1987": 33,
+    "1988": 46,
+    "1989": 46,
+    "1990": 51,
+    "1991": 57,
+    "1992": 74,
+    "1993": 112,
+    "1994": 111,
+    "1995": 111,
+    "1996": 138,
+    "1997": 126,
+    "1998": 154,
+    "1999": 153,
+    "2000": 188,
+    "2001": 172,
+    "2002": 188,
+    "2003": 213,
+    "2004": 198,
+    "2005": 261,
+    "2006": 286,
+    "2007": 315,
+    "2008": 401,
+    "2009": 478,
+    "2010": 506,
+    "2011": 547,
+    "2012": 575,
+    "2013": 656,
+    "2014": 715,
+    "2015": 747,
+    "2016": 814,
+    "2017": 756,
+    "2018": 784,
+    "2019": 802,
+    "2020": 907,
+    "2021": 946,
+    "2022": 963,
+    "2023": 1002,
+    "2024": 1193,
+    "2025": 1349,
+    "2026": 1264
    }
   }
  },
  "geocode": {
+  "Agusan Marsh Wildlife Sanctuary, Mindanao, Philippines": null,
   "Alberta, Canada": [
    55.001251,
    -115.002136
   ],
   "Altai Republic, Russia": [
+   50.7114101,
+   86.8572186
+  ],
+  "Altai, Russia": [
    50.7114101,
    86.8572186
   ],
@@ -528,6 +657,8 @@
    -3.8932882,
    -73.1868553
   ],
+  "Andean-Amazon transition zone, Caquetá / Amazonia, Colombia": null,
+  "Apopka Marsh, Florida, USA": null,
   "Atchafalaya River, Louisiana, United States": [
    30.1250596,
    -91.4955297
@@ -538,9 +669,11 @@
    101.6579885
   ],
   "Balanak Swamp, Altai Republic, Russia": null,
+  "Bear Creek watershed, central Iowa, USA": null,
   "Belait / Tutong / Temburong, Brunei Darussalam": null,
   "Belait or Temburong, Brunei": null,
   "Belize coastal and terrestrial peatlands, National, Belize": null,
+  "Berbak Delta, Jambi, Indonesia": null,
   "Big Cypress National Preserve, Florida, United States": [
    25.9361216,
    -81.0951271
@@ -548,6 +681,14 @@
   "Big Cypress Swamp, Florida, United States": [
    30.0818677,
    -85.1007483
+  ],
+  "Bocas del Toro, Panama": [
+   9.2684749,
+   -81.9932387
+  ],
+  "Bohemia, Czech Republic": [
+   49.8653861,
+   13.5696396
   ],
   "Boreal Plains, Canada, Canada": null,
   "Boreal Shield East, Canada, Canada": null,
@@ -570,10 +711,15 @@
    -11.743613,
    -67.1366534
   ],
+  "Caquetá / Amazonia, Colombia": [
+   1.183361,
+   -75.703284
+  ],
   "Central Africa, Democratic Republic of the Congo": [
    -4.3027436,
    15.310832
   ],
+  "Central Forest State Nature Biosphere Reserve, European Russia, Russia": null,
   "Central Kalimantan peat dome, Central Kalimantan, Indonesia": null,
   "Central Kalimantan peat swamp forest, Central Kalimantan, Indonesia": null,
   "Central Kalimantan peatlands, Central Kalimantan, Indonesia": null,
@@ -590,6 +736,7 @@
    -2.2138314,
    113.9255363
   ],
+  "Central New York wetlands, New York, USA": null,
   "Central Siberia, Russia": [
    65.2539737,
    106.7898242
@@ -610,9 +757,17 @@
   "Congo Basin, Central Africa, Democratic Republic of the Congo": null,
   "Congo Basin, Congo Basin, Not stated": null,
   "Congo Basin, Not stated": null,
+  "Congo Basin, Republic of the Congo": null,
+  "Cranesville Swamp Preserve, West Virginia, USA": [
+   39.5407146,
+   -79.4830058
+  ],
+  "Cricamola, Bocas del Toro, Panama": null,
+  "Cuvette Centrale, Congo Basin, Republic of the Congo": null,
   "Cuvette Centrale, Cuvette Centrale, Democratic Republic of the Congo": null,
   "Cuvette Centrale, Democratic Republic of the Congo": null,
   "Da Hinggan Mountains, Heilongjiang / Inner Mongolia, China": null,
+  "Da Xing'an Mountains, Northeast China, China": null,
   "Da Xing'an Mountains, Northeast, China": null,
   "Danube National Park, Lower Austria, Austria": null,
   "Daxing'an Mountains, Northeast China, China": null,
@@ -625,7 +780,10 @@
    0.7884397,
    116.2419977
   ],
+  "Eastern Amazon, Para, Brazil": null,
   "Eastern Great Xing'an Mountains, Heilongjiang / Inner Mongolia, China": null,
+  "European Russia, Russia": null,
+  "Everglades (Water Conservation Area 2A), Florida, USA": null,
   "Everglades National Park, Florida, United States": [
    25.3679443,
    -80.8783066
@@ -636,15 +794,28 @@
    27.3441959,
    -81.0312841
   ],
+  "Florida, USA": [
+   27.7567667,
+   -81.4639835
+  ],
   "Florida, United States": [
    27.7567667,
    -81.4639835
+  ],
+  "Fort McMurray, Alberta, Canada": [
+   56.7291997,
+   -111.3885221
+  ],
+  "Georgia / Florida, USA": [
+   31.9339436,
+   -83.7482925
   ],
   "Georgia, USA": [
    32.3293809,
    -83.1137366
   ],
   "Giam Siak Kecil–Bukit Batu Biosphere Reserve, Sumatra, Indonesia": null,
+  "Gornyi Altai swamps, Altai, Russia": null,
   "Great Dismal Swamp, Virginia / North Carolina, USA": [
    36.5375826,
    -76.4204223
@@ -675,6 +846,15 @@
   ],
   "Indonesia, Southeast Asia, Indonesia": null,
   "Iquitos region, Loreto, Peru": null,
+  "Iquitos, Loreto, Peru": [
+   -3.749365,
+   -73.2444145
+  ],
+  "Jambi peat dome, Jambi, Sumatra, Indonesia": null,
+  "Jambi, Indonesia": [
+   -1.7069965,
+   102.7140041
+  ],
   "Jambi, Jambi, Indonesia": [
    -1.6296917,
    103.6077806
@@ -687,6 +867,10 @@
   "Kaamanen, Lapland, Finland": [
    69.1047373,
    27.1978479
+  ],
+  "Kalampangan, Central Kalimantan, Indonesia": [
+   -2.2787149,
+   114.0112539
   ],
   "Kalimantan Barat, West Kalimantan, Indonesia": [
    -0.0596325,
@@ -719,6 +903,8 @@
    44.4717007,
    -92.1791073
   ],
+  "Louisiana coastal saline marsh, Louisiana, USA": null,
+  "Louisiana coastal wetlands, Louisiana, United States": null,
   "Louisiana gulf coast swamp forest, Louisiana, USA": null,
   "Louisiana, USA": [
    30.8703881,
@@ -731,6 +917,11 @@
   "Lower Austria, Austria": [
    48.2817813,
    15.7632457
+  ],
+  "Lower Mississippi Alluvial Valley, Lower Mississippi, USA": null,
+  "Lower Mississippi, USA": [
+   32.3534423,
+   -90.8818093
   ],
   "Lower Savannah River, Georgia, USA": [
    32.0800487,
@@ -755,6 +946,10 @@
   ],
   "Malaysia, Southeast Asia, Malaysia": null,
   "Maludam National Park, Sarawak, Malaysia": null,
+  "Marang, Central Kalimantan, Indonesia": [
+   -2.0618142,
+   113.7965159
+  ],
   "Mauritia flexuosa palm swamp peat forest, Peruvian Amazon, Peru": null,
   "Mazagão, Amapá, Brazil": [
    -0.0431531,
@@ -763,6 +958,10 @@
   "Mekong Delta, Vietnam": [
    9.7508958,
    105.2224602
+  ],
+  "Mer Bleue, Ontario, Canada": [
+   45.4006154,
+   -75.4994842
   ],
   "Merang peat swamp forest, South Sumatra, Indonesia": null,
   "Meulaboh, West Aceh, Indonesia": null,
@@ -775,6 +974,10 @@
    43.1606855,
    -77.444328
   ],
+  "Mindanao, Philippines": [
+   7.6897787,
+   125.2365313
+  ],
   "Minnesota site, Minnesota, United States": [
    44.0142802,
    -92.4162336
@@ -783,9 +986,17 @@
   "Mississippi deltaic plain, Louisiana, USA": null,
   "Mississippi river deltaic plain, Louisiana, USA": null,
   "Moloi River, Not stated, Kenya": null,
+  "Mont-Saint-Hilaire, Québec, Canada": [
+   45.5623512,
+   -73.1918864
+  ],
   "Moscow region, Moscow Oblast, Russia": [
    55.8858149,
    37.4562282
+  ],
+  "Napahai, Yunnan, China": [
+   27.8336987,
+   99.6712489
   ],
   "Narathiwat province swamp forest, Narathiwat, Thailand": null,
   "Narathiwat, Thailand": [
@@ -799,6 +1010,10 @@
   "National, Finland": [
    14.6553047,
    121.0897395
+  ],
+  "New South Wales, Australia": [
+   -32.1629594,
+   147.0320469
   ],
   "New York State forested peatland, New York, United States": null,
   "New York, USA": [
@@ -823,6 +1038,10 @@
    -79.0392919
   ],
   "North Florida swamp forest, Florida, United States": null,
+  "North Selangor Peat Swamp Forest, Selangor, Malaysia": [
+   3.5685312,
+   101.2667034
+  ],
   "North Selangor, Selangor, Malaysia": [
    2.9687015,
    101.7415901
@@ -866,6 +1085,7 @@
    30.6668928,
    -82.3331791
   ],
+  "Okefenokee swamp, Georgia / Florida, USA": null,
   "Ontario, Canada": [
    50.000678,
    -86.000977
@@ -884,15 +1104,29 @@
    -2.2072919,
    113.9164372
   ],
+  "Pantanal, Mato Grosso, Brazil": [
+   -17.6750684,
+   -57.4553363
+  ],
   "Papua Barat, West Papua, Indonesia": [
    -0.86573,
    134.0755946
   ],
+  "Para, Brazil": [
+   -4.7493933,
+   -52.8973006
+  ],
   "Pastaza-Marañon foreland basin, Amazon, Peru": null,
   "Pastaza-Marañón foreland basin, Amazon basin, Peru": null,
+  "Peace River, Alberta, Canada": [
+   56.2337111,
+   -117.2910839
+  ],
   "Peat swamp forest sites in Indonesia, Southeast Asia, Indonesia": null,
   "Peat swamp forests of Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
   "Pekan peat swamp forest, Pahang, Malaysia": null,
+  "Pematang Gadung peat dome, West Kalimantan, Indonesia": null,
+  "Peninsular Malaysia peatlands, Peninsular Malaysia, Malaysia": null,
   "Peninsular Malaysia, Malaysia": [
    3.0839554,
    101.7442451
@@ -901,8 +1135,11 @@
    -6.8699697,
    -75.0458515
   ],
+  "Peruvian Amazon, Amazon, Peru": null,
   "Peruvian Amazon, Peru": null,
+  "Petushikha black alder swamp, European Russia, Russia": null,
   "Qinghai-Tibet Plateau, China": null,
+  "Qinghai-Tibet Plateau, Qinghai-Tibet, China": null,
   "Qinghai-Tibet, China": [
    37.3371261,
    97.4152619
@@ -921,6 +1158,14 @@
    -22.1646782,
    144.5844903
   ],
+  "Raja Musa Forest Reserve, Selangor, Malaysia": [
+   3.511314,
+   101.3126147
+  ],
+  "Republic of the Congo": [
+   -0.7264327,
+   15.6419155
+  ],
   "Riau Province, Indonesia": null,
   "Riau Province, Riau, Indonesia": null,
   "Riau, Indonesia": [
@@ -930,6 +1175,10 @@
   "Rift Valley, Kenya": [
    1.1328606,
    36.293934
+  ],
+  "Russia": [
+   64.6863136,
+   97.7453061
   ],
   "SAFE project landscape, Sabah, Malaysia": null,
   "SPRUCE, Minnesota, United States": [
@@ -965,11 +1214,19 @@
    33.1478707,
    -81.7516388
   ],
+  "Sebangau National Park, Central Kalimantan, Indonesia": [
+   -2.4769018,
+   113.6931414
+  ],
   "Sebungan, Southeast Asia, Not stated": null,
   "Selangor peat swamp forest and oil palm plantation, Selangor, Malaysia": null,
   "Selangor, Malaysia": [
    3.2083304,
    101.304146
+  ],
+  "Selangor, Selangor, Malaysia": [
+   2.9240809,
+   101.7812216
   ],
   "Shaubac Wetlands, Nova Scotia, Canada": null,
   "South Bohemia, Czech Republic": [
@@ -1014,6 +1271,7 @@
   ],
   "Southeast Asia, Not stated": null,
   "Southeast Asian tropical forested peatland, Not stated, Southeast Asia": null,
+  "Southern Aceh, Indonesia": null,
   "Southern Ontario swamps, Southern Ontario, Canada": null,
   "Southern Ontario, Canada": [
    43.2231351,
@@ -1024,21 +1282,39 @@
    -0.1432941,
    101.6241024
   ],
+  "Sunny Hill Farm, Florida, USA": null,
+  "Tibet, China": [
+   29.8556443,
+   90.8749807
+  ],
+  "Tibetan Plateau permafrost transect, Tibetan Plateau, China": null,
+  "Tibetan Plateau, China": [
+   31.8280766,
+   87.4064278
+  ],
   "Tibetan Plateau, Tibet, China": [
    31.8280766,
    87.4064278
   ],
+  "Tibetan alpine permafrost region, Tibet, China": null,
   "To-Daeng, Narathiwat Province, Thailand": [
    6.3656142,
    101.7654954
   ],
+  "Trumon and Singkil, Southern Aceh, Indonesia": null,
   "Turochak Swamp, Altai Republic, Russia": null,
+  "Tver region swamp, Tver, Russia": null,
+  "Tver, Russia": [
+   56.858675,
+   35.9208284
+  ],
   "U Minh Thuong National Park, Mekong Delta, Vietnam": null,
   "United States": [
    39.7837304,
    -100.445882
   ],
   "United States wetlands, Not stated, United States": null,
+  "Vasyugan Swamp, West Siberia, Russia": null,
   "Vasyugan Swamp, Western Siberia, Russia": null,
   "Veracruz coastal freshwater wetlands, Veracruz, Mexico": null,
   "Veracruz coastal plain, Veracruz, Mexico": null,
@@ -1050,6 +1326,7 @@
    37.1232245,
    -78.4927721
   ],
+  "Vrouwe Vennepolder, unknown, Netherlands": null,
   "Waccamaw River floodplain, South Carolina, USA": null,
   "Waccamaw River, South Carolina, USA": [
    33.8874211,
@@ -1071,6 +1348,8 @@
    76.0
   ],
   "West Siberian plain, West Siberia, Russia": null,
+  "Western Boreal Plain, Alberta, Canada": null,
+  "Western Siberia oligotrophic swamp, Western Siberia, Russia": null,
   "Western Siberia taiga, Western Siberia, Russia": null,
   "Western Siberia, Russia": [
    55.0959197,
@@ -1083,15 +1362,22 @@
   "XiaoXing'an Mountains, Heilongjiang, China": null,
   "Xiaoxing'an Mountain region, Heilongjiang, China": null,
   "Xiaoxing'an Mountains, Heilongjiang, China": null,
+  "Xiaoxing'anling region, Heilongjiang, China": null,
   "Xiaoxing’an Mountains, Northeast China, China": null,
   "ZOTTO observatory, Central Siberia, Russia": null,
+  "central Iowa, USA": [
+   41.8967802,
+   -87.7655592
+  ],
   "central Ontario, Ontario, Canada": [
    44.9376036,
    -78.9925565
   ],
   "coastal freshwater forested wetland, North Carolina, USA": null,
   "forested swamp near Ithaca, New York, USA": null,
+  "north-eastern New South Wales wetlands, New South Wales, Australia": null,
   "northern Alberta study site, Alberta, Canada": null,
+  "northern Alberta swamp, Alberta, Canada": null,
   "northern Alberta, Alberta, Canada": [
    58.7131298,
    -111.1591342
@@ -1115,7 +1401,12 @@
   "southern Quebec drained swamp peatland sites, Quebec, Canada": null,
   "southern Taiga Plains, Northwest Territories, Canada": null,
   "southwestern Nova Scotia swamps, Nova Scotia, Canada": null,
-  "umava Mountains, South Bohemia, Czech Republic": null
+  "umava Mountains, South Bohemia, Czech Republic": null,
+  "unknown, Netherlands": [
+   52.3866987,
+   4.9236056
+  ],
+  "Šumava National Park, Bohemia, Czech Republic": null
  },
  "predictions": {},
  "prompts": {
@@ -1230,6 +1521,118 @@
     "name": "record_field_map"
    },
    "system": "You classify papers for a systematic map of a research field, so a PhD student can see what the field as a whole has and has not studied.\n\nThe student's research context, including the research questions to tag:\n<context>\n# PhD research context (used by the AI to judge relevance)\n\nEdit this file whenever your project evolves. The more specific it is, the better\nthe relevance scores and research-question tags will be.\n\n## Project\n\nPhD in biology (UQAM). Carbon and greenhouse gas dynamics (CO2, CH4, N2O) in\nforested wetlands, mainly forested swamps, of southern Québec, with the aim of\ninforming nature-based climate solutions.\n\nFluxes are measured with closed chambers on soil collars and on tree stems\n(LI-COR LI-7810 / LI-7820 trace gas analyzers). No aquatic (water surface)\nflux measurements.\n\n## Planned chapters\n\n1. Flux budget and microclimate controls (soil and stem fluxes, temperature,\n   water table, seasonal and spatial variability).\n2. Vegetation: role of trees and understory, stem fluxes, plant-mediated transport.\n3. Soil and water microbial communities: taxonomic and functional diversity,\n   methanogens, methanotrophs, nitrifiers / denitrifiers.\n4. Hydrology, biogeochemistry and contaminants (water chemistry, DOC, nutrients,\n   redox, anthropogenic inputs).\n\n## Research questions\n\n- RQ1: What controls whether a southern Québec forested swamp is a net GHG source or sink?\n- RQ2: How does a disturbed forested wetland compare to an intact one?\n- RQ3: How is anthropogenic impact expressed in forested wetlands?\n- RQ4: What is the distribution of carbon sources between soil and water in wetlands?\n- RQ5: What is the role of taxonomic and functional microbial diversity in the\n  belowground systems of forested wetlands in southern Québec?\n\n</context>\n\nClassify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome \"Not stated\" when there is no clue. Answer in the requested JSON format."
+  },
+  "45e17bd25236": {
+   "kind": "field",
+   "schema": {
+    "description": "Classify one paper for a systematic map of the research field.",
+    "input_schema": {
+     "properties": {
+      "biome": {
+       "enum": [
+        "Boreal",
+        "Temperate",
+        "Subtropical",
+        "Tropical",
+        "Arctic / tundra",
+        "Multiple / global",
+        "Not stated"
+       ],
+       "type": "string"
+      },
+      "ecosystems": {
+       "items": {
+        "enum": [
+         "Forested swamp",
+         "Peatland / bog / fen",
+         "Marsh",
+         "Upland forest",
+         "Other wetland",
+         "Other"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "gases": {
+       "items": {
+        "enum": [
+         "CO2",
+         "CH4",
+         "N2O"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "on_topic": {
+       "description": "True if the paper actually studies greenhouse gas or carbon exchange in wetland ecosystems (field, lab, model or review). False for papers that only mention these words.",
+       "type": "boolean"
+      },
+      "research_questions": {
+       "description": "Research questions of the PhD that this paper substantially informs. May be empty.",
+       "items": {
+        "enum": [
+         "RQ1 Source/sink controls",
+         "RQ2 Disturbed vs intact",
+         "RQ3 Anthropogenic impact",
+         "RQ4 Soil vs water C sources",
+         "RQ5 Microbial taxonomy & function"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "sites": {
+       "description": "Named field sites. Empty if none are named.",
+       "items": {
+        "properties": {
+         "country": {
+          "type": "string"
+         },
+         "name": {
+          "type": "string"
+         },
+         "region": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "name",
+         "region",
+         "country"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      },
+      "study_design": {
+       "enum": [
+        "Field observation",
+        "Field experiment",
+        "Lab / incubation",
+        "Modelling",
+        "Review",
+        "Meta-analysis / synthesis",
+        "Methods"
+       ],
+       "type": "string"
+      }
+     },
+     "required": [
+      "on_topic",
+      "research_questions",
+      "ecosystems",
+      "gases",
+      "biome",
+      "study_design",
+      "sites"
+     ],
+     "type": "object"
+    },
+    "name": "record_field_map"
+   },
+   "system": "You classify papers for a systematic map of a research field, so a PhD student can see what the field as a whole has and has not studied.\n\nThe student's research context, including the research questions to tag:\n<context>\n# PhD research context (used by the AI to judge relevance)\n\nEdit this file whenever your project evolves. The more specific it is, the better\nthe relevance scores and research-question tags will be.\n\n## Project\n\nPhD in biology (UQAM). Carbon and greenhouse gas dynamics (CO2, CH4, N2O) in\nforested wetlands, mainly forested swamps, of southern Québec, with the aim of\ninforming nature-based climate solutions.\n\nFluxes are measured with closed chambers on soil collars and on tree stems\n(LI-COR LI-7810 / LI-7820 trace gas analyzers). No aquatic (water surface)\nflux measurements.\n\n## Planned chapters\n\n1. Flux budget and microclimate controls (soil and stem fluxes, temperature,\n   water table, seasonal and spatial variability).\n2. Vegetation: role of trees and understory, stem fluxes, plant-mediated transport.\n3. Soil and water microbial communities: taxonomic and functional diversity,\n   methanogens, methanotrophs, nitrifiers / denitrifiers.\n4. Hydrology, biogeochemistry and contaminants (water chemistry, DOC, nutrients,\n   redox, anthropogenic inputs).\n\n## Research questions\n\n- RQ1: What controls whether a southern Québec forested swamp is a net GHG source or sink?\n- RQ2: How does a disturbed forested wetland compare to an intact one?\n- RQ3: How is anthropogenic impact expressed in forested wetlands?\n- RQ4: What is the distribution of carbon sources between soil and water in wetlands?\n- RQ5: What is the role of taxonomic and functional microbial diversity in the\n  belowground systems of forested wetlands in southern Québec?\n\n</context>\n\nThe paper may be written in French or another language: classify it all the same, using the English labels provided.\nClassify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome \"Not stated\" when there is no clue. Answer in the requested JSON format."
   },
   "ab1a27d51183": {
    "kind": "extract",
@@ -1516,6 +1919,26 @@
    "suggested_to_date": 83,
    "triaged": 28,
    "unique_candidates": 37368
+  },
+  {
+   "candidates_evaluated": 26617,
+   "date": "2026-10-04",
+   "decisions": 5,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 200,
+   "field_progress": "Forested swamps 346/346; Forested wetlands 799/1748; All wetlands 55/1500",
+   "library": 21,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 1,
+   "new_suggestions": 2,
+   "notes": "",
+   "pending": 72,
+   "retained": 12,
+   "retractions": 0,
+   "suggested_to_date": 85,
+   "triaged": 2,
+   "unique_candidates": 37374
   }
  ],
  "seen_candidates": [
@@ -38663,6 +39086,7 @@
   "W7125368300",
   "W71286975",
   "W7154918054",
+  "W7160383036",
   "W7167485363",
   "W7172448462",
   "W7172472129",
@@ -38677,6 +39101,7 @@
   "W7202281769",
   "W7202298481",
   "W7202425399",
+  "W7203492378",
   "W7203541435",
   "W7203579157",
   "W7203717651",
@@ -38689,6 +39114,7 @@
   "W7204193221",
   "W7204443803",
   "W7204532570",
+  "W7204709510",
   "W7204745014",
   "W7204754051",
   "W7204766622",
@@ -38709,12 +39135,14 @@
   "W7211932928",
   "W7212152533",
   "W7212158442",
+  "W7212289509",
   "W7212359105",
   "W7212367705",
   "W7212748784",
   "W7213273156",
   "W7213428560",
   "W7213540030",
+  "W7213547695",
   "W7213885806",
   "W7213908082",
   "W7213976092",
@@ -38730,6 +39158,7 @@
   "W7214550558",
   "W7214611646",
   "W7214706167",
+  "W7214961646",
   "W7215031634",
   "W72673922",
   "W72730618",

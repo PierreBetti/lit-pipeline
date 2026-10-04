@@ -142,8 +142,9 @@
     <div id="graph" role="img" aria-label="Citation map of your library and suggested papers"></div>
     <div class="overlay">
       <input type="search" id="search" placeholder="Find a paper or author" aria-label="Find a paper or author">
+      <div class="chips" id="map-mode" role="group" aria-label="What to show" style="margin:10px 0 0"></div>
       <ul class="legend" id="legend"></ul>
-      <p class="hint">Bigger dot means more citations; a ring means you have read it. Arrows point to the cited paper, dashed lines join similar papers.</p>
+      <p class="hint" id="map-hint">Bigger dot means more citations; a ring means you have read it. Arrows point to the cited paper, dashed lines join similar papers.</p>
     </div>
     <aside class="detail" id="detail" aria-live="polite"></aside>
   </section>
@@ -301,7 +302,12 @@ if (!DATA) {
       shapeProperties: { borderDashes: n.kind === "suggested" ? [4, 3] : false },
       font: { color: n.kind === "suggested" ? MUTED : INK, size: 12, face: "system-ui" }
     })));
-    const edges = new vis.DataSet(G.edges.map((e, i) => e.kind === "similar"
+    const maxS = Math.max(0.01, ...G.edges.filter(e => e.kind === "libsim").map(e => e.strength));
+    const edges = new vis.DataSet(G.edges.map((e, i) => e.kind === "libsim"
+      ? { id: i, from: e.from, to: e.to, kind: "libsim", arrows: { to: { enabled: false } }, dashes: [7, 6],
+          width: 1 + 4 * e.strength / maxS, color: { color: EDGE, highlight: INK }, smooth: { type: "continuous" },
+          title: `Shared references (similarity ${(e.strength * 100).toFixed(0)}%)` }
+      : e.kind === "similar"
       ? { id: i, from: e.from, to: e.to, dashes: [3, 4], arrows: { to: { enabled: false } },
           color: { color: EDGE, highlight: MUTED }, width: 1, smooth: { type: "continuous" } }
       : { id: i, from: e.from, to: e.to, arrows: { to: { enabled: true, scaleFactor: 0.4 } },
@@ -314,6 +320,10 @@ if (!DATA) {
     const counts = {};
     uniq.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
     const hidden = new Set();
+    let mapMode = "all";
+    function applyVisibility() {
+      nodes.update(uniq.map(n => ({ id: n.id, hidden: (mapMode === "mine" && n.kind === "suggested") || hidden.has(n.category) })));
+    }
     const legend = document.getElementById("legend");
     Object.keys(PALETTE).filter(c => counts[c]).forEach(cat => {
       const li = document.createElement("li"), b = document.createElement("button");
@@ -323,9 +333,19 @@ if (!DATA) {
       b.addEventListener("click", () => {
         hidden.has(cat) ? hidden.delete(cat) : hidden.add(cat);
         b.setAttribute("aria-pressed", String(!hidden.has(cat)));
-        nodes.update(G.nodes.map(n => ({ id: n.id, hidden: hidden.has(n.category) })));
+        applyVisibility();
       });
       li.appendChild(b); legend.appendChild(li);
+    });
+    // "Only my papers": hide suggestions, keep citation and similarity links between your own papers
+    chipGroup(document.getElementById("map-mode"), [["all", "With suggestions"], ["mine", "Only my papers"]], "all", mode => {
+      mapMode = mode;
+      applyVisibility();
+      document.getElementById("map-hint").textContent = mode === "mine"
+        ? "Your library only. Arrows: one paper cites the other. Dashed grey lines: papers sharing references, thicker when they share more (like Connected Papers)."
+        : "Bigger dot means more citations; a ring means you have read it. Arrows point to the cited paper, dashed lines join similar papers.";
+      network.stabilize(150);
+      setTimeout(() => network.fit({ animation: { duration: 400 } }), 300);
     });
     const detail = document.getElementById("detail");
     function show(n) {
@@ -557,22 +577,24 @@ if (!DATA) {
       const span = years.filter(y => y >= from);
       const cats = [...new Set(lib.map(p => p.category))];
       document.getElementById("time-lead").textContent = F
-        ? `Bars: your library by publication year and category. Line: papers per year in the ${F.label.toLowerCase()} literature (all matches of its OpenAlex search, before on-topic filtering).`
-        : "Bars: your library by publication year and category.";
+        ? `Line and axis: papers per year in the ${F.label.toLowerCase()} literature (all matches of its OpenAlex search). Bars: your own papers by year and category, on their own scale so they stay visible; hover a bar for exact counts.`
+        : "Bars: your library by publication year and category; hover a bar for exact counts.";
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById("timechart"), {
         data: { labels: span, datasets: [
           ...cats.map(c => ({ type: "bar", label: c, data: span.map(y => lib.filter(p => +p.year === y && p.category === c).length),
-            backgroundColor: colorOf(c), stack: "lib", yAxisID: "y" })),
+            backgroundColor: colorOf(c) + "cc", stack: "lib", yAxisID: "y", maxBarThickness: 18 })),
           ...(F ? [{ type: "line", label: F.label, data: span.map(y => field[y] || 0),
             borderColor: MUTED, backgroundColor: MUTED, pointRadius: 0, borderWidth: 1.5, tension: .25, yAxisID: "y2" }] : [])
         ] },
         options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
           plugins: { legend: { labels: { color: INK, boxWidth: 12 } } },
           scales: { x: { stacked: true, ticks: { color: MUTED, maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
-            y: { stacked: true, title: { display: true, text: "Your papers", color: MUTED }, ticks: { color: MUTED, precision: 0 }, grid: { color: LINE } },
-            y2: { position: "right", display: !!F, title: { display: true, text: "Field papers", color: MUTED },
-              ticks: { color: MUTED }, grid: { display: false } } } }
+            // your papers are few: their bars keep their own hidden scale (exact counts in the tooltip)
+            y: { stacked: true, display: false, beginAtZero: true,
+                 max: 2.5 * Math.max(1, ...span.map(y => lib.filter(p => +p.year === y).length)) },
+            y2: { position: "left", display: !!F, beginAtZero: true, title: { display: true, text: "Papers per year in the field", color: MUTED },
+              ticks: { color: MUTED }, grid: { color: LINE } } } }
       });
       const periods = [[0, 1999, "Before 2000"], [2000, 2009, "2000s"], [2010, 2014, "2010-2014"], [2015, 2019, "2015-2019"], [2020, 9999, "2020 onwards"]];
       const fTot = Object.values(field).reduce((a, b) => a + b, 0), lTot = lib.length;

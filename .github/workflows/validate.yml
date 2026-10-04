@@ -27,7 +27,16 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt
+      - name: Cache the semantic model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ hashFiles('config.json') }}
+          restore-keys: hf-
+      - name: Install dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
       - name: Run validation task
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}

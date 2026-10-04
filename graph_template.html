@@ -334,7 +334,7 @@ if (!DATA) {
         <h3>${esc(n.title || n.label)}</h3>
         <p class="muted">${esc(n.label)}. ${n.citations} citations${pct}.</p>
         ${n.kind === "suggested"
-          ? `<p><strong>${esc((n.roles || []).join(", "))}</strong>. Global score ${n.global}/100, similarity ${n.similarity}/100${n.relevance ? `, relevance ${n.relevance}/5` : ""}.</p>
+          ? `<p><strong>${esc((n.roles || []).join(", "))}</strong>. Global score ${n.global}/100, similarity ${n.similarity}/100${n.semantic != null ? `, semantic match ${n.semantic}/100` : ""}${n.relevance ? `, relevance ${n.relevance}/5` : ""}.</p>
              <p class="muted">${esc(n.why)}</p>`
           : `<p class="muted">${esc(n.category)}${n.read ? ", read" : ", not read yet"}.</p>`}
         <p>${n.doi ? `<a href="${esc(n.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""}
@@ -599,7 +599,10 @@ if (!DATA) {
     const alerts = [];
     if ((P.duplicates || []).length) alerts.push(`Duplicates in your library (the same paper twice): ${P.duplicates.map(esc).join("; ")}. Merge them in Zotero (Duplicate Items).`);
     if (P.retracted.length) alerts.push(`⚠️ Retracted papers in your library: ${P.retracted.map(esc).join("; ").replace(/\.$/, "")}. Check them before citing.`);
-    document.getElementById("alerts").innerHTML = alerts.map(a => `<div class="card alert" style="margin-bottom:12px">${a}</div>`).join("");
+    document.getElementById("alerts").innerHTML = alerts.map(a => `<div class="card alert" style="margin-bottom:12px">${a}</div>`).join("") +
+      (DATA.stopping ? `<div class="card" style="margin-bottom:12px"><strong>When can you stop screening?</strong>
+        <p style="margin:6px 0 0">About <b>${DATA.stopping.expected_relevant}</b> relevant papers are probably still in your queue of ${DATA.stopping.queue}
+        (90% upper estimate: ${DATA.stopping.upper_90}). Estimated from your Personal scores; when it drops below 1, further screening is unlikely to pay off.</p></div>` : "");
     const reasons = Object.entries(P.exclusion_reasons).map(([r, n]) => `${esc(r)}: ${n}`).join("<br>") || "none yet";
     document.getElementById("prisma").innerHTML = `
       <div class="stage">Identification</div>
@@ -670,6 +673,7 @@ if (!DATA) {
                   : kpi("Confidence intervals", "–", "needs a fully classified scope"),
       R && R.status === "ok" ? kpi("AI test-retest", num(R.agreement.on_topic.kappa), `on-topic kappa, ${R.n} papers classified twice`, cls(R.agreement.on_topic.kappa))
                              : kpi("AI test-retest", "–", "run the consistency task"),
+      (pref.text_model && pref.text_model.auc_cv != null) ? kpi("Preference model", num(pref.text_model.auc_cv), "cross-validated AUC, text model", cls(pref.text_model.auc_cv)) :
       pref.auc_cv != null ? kpi("Preference model", num(pref.auc_cv), "cross-validated AUC", cls(pref.auc_cv))
                           : kpi("Preference model", "–", "needs screening decisions"),
       lastRecall != null ? kpi("Discovery recall", Math.round(100 * lastRecall) + "%", `of review studies found, mean of ${bench.length} benchmark(s)`, lastRecall >= .6 ? "good" : "fair")
@@ -713,6 +717,8 @@ if (!DATA) {
     // preferences
     h += `<h2>Does the personal score predict your decisions?</h2>`;
     const pro = pref.prospective || {};
+    const tm = pref.text_model || {};
+    h += tm.ready ? `<p class="lead">Text model (learns from the content of your library and your decisions, ${tm.positives} kept vs ${tm.negatives} excluded): cross-validated AUC <b>${num(tm.auc_cv)}</b>${pref.ready ? `, vs <b>${num(pref.auc_cv)}</b> for the 5-feature model` : ""}. The Personal score averages the models that are ready.</p>` : "";
     h += pref.ready
       ? `<p class="lead">From ${pref.n} decisions: in-sample AUC ${num(pref.auc)} (optimistic), cross-validated AUC <b>${num(pref.auc_cv)}</b> (on decisions it did not learn from). Prospective test, scores recorded before you decided: ${pro.n ? `AUC <b>${num(pro.auc)}</b> on ${pro.n} decisions` : "accumulating"}. 0.5 means no better than chance.</p>`
       : `<p class="lead">Needs at least ${pref.needed || 12} screening decisions (3 kept and 3 excluded minimum); ${pref.n || 0} so far.</p>`;

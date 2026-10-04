@@ -1,24 +1,85 @@
 {
-  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list.",
+  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list. research_question_descriptions: full wording of each research question, used by the semantic model. semantic: local embedding model settings (no AI quota).",
   "notion": {
     "library_data_source": "87a4954a-4928-8345-b3a8-87caeb0b2c4a",
     "suggestions_data_source": "444be872-ca23-4e7e-8d93-665568721b36",
     "review_log_data_source": "4e18753f-4ddc-4caa-911c-04eacc6a4d90",
-    "validation_data_source": "89c1a1e0-42c5-4229-8428-d092a6ef5533"
+    "validation_data_source": "89c1a1e0-42c5-4229-8428-d092a6ef5533",
+    "digest_data_source": "771aea1a-9b0a-4637-ba2c-98ea19e0b398"
   },
   "ai": {
     "temperature": 0,
     "pinned_model": null,
-    "fallback_models": ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemini-flash-latest"],
+    "fallback_models": [
+      "gemini-2.5-flash-lite",
+      "gemini-2.5-flash",
+      "gemini-flash-lite-latest",
+      "gemini-flash-latest"
+    ],
     "log_raw_outputs": true
   },
-  "categories": ["Fluxes & microclimate", "Vegetation & tree stems", "Soil & water microbes",
-                 "Hydrology & biogeochemistry", "Methods & instrumentation", "Nature-based solutions & policy"],
-  "research_questions": ["RQ1 Source/sink controls", "RQ2 Disturbed vs intact", "RQ3 Anthropogenic impact",
-                         "RQ4 Soil vs water C sources", "RQ5 Microbial taxonomy & function"],
-  "ecosystems": ["Forested swamp", "Peatland / bog / fen", "Marsh", "Upland forest", "Other wetland", "Other"],
-  "gases": ["CO2", "CH4", "N2O"],
-  "biomes": ["Boreal", "Temperate", "Subtropical", "Tropical", "Arctic / tundra", "Multiple / global", "Not stated"],
-  "study_designs": ["Field observation", "Field experiment", "Lab / incubation", "Modelling", "Review",
-                    "Meta-analysis / synthesis", "Methods"]
+  "categories": [
+    "Fluxes & microclimate",
+    "Vegetation & tree stems",
+    "Soil & water microbes",
+    "Hydrology & biogeochemistry",
+    "Methods & instrumentation",
+    "Nature-based solutions & policy"
+  ],
+  "research_questions": [
+    "RQ1 Source/sink controls",
+    "RQ2 Disturbed vs intact",
+    "RQ3 Anthropogenic impact",
+    "RQ4 Soil vs water C sources",
+    "RQ5 Microbial taxonomy & function"
+  ],
+  "ecosystems": [
+    "Forested swamp",
+    "Peatland / bog / fen",
+    "Marsh",
+    "Upland forest",
+    "Other wetland",
+    "Other"
+  ],
+  "gases": [
+    "CO2",
+    "CH4",
+    "N2O"
+  ],
+  "biomes": [
+    "Boreal",
+    "Temperate",
+    "Subtropical",
+    "Tropical",
+    "Arctic / tundra",
+    "Multiple / global",
+    "Not stated"
+  ],
+  "study_designs": [
+    "Field observation",
+    "Field experiment",
+    "Lab / incubation",
+    "Modelling",
+    "Review",
+    "Meta-analysis / synthesis",
+    "Methods"
+  ],
+  "research_question_descriptions": {
+    "RQ1 Source/sink controls": "What controls whether a forested swamp is a net source or sink of greenhouse gases (CO2, CH4, N2O), including temperature, water table and soil conditions?",
+    "RQ2 Disturbed vs intact": "How do greenhouse gas fluxes and carbon dynamics differ between disturbed and intact forested wetlands?",
+    "RQ3 Anthropogenic impact": "How do human activities such as drainage, land use, agriculture and pollution affect greenhouse gas fluxes in forested wetlands?",
+    "RQ4 Soil vs water C sources": "How is carbon distributed between soil and water in wetlands, and what are the sources of dissolved carbon and greenhouse gases?",
+    "RQ5 Microbial taxonomy & function": "What is the role of taxonomic and functional microbial diversity, such as methanogens, methanotrophs and denitrifiers, in greenhouse gas production in wetland soils and water?"
+  },
+  "semantic": {
+    "enabled": true,
+    "model": "BAAI/bge-small-en-v1.5",
+    "cos_low": 0.45,
+    "cos_high": 0.8,
+    "discovery_per_question": 60,
+    "discovery_keep": 30
+  },
+  "digest": {
+    "every_days": 7
+  }
 }

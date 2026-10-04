@@ -82,6 +82,18 @@ papers were matched, triaged and suggested. After that it runs by itself every n
 
 ---
 
+## Semantic layer and digest
+
+- A small open-source model runs inside the workflow (no AI quota): every suggestion gets a **Semantic match**
+  with your research questions, a **semantic discovery** channel finds papers by meaning, and the **Personal
+  score** learns from the content of what you keep and exclude. The first run downloads the model (about
+  130 MB, then cached), so it takes a few minutes longer.
+- Edit the full wording of your research questions in `config.json` (`research_question_descriptions`):
+  that is what the model compares papers against.
+- The Screening tab estimates **how many relevant papers are left** in your queue.
+- A **📰 Weekly digest** page appears in Notion every 7 days.
+- The field map now includes French search terms, theses, reports, chapters and preprints (`scopes.json`).
+
 ## Validation (numbers for a methods paper)
 
 Run from **Actions > Validation > Run workflow**, choosing a task. Results appear in the dashboard's

@@ -48,12 +48,33 @@ Aggregated over the library and weighted by the researcher's own relevance ratin
 **Roles.** Prior work: cited by ≥ 2 library papers. Derivative work: cites ≥ 2 library papers. Similar work:
 similarity ≥ 40 or no other role.
 
+**Semantic match.** A local open-source sentence-embedding model (default BAAI/bge-small-en-v1.5, run on CPU
+inside the workflow, so no AI quota and identical results across runs) embeds each research question (full
+wording in `config.json`, with the model's query instruction) and each candidate's title and abstract. The
+Semantic match M is the best cosine similarity across questions, mapped linearly from [0.45, 0.80] to [0, 100].
+
+**Semantic discovery.** Each research question is also sent to OpenAlex's relevance search (60 results per
+question); the pooled results are re-ranked by Semantic match and the 30 closest join the candidate pool
+(pre-ranking bonus +3, source "Semantic search"). This reaches papers that use different vocabulary and are
+not linked to the library by citations.
+
 **Global score** (identical in Python and in Notion):
-`G = 100 × (0.35·r/5 + 0.30·S/100 + 0.15·min(C,5)/5 + 0.12·pct/100 + 0.08·rec)`, where C is the number of
-library papers directly linked (+1 for a Semantic Scholar recommendation); unknown r or pct count as 0.5.
+`G = 100 × (0.30·r/5 + 0.25·S/100 + 0.15·M/100 + 0.12·min(C,5)/5 + 0.10·pct/100 + 0.08·rec)`, where C is the
+number of library papers directly linked (+1 for a Semantic Scholar recommendation); unknown r, M or pct count
+as 0.5.
 The top 40 candidates are proposed for screening and receive an AI relevance score (up to 20 per run).
 
-**Preference learning.** Once ≥ 12 screening decisions exist (≥ 3 retained, ≥ 3 excluded), an L2-regularized
+**Text-based active learning.** A logistic regression (L2, C = 1, balanced classes) on the embeddings of
+titles and abstracts, with every library paper and every retained suggestion as positives and every excluded
+suggestion as negatives (needs ≥ 3 of each). Its cross-validated AUC is computed on screened suggestions
+only (5 folds, leave-one-out below 25), with library papers kept in every training fold. The Personal score
+is the mean of the text model and the feature model below, whichever are ready.
+
+**Stopping estimate.** The expected number of relevant papers left in the screening queue is the sum of
+the Personal-score probabilities of pending suggestions, with a 90% upper bound from the normal
+approximation of the Poisson-binomial distribution. Below 1, further screening is unlikely to pay off.
+
+**Feature-based preference learning.** Once ≥ 12 screening decisions exist (≥ 3 retained, ≥ 3 excluded), an L2-regularized
 logistic regression (λ = 0.05, batch gradient descent) is fit on five features (AI relevance, similarity,
 direct links, citation percentile, recency) to predict *retained vs excluded*. Its output is the Personal
 score. Evaluation: in-sample AUC, 5-fold cross-validated AUC (leave-one-out below 25 decisions), and a
@@ -61,8 +82,8 @@ prospective AUC using only scores recorded before the decision was made.
 
 ## 4. Field-wide systematic map
 
-**Scopes.** Nested OpenAlex boolean searches on titles and abstracts (`scopes.json`), restricted to
-articles and reviews, ordered from most specific to broadest. A scope with ≤ 4000 matches is retrieved in
+**Scopes.** Nested OpenAlex boolean searches on titles and abstracts (`scopes.json`), in English and French,
+over articles, reviews, theses, reports, book chapters and preprints, ordered from most specific to broadest. A scope with ≤ 4000 matches is retrieved in
 full; a larger one is represented by a simple random sample of 1500 works drawn by OpenAlex with a fixed
 seed (42). Full scopes are refreshed weekly, samples every 120 days or when the query changes.
 
@@ -80,7 +101,13 @@ is below max(3, 2% of N_on), and a *reading gap* when the field is above that th
 no paper in the cell. In the rings figure, a sector is a gap when `p_k < 3%` or its estimate is below 3
 (shown only once ≥ 20 on-topic works are classified).
 
-## 5. Reproducibility
+## 5. Weekly digest
+
+Every 7 days a Notion page summarizes: the best new suggestions (by AI relevance, then Personal score, then
+Semantic match), papers added to the library, ecosystem × research question cells newly covered by the
+library, field map progress, the stopping estimate, and alerts (retractions, duplicates).
+
+## 6. Reproducibility
 
 - Temperature 0; the exact model version returned by the API is recorded for every answer.
 - Every prompt (system text + output schema) is hashed; all prompt versions are archived in
@@ -91,7 +118,7 @@ no paper in the cell. In the rings figure, a sector is a gap when `p_k < 3%` or 
 - `config.json` can pin a single model version for a study (`ai.pinned_model`).
 - The classified field corpus is exported nightly to `export/field_corpus.csv` (no abstracts).
 
-## 6. Validation protocol (`validate.py`)
+## 7. Validation protocol (`validate.py`)
 
 1. **AI vs human classification.** Random sample of 50 classified works per scope; 30 double-coded.
    Coding is blind (AI labels are not shown in Notion). Metrics: Cohen's kappa (binary and single-choice
@@ -109,7 +136,7 @@ no paper in the cell. In the rings figure, a sector is a gap when `p_k < 3%` or 
    one round of plain citation chasing (all references and citing papers of the seeds, unranked), and
    against other tools run manually with the same seeds.
 
-## 7. Known limitations
+## 8. Known limitations
 
 OpenAlex coverage of grey literature, non-English work, abstracts (some publishers withhold them, so a
 share of works is classified from titles only, reported separately) and reference lists; English-only

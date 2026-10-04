@@ -116,6 +116,7 @@ elif AI_CFG.get("fallback_models") and "GEMINI_MODELS" not in os.environ:
     GEMINI_MODELS = list(AI_CFG["fallback_models"])
 GEMINI_MODEL = GEMINI_MODELS[0]
 VALIDATION_DS = CONFIG.get("notion", {}).get("validation_data_source", "")
+DIGEST_DS = CONFIG.get("notion", {}).get("digest_data_source", "")
 
 
 def prompt_hash(system, tool):
@@ -866,13 +867,14 @@ def recency(year):
     return max(0.0, 1 - (dt.date.today().year - year) / 15)
 
 
-def global_score(relevance, similarity, connections, pct, year):
+def global_score(relevance, similarity, connections, pct, year, semantic=None):
     """Same formula as the 'Global score' property in Notion. If you change one, change the other."""
     return round(100 * (
-        0.35 * (relevance / 5 if relevance else 0.5)
-        + 0.30 * (similarity or 0) / 100
-        + 0.15 * min(connections or 0, 5) / 5
-        + 0.12 * (pct / 100 if pct is not None else 0.5)
+        0.30 * (relevance / 5 if relevance else 0.5)
+        + 0.25 * (similarity or 0) / 100
+        + 0.15 * (semantic / 100 if semantic is not None else 0.5)
+        + 0.12 * min(connections or 0, 5) / 5
+        + 0.10 * (pct / 100 if pct is not None else 0.5)
         + 0.08 * recency(year)
     ))
 
@@ -934,11 +936,13 @@ def load_existing_suggestions():
                 "personal": read(pr.get("Personal score")),
                 "roles": read(pr.get("Role")) or [],
                 "summary": read(pr.get("Summary")) or "",
+                "abstract": read(pr.get("Abstract")) or "",
+                "semantic": read(pr.get("Semantic match")),
             }
     return existing
 
 
-def build_suggestions(papers, existing, keep_n=None):
+def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None):
     lib = [p for p in papers if p.get("work")]
     lib_ids = {short_id(p["work"]["id"]) for p in lib}
     lib_dois = {p["doi"] for p in papers if p["doi"]}
@@ -980,8 +984,10 @@ def build_suggestions(papers, existing, keep_n=None):
             s2.add(short_id(w["id"]))
 
     # Cheap pre-ranking, then score the best CANDIDATE_POOL in depth.
-    candidates = (set(cited_by_lib) | set(cites_lib) | set(cocite) | s2) - lib_ids
+    sem_extra = {k: v for k, v in (sem_extra or {}).items() if k not in lib_ids}
+    candidates = (set(cited_by_lib) | set(cites_lib) | set(cocite) | s2 | set(sem_extra)) - lib_ids
     pre = {x: 2 * len(cited_by_lib[x]) + 2 * len(cites_lib[x]) + sum(cocite[x].values()) + (2 if x in s2 else 0)
+              + (3 if x in sem_extra else 0)
            for x in candidates}
     pool = [x for x, v in sorted(pre.items(), key=lambda kv: kv[1], reverse=True) if v >= 2][:CANDIDATE_POOL]
 
@@ -1009,6 +1015,14 @@ def build_suggestions(papers, existing, keep_n=None):
         scored.append({"id": x, "work": w, "raw": raw, "per_lib": per_lib, "refs": refs_x})
 
     top_raw = max((c["raw"] for c in scored), default=0) or 1
+    if emb is not None and scored:      # meaning-based match with your research questions
+        import semantic
+        _, sem = semantic.match_scores(emb, CONFIG, RESEARCH_QUESTIONS,
+                                       [semantic.paper_text(c["work"].get("display_name"),
+                                                            abstract_text(c["work"].get("abstract_inverted_index")))
+                                        for c in scored])
+        for c, v in zip(scored, sem):
+            c["semantic"] = v
     for c in scored:
         x, w = c["id"], c["work"]
         c["similarity"] = round(100 * c["raw"] / top_raw)
@@ -1039,6 +1053,10 @@ def build_suggestions(papers, existing, keep_n=None):
         if c["s2"]:
             reasons.append("Recommended by Semantic Scholar from your library")
             sources.append("Semantic Scholar recommendation")
+        c.setdefault("semantic", None)
+        if x in sem_extra:
+            reasons.append(f"Found by meaning: close to your research questions (semantic match {sem_extra[x]})")
+            sources.append("Semantic search")
         if c["closest"]:
             reasons.append("Most similar to " + " and ".join(name_of[l] for l in c["closest"]))
         if c["shared_refs"]:
@@ -1049,7 +1067,7 @@ def build_suggestions(papers, existing, keep_n=None):
         c["relevance"] = prev.get("relevance")
         c["summary"] = prev.get("summary") or ""
         c["global"] = global_score(c["relevance"], c["similarity"], c["score"],
-                                   percentile(w), w.get("publication_year"))
+                                   percentile(w), w.get("publication_year"), c["semantic"])
 
     scored.sort(key=lambda c: c["global"], reverse=True)
     top = scored[:keep_n or MAX_SUGGESTIONS]
@@ -1172,7 +1190,7 @@ def track_decisions(existing, state):
     return len(events)
 
 
-def sync_suggestions(top, refresh, lib_ids, existing, triager, model):
+def sync_suggestions(top, refresh, lib_ids, existing, triager, scorer):
     # Suggestions you have since added to Zotero get marked automatically.
     for oid, info in existing.items():
         if oid in lib_ids and info["decision"] == "To review":
@@ -1193,8 +1211,10 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager, model):
             "Citations": p_num(w.get("cited_by_count")),
             "Citation percentile": p_num(percentile(w)),
         }
-        ps = personal_score(model, c["relevance"], c["similarity"], c["score"], percentile(w),
-                            w.get("publication_year"))
+        if c.get("semantic") is not None:
+            props["Semantic match"] = p_num(c["semantic"])
+        ps = scorer(c["work"].get("display_name"), abstract_text(w.get("abstract_inverted_index")), c["relevance"],
+                    c["similarity"], c["score"], percentile(w), w.get("publication_year"))
         if ps is not None:
             props["Personal score"] = p_num(ps)
             PREDICTIONS.setdefault(c["id"], [TODAY, ps])
@@ -1225,15 +1245,14 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager, model):
     new_ids = {c["id"] for c in top + refresh if c["id"] not in existing}
 
     # Personal score for older pending suggestions that were not re-scored this run
-    if model.get("ready"):
-        scored_ids = {c["id"] for c in top + refresh}
-        for oid, info in existing.items():
-            if oid in scored_ids or info["decision"] != "To review":
-                continue
-            ps = personal_score(model, info["relevance"], info["similarity"], info["connections"],
-                                info["percentile"], info["year"])
-            if ps != info["personal"]:
-                update_page(info["page_id"], {"Personal score": p_num(ps)})
+    scored_ids = {c["id"] for c in top + refresh}
+    for oid, info in existing.items():
+        if oid in scored_ids or info["decision"] != "To review":
+            continue
+        ps = scorer(info["title"], info["abstract"], info["relevance"], info["similarity"], info["connections"],
+                    info["percentile"], info["year"])
+        if ps is not None and ps != info["personal"]:
+            update_page(info["page_id"], {"Personal score": p_num(ps)})
 
     stats = {"created": created, "new_ids": new_ids, "new_relevant": 0, "triaged": 0}
     # AI relevance for suggestions, best candidates first, within the free quota left today
@@ -1261,7 +1280,7 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager, model):
         c["relevance"] = result["relevance"]
         c["summary"] = result.get("summary") or ""
         c["global"] = global_score(c["relevance"], c["similarity"], c["score"],
-                                   percentile(w), w.get("publication_year"))
+                                   percentile(w), w.get("publication_year"), c.get("semantic"))
         if c["id"] in existing:
             existing[c["id"]]["relevance"] = c["relevance"]
         done += 1
@@ -1333,6 +1352,7 @@ def build_graph(papers, suggestions):
             "roles": c["roles"],
             "similarity": c["similarity"],
             "relevance": c["relevance"],
+            "semantic": c.get("semantic"),
             "global": c["global"],
         })
         for name in c["cited_by"]:
@@ -1379,6 +1399,7 @@ The student's research context, including the research questions to tag:
 {context}
 </context>
 
+The paper may be written in French or another language: classify it all the same, using the English labels provided.
 Classify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome "Not stated" when there is no clue. Record your answer with the record_field_map tool."""
 
 FIELD_SELECT = "id,doi,display_name,publication_year,type,cited_by_count"
@@ -1426,21 +1447,21 @@ def save_corpus(corpus):
                                           encoding="utf-8")
 
 
-def _scope_filter(query):
-    return f"title_and_abstract.search:{query},type:article|review"
+def _scope_filter(query, types="article|review"):
+    return f"title_and_abstract.search:{query},type:{types}"
 
 
 def fetch_scope(scope, cfg, corpus, state):
     """Download the papers of one scope: all of them if it is small enough, otherwise a fixed random sample."""
     meta = state.setdefault("field_scopes", {}).setdefault(scope["id"], {})
-    flt = _scope_filter(scope["query"])
+    flt = _scope_filter(scope["query"], cfg.get("types", "article|review"))
     res = openalex("/works", {"filter": flt, "per_page": 1, "select": "id"})
     if not res:
         log(f"   {scope['label']}: OpenAlex did not answer, keeping the previous corpus")
         return
     total = res.get("meta", {}).get("count", 0)
     mode = "full" if total <= cfg["max_full"] else "sample"
-    key = hashlib.md5(f"{scope['query']}|{mode}|{cfg['sample_size']}".encode()).hexdigest()
+    key = hashlib.md5(f"{scope['query']}|{mode}|{cfg['sample_size']}|{cfg.get('types', '')}".encode()).hexdigest()
     last = meta.get("last_fetch")
     age = (dt.date.today() - dt.date.fromisoformat(last)).days if last else 9999
     stale = meta.get("key") != key or (age >= 7 if mode == "full" else age >= 120)
@@ -1771,6 +1792,95 @@ def export_dataset(corpus_path=None):
                         k.get("m", ""), k.get("h", ""), k.get("dt", "")])
 
 
+# ----------------------------------------------------------------------------
+# Weekly digest (a Notion page per week)
+# ----------------------------------------------------------------------------
+def _rt(text, url=None, bold=False):
+    t = {"type": "text", "text": {"content": text[:1900]}, "annotations": {"bold": bold}}
+    if url:
+        t["text"]["link"] = {"url": url}
+    return t
+
+
+def _para(*parts):
+    return {"object": "block", "type": "paragraph", "paragraph": {"rich_text": list(parts)}}
+
+
+def _bullet(*parts):
+    return {"object": "block", "type": "bulleted_list_item", "bulleted_list_item": {"rich_text": list(parts)}}
+
+
+def _heading(text):
+    return {"object": "block", "type": "heading_3", "heading_3": {"rich_text": [_rt(text)]}}
+
+
+def _notion_url(page_id):
+    return "https://www.notion.so/" + page_id.replace("-", "")
+
+
+def library_gap_cells(papers):
+    return sorted({f"{e} | {q}" for p in papers for e in p["ecosystems"] for q in p["rqs"]})
+
+
+def write_digest(papers, existing, field, stopping, alerts, state):
+    if not DIGEST_DS or DRY_RUN:
+        return
+    snap = state.get("digest") or {}
+    every = (CONFIG.get("digest") or {}).get("every_days", 7)
+    last = snap.get("last")
+    if last and (dt.date.today() - dt.date.fromisoformat(last)).days < every:
+        return
+    since = last or "0000"
+    known = set(snap.get("library", []))
+    new_lib = [p for p in papers if known and p["page_id"] not in known]
+    new_sugg = [i for i in (existing or {}).values() if (i["first_suggested"] or "") > since]
+    pending = [i for i in (existing or {}).values() if i["decision"] == "To review"]
+    pick = sorted(new_sugg if last else pending,
+                  key=lambda i: ((i["relevance"] or 0), (i["personal"] or 0), (i["semantic"] or 0)), reverse=True)[:6]
+    cells_now = library_gap_cells(papers)
+    filled = sorted(set(cells_now) - set(snap.get("cells", []))) if last else []
+
+    blocks = [_para(_rt(f"Since {last}." if last else "First digest: here is where things stand."))]
+    blocks.append(_heading("Worth reading" if last else "Top of your screening queue"))
+    blocks += [_bullet(_rt(i["title"][:200], _notion_url(i["page_id"])),
+                       _rt(f"  relevance {i['relevance'] or '?'}/5" + (f", personal score {i['personal']}" if i["personal"] is not None else "")))
+               for i in pick] or [_bullet(_rt("Nothing new this week."))]
+    if new_lib:
+        blocks.append(_heading(f"Added to your library ({len(new_lib)})"))
+        blocks += [_bullet(_rt(p["name"], p.get("notion_url"))) for p in new_lib[:15]]
+    if filled:
+        blocks.append(_heading("Evidence gaps your library now covers"))
+        blocks += [_bullet(_rt(c)) for c in filled[:15]]
+    if field:
+        blocks.append(_heading("Field map"))
+        blocks += [_bullet(_rt(f"{f['label']}: {f['classified']} of {f['fetched']} papers classified"
+                               + (f", about {f['est_on_topic']} on-topic papers in the field" if f.get("est_on_topic") else "")))
+                   for f in field]
+    if stopping:
+        blocks.append(_heading("Screening"))
+        blocks.append(_para(_rt(f"About {stopping['expected_relevant']} relevant papers are probably still in your queue of "
+                                f"{stopping['queue']} (90% upper estimate {stopping['upper_90']}).")))
+    if alerts:
+        blocks.append(_heading("Alerts"))
+        blocks += [_bullet(_rt(a)) for a in alerts]
+
+    try:
+        notion("POST", "/pages", {
+            "parent": {"type": "data_source_id", "data_source_id": DIGEST_DS},
+            "properties": {"Week": p_title(f"Week of {TODAY}"), "Date": p_date(TODAY),
+                           "New suggestions": p_num(len(new_sugg) if last else len(pending)),
+                           "New relevant": p_num(sum(1 for i in (new_sugg if last else pending) if (i["relevance"] or 0) >= 4)),
+                           "Library growth": p_num(len(new_lib)), "Gap changes": p_num(len(filled)),
+                           "Left in queue": p_num(stopping["expected_relevant"] if stopping else None)},
+            "children": blocks[:95],
+        })
+        log("   weekly digest written to Notion")
+    except RuntimeError as e:
+        log("   could not write the weekly digest (connect your integration to it): " + str(e)[:150])
+        return
+    state["digest"] = {"last": TODAY, "library": [p["page_id"] for p in papers], "cells": cells_now}
+
+
 def write_dashboard(data):
     if not DRY_RUN:
         DATA_DIR.mkdir(exist_ok=True)
@@ -1824,14 +1934,58 @@ def main():
     else:
         log(f"   preference learning waits for more decisions ({model['n']}/{model['needed']}, "
             "with at least 3 Added and 3 Not relevant)")
-    top, refresh, lib_ids, candidates = build_suggestions(papers, existing or {})
+    # --- semantic layer (local model, no AI quota) ---
+    import semantic
+    emb = semantic.get_embedder(CONFIG, log)
+    sem_extra = {}
+    if emb is not None:
+        try:
+            lib_ids_now = {short_id(p["work"]["id"]) for p in papers if p.get("work")}
+            sem_extra = semantic.discover(emb, CONFIG, RESEARCH_QUESTIONS, openalex, abstract_text, short_id,
+                                          lib_ids_now, log)
+        except Exception as e:
+            log(f"   semantic discovery skipped: {type(e).__name__}: {str(e)[:150]}")
+    text_model = {"ready": False}
+    if emb is not None and existing:
+        lib_texts = [semantic.paper_text(p["title"], p["abstract"]) for p in papers]
+        kept = [i for i in existing.values() if i["decision"] == "Added to Zotero"]
+        dropped = [i for i in existing.values() if i["decision"] == "Not relevant"]
+        txt = lambda i: semantic.paper_text(i["title"], i["abstract"] or i["summary"])
+        try:
+            text_model = semantic.train_text_model(
+                emb, lib_texts + [txt(i) for i in kept], [txt(i) for i in dropped],
+                [(txt(i), 1) for i in kept] + [(txt(i), 0) for i in dropped])
+        except Exception as e:
+            log(f"   text model skipped: {type(e).__name__}: {str(e)[:150]}")
+        if text_model.get("ready"):
+            log(f"   text model trained on {text_model['positives']} kept / {text_model['negatives']} excluded papers"
+                f" (cross-validated AUC {text_model.get('auc_cv')})")
+
+    def scorer(title, abstract, rel, sim, conn, pct, year):
+        """Personal score: average of the text model and the 5-feature model, whichever are ready."""
+        parts = []
+        if text_model.get("ready"):
+            parts.append(text_model["predict"]([semantic.paper_text(title, abstract)])[0])
+        pm = personal_score(model, rel, sim, conn, pct, year)
+        if pm is not None:
+            parts.append(pm / 100)
+        return round(100 * sum(parts) / len(parts)) if parts else None
+
+    top, refresh, lib_ids, candidates = build_suggestions(papers, existing or {}, emb=emb, sem_extra=sem_extra)
     # everything ever suggested was, by definition, identified by the algorithm
     seen = set(state.get("seen_candidates", [])) | set(candidates) | set(existing or {})
     state["seen_candidates"] = sorted(seen)
     stats = {"created": 0, "new_relevant": 0, "triaged": 0}
     if existing is not None:
-        stats = sync_suggestions(top, refresh, lib_ids, existing, triager, model)
+        stats = sync_suggestions(top, refresh, lib_ids, existing, triager, scorer)
         existing = load_existing_suggestions()   # fresh view including today's additions
+    stopping = None
+    pending = [i for i in (existing or {}).values() if i["decision"] == "To review"]
+    probs = [scorer(i["title"], i["abstract"], i["relevance"], i["similarity"], i["connections"],
+                    i["percentile"], i["year"]) for i in pending]
+    if pending and all(p is not None for p in probs):
+        stopping = semantic.stopping_estimate([p / 100 for p in probs])
+        log(f"   about {stopping['expected_relevant']} relevant papers likely left in your queue of {len(pending)}")
 
     log("5. Field-wide systematic map")
     field, field_done, field_progress = run_field_map(papers, triager, state)
@@ -1847,7 +2001,10 @@ def main():
         "milestones": find_milestones(papers, top),
         "prisma": prisma,
         "saturation": saturation_series(existing or {}),
-        "preferences": {**model, "features": FEATURES, "prospective": prospective_eval(existing or {}, state)},
+        "preferences": {**model, "features": FEATURES, "prospective": prospective_eval(existing or {}, state),
+                        "text_model": {k: v for k, v in text_model.items() if k != "predict"},
+                        "semantic_model": semantic.settings(CONFIG)["model"] if emb is not None else None},
+        "stopping": stopping,
         "validation": json.loads((DATA_DIR / "validation.json").read_text(encoding="utf-8"))
                       if (DATA_DIR / "validation.json").exists() else {},
         "runs": state.get("runs", [])[-60:],
@@ -1868,6 +2025,9 @@ def main():
     data["runs"] = state["runs"][-60:]
     state.setdefault("prompts", {}).update(_PROMPTS_SEEN)   # every prompt version ever used, archived
     write_dashboard(data)
+    alerts = ([f"Retracted: {r}" for r in metrics["retractions"]]
+              + [f"Duplicate in your library: {d} (merge it in Zotero)" for d in metrics["duplicates"]])
+    write_digest(papers, existing, field, stopping, alerts, state)
     export_dataset()
     write_run_log(run)
     save_state(state)

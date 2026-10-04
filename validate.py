@@ -232,7 +232,10 @@ def task_preferences():
         return {"status": "waiting", "message": str(e)[:150]}
     model = P.train_preferences(existing)
     state = P.load_state()
-    return {"status": "ok" if model.get("ready") else "waiting", "n": model["n"], "auc_in_sample": model.get("auc"),
+    dash = P.DATA_DIR / "dashboard.json"
+    text_model = json.loads(dash.read_text()).get("preferences", {}).get("text_model", {}) if dash.exists() else {}
+    return {"status": "ok" if model.get("ready") or text_model.get("ready") else "waiting", "n": model["n"],
+            "text_model_auc_cv": text_model.get("auc_cv"), "auc_in_sample": model.get("auc"),
             "auc_cross_validated": model.get("auc_cv"), "prospective": P.prospective_eval(existing, state),
             "message": None if model.get("ready") else f"Needs {model['needed']} screening decisions."}
 

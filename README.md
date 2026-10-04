@@ -94,6 +94,15 @@ papers were matched, triaged and suggested. After that it runs by itself every n
 - A **📰 Weekly digest** page appears in Notion every 7 days.
 - The field map now includes French search terms, theses, reports, chapters and preprints (`scopes.json`).
 
+## Lenses and geography
+
+The dashboard has a control bar (on the Study sites, Evidence gaps, Field rings and Timeline tabs):
+**Show** (my library / library vs field / field only), **Field** (which scope) and **Where** (World, Canada,
+Québec by default, editable in `config.json` under `geography`). The choice is kept in the link, so a Notion
+embed can show a fixed view, for example `…/lit-pipeline/#gaps?lens=field&scope=forested&geo=quebec`.
+The Evidence gaps tab also has a table following each research question from the world level down to the
+most local one. Below the world level, numbers rely on papers whose study sites could be located.
+
 ## Validation (numbers for a methods paper)
 
 Run from **Actions > Validation > Run workflow**, choosing a task. Results appear in the dashboard's

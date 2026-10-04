@@ -98,6 +98,14 @@ on-topic rate `ρ = m/n`, estimated on-topic papers `N_on = N·ρ`. For a catego
 m on-topic works: `p_k = x_k/m` with a Wilson 95% interval; in sampled scopes the interval includes a finite
 population correction (z scaled by `√((N_on − m)/(N_on − 1))`). Estimated count `N_on·p_k`.
 
+**Geography.** Sites are geocoded with OpenStreetMap Nominatim (English place names), which also returns
+the country code and province or state; a work belongs to a geographic level (`config.json`, `geography`:
+by default World, Canada, Québec) if any of its located sites falls within it. Below the world level,
+statistics are computed on located works only, and the share of on-topic works that could be located is
+reported alongside. In sampled scopes, counts are scaled by the same sampling factor as the scope. A drop-off
+is flagged when a research question's share at a level is less than half its worldwide share (for questions
+with at least 5% worldwide), and a geographic gap when no located work addresses it.
+
 **Gaps.** A cell (ecosystem × research question) is a *research gap* when its estimated count in the field
 is below max(3, 2% of N_on), and a *reading gap* when the field is above that threshold but the library has
 no paper in the cell. In the rings figure, a sector is a gap when `p_k < 3%` or its estimate is below 3

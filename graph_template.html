@@ -110,6 +110,11 @@
   .vt th:first-child, .vt td:first-child { text-align: left; }
   .good { color: #3b7a3b; } .fair { color: #a07020; } .poor { color: var(--gap); }
   @media (prefers-color-scheme: dark) { .good { color: #8fca8f; } .fair { color: #e2b45f; } }
+  .lensbar { display: flex; gap: 6px 18px; flex-wrap: wrap; padding: 8px 16px 0; align-items: center; }
+  .lensbar .chips { margin: 0; }
+  .lensbar .chips::before { content: attr(data-label); color: var(--muted); font-size: 12px; margin-right: 2px; align-self: center; }
+  .lensbar[hidden] { display: none; }
+  .geo-drop { color: var(--gap); font-weight: 600; }
   .rings-wrap { display: grid; grid-template-columns: minmax(300px, 520px) minmax(260px, 1fr); gap: 16px; align-items: start; }
   .rings-wrap svg path.sector { cursor: pointer; }
   .rings-wrap svg path.sector:hover, .rings-wrap svg path.sector.sel { stroke: var(--ink); stroke-width: 1.5; }
@@ -118,7 +123,7 @@
   .prog { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; min-width: 90px; }
   .prog span { display: block; height: 100%; background: rgba(var(--heat), .9); }
   .heat td.reading { box-shadow: inset 0 0 0 2px #c9952b; }
-  .heat td .sub { display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
+  .heat td .sub, .heat th .sub { display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
   @media (max-width: 760px) { .rings-wrap { grid-template-columns: 1fr; } }
   @media (max-width: 640px) { .prisma { grid-template-columns: 1fr; } .detail { top: auto; bottom: 12px; } }
 </style>
@@ -137,6 +142,11 @@
   <button role="tab" aria-selected="false" data-tab="t-screen">Screening</button>
   <button role="tab" aria-selected="false" data-tab="t-valid">Validation</button>
 </nav>
+<div class="lensbar" id="lensbar" aria-label="What to show">
+  <div class="chips" id="lens-chips" role="group" aria-label="Lens"></div>
+  <div class="chips" id="scope-chips" role="group" aria-label="Field scope"></div>
+  <div class="chips" id="geo-chips" role="group" aria-label="Geography"></div>
+</div>
 <main>
   <section class="tab active" id="t-map" role="tabpanel">
     <div id="graph" role="img" aria-label="Citation map of your library and suggested papers"></div>
@@ -155,7 +165,7 @@
       <strong>Where the evidence comes from</strong>
       <p class="hint" id="sites-summary"></p>
       <ul class="legend" id="sites-legend"></ul>
-      <div class="chips" id="field-layer" role="group" aria-label="Show the field's study sites" style="margin-top:6px"></div>
+
       <p class="hint">Solid dot: exact site. Hollow: located at region level. Faint: country only. Sites are extracted by AI from abstracts and geocoded automatically, so check them before using the map in a figure.</p>
     </div>
   </section>
@@ -163,12 +173,15 @@
   <section class="tab" id="t-gaps" role="tabpanel"><div class="pad">
     <h2>Evidence gap map</h2>
     <p class="lead" id="gaps-lead">How many papers address each research question in each ecosystem. Hatched cells are gaps. Click a cell for details.</p>
-    <div class="chips" id="gap-source" role="group" aria-label="Data source"></div>
+
     <div class="chips" id="gas-filter" role="group" aria-label="Filter by gas"></div>
     <div class="scroll"><table class="heat" id="heat-rq"></table></div>
     <div id="cell-papers"></div>
+    <h2 id="geo-title">From the world to the local scale</h2>
+    <p class="lead" id="geo-lead"></p>
+    <div class="scroll"><table class="heat" id="geo-table"></table></div>
     <h2>Study design by biome</h2>
-    <p class="lead">What kind of evidence you have, and where.</p>
+    <p class="lead" id="design-lead">What kind of evidence exists, and where.</p>
     <div class="scroll"><table class="heat" id="heat-design"></table></div>
   </div></section>
 
@@ -187,7 +200,7 @@
   <section class="tab" id="t-time" role="tabpanel"><div class="pad">
     <h2>Your library against the field</h2>
     <p class="lead" id="time-lead"></p>
-    <div class="chips" id="time-scope" role="group" aria-label="Field scope for the comparison"></div>
+
     <div class="card"><div class="chartbox"><canvas id="timechart" aria-label="Papers per year"></canvas></div></div>
     <div class="grid2" style="margin-top:14px">
       <div class="card">
@@ -256,15 +269,60 @@ function chipGroup(el, options, initial, onPick) {
   });
 }
 
-// ---------- tabs (each tab is drawn the first time it is opened)
+// ---------- tabs and the shared view (lens, scope, geography), all encoded in the link
 const drawn = {};
 const drawers = {};
+const redrawers = {};   // tabs that can update in place when the view changes
+const GEO = (DATA && DATA.options && DATA.options.geography) || [{ id: "world", label: "World" }];
+const VIEW = { lens: "field", scope: null, geo: "world" };
+const LENS_TABS = { "t-sites": ["lens", "scope", "geo"], "t-gaps": ["lens", "scope", "geo"], "t-rings": ["geo"], "t-time": ["lens", "scope"] };
+let current = "t-map";
+function readHash() {
+  const [tab, query] = location.hash.slice(1).split("?");
+  const q = new URLSearchParams(query || "");
+  ["lens", "scope", "geo"].forEach(k => { if (q.get(k)) VIEW[k] = q.get(k); });
+  return tab;
+}
+function writeHash() {
+  const q = new URLSearchParams();
+  if (LENS_TABS[current]) LENS_TABS[current].forEach(k => VIEW[k] && q.set(k, VIEW[k]));
+  history.replaceState(null, "", "#" + current.slice(2) + (q.toString() ? "?" + q : ""));
+}
 function openTab(id) {
+  current = id;
   document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.id === id));
+  renderLensbar();
   if (!drawn[id] && drawers[id]) { drawers[id](); drawn[id] = true; }
   if (id === "t-sites" && window._sitesMap) setTimeout(() => window._sitesMap.invalidateSize(), 50);
-  history.replaceState(null, "", "#" + id.slice(2));
+  writeHash();
+}
+function setView(key, value) {
+  VIEW[key] = value;
+  Object.keys(drawn).forEach(k => { if (LENS_TABS[k] && k !== current && !redrawers[k]) drawn[k] = false; });
+  if (redrawers[current]) redrawers[current]();
+  Object.entries(redrawers).forEach(([k, f]) => { if (k !== current && drawn[k]) f(); });
+  renderLensbar();
+  writeHash();
+}
+function renderLensbar() {
+  const bar = document.getElementById("lensbar");
+  const keys = LENS_TABS[current];
+  bar.hidden = !keys || !DATA;
+  if (bar.hidden) return;
+  const F = (DATA.field || []);
+  if (!VIEW.scope && F.length) VIEW.scope = F[0].id;
+  const groups = {
+    lens: ["lens-chips", "Show", [["library", "My library"], ["compare", "Library vs field"], ["field", "Field only"]]],
+    scope: ["scope-chips", "Field", F.map(f => [f.id, f.label])],
+    geo: ["geo-chips", "Where", GEO.map(g => [g.id, g.label])],
+  };
+  Object.entries(groups).forEach(([k, [elId, label, opts]]) => {
+    const el = document.getElementById(elId);
+    el.dataset.label = label;
+    el.style.display = keys.includes(k) && opts.length ? "" : "none";
+    if (keys.includes(k)) chipGroup(el, opts, VIEW[k], v => setView(k, v));
+  });
 }
 document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => openTab(b.dataset.tab)));
 
@@ -380,79 +438,96 @@ if (!DATA) {
     });
   }
 
+  // ---------- shared helpers for the lens / scope / geography
+  const scopeF = () => FIELD.find(f => f.id === VIEW.scope) || FIELD[0];
+  const geoLevel = () => GEO.find(g => g.id === VIEW.geo) || GEO[0];
+  const normPlace = s => (s || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  const inGeo = (cc, st, L) => !L.country_code || ((cc || "") === L.country_code.toLowerCase() && (!L.state || normPlace(st) === normPlace(L.state)));
+  const libInGeo = p => { const L = geoLevel(); return !L.country_code || p.sites.some(s => inGeo(s.cc, s.state, L)); };
+  const fieldGeo = F => F && F.geo ? (F.geo[VIEW.geo] || F.geo.world) : null;
+
   // ---------- 2. study sites
   drawers["t-sites"] = () => {
-    const map = L.map("sitesmap", { worldCopyJump: true }).setView([45, -40], 2);
+    const map = L.map("sitesmap", { worldCopyJump: true, zoomControl: false }).setView([45, -40], 2);
+    L.control.zoom({ position: "topright" }).addTo(map);
     window._sitesMap = map;
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-    const bounds = [], perCat = {};
-    let mapped = 0, unmapped = 0;
-    DATA.library.forEach(p => {
-      if (!p.sites.length) { unmapped++; return; }
-      mapped++;
-      perCat[p.category] = (perCat[p.category] || 0) + 1;
-      p.sites.forEach(s => {
-        const c = colorOf(p.category);
-        const style = s.precision === "site" ? { radius: 7, fillOpacity: 0.9, weight: 1.5, color: INK }
-          : s.precision === "region" ? { radius: 8, fillOpacity: 0.15, weight: 2, color: c }
-          : { radius: 9, fillOpacity: 0.1, weight: 1, color: c, opacity: 0.6, dashArray: "3 3" };
-        L.circleMarker([s.lat, s.lon], { ...style, fillColor: c })
-          .bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(p.title)}<br><span style="opacity:.7">${esc(s.label)} (${s.precision})</span>`
-            + (p.doi ? `<br><a href="${esc(p.doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""))
-          .addTo(map);
-        bounds.push([s.lat, s.lon]);
-      });
-    });
-    if (bounds.length) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
-    document.getElementById("sites-summary").textContent =
-      `${mapped} papers placed on the map. ${unmapped} without a site (reviews, models, global studies, or not yet extracted).`;
-    document.getElementById("sites-legend").innerHTML = Object.entries(perCat).map(([c, n]) =>
-      `<li><span style="display:flex;gap:8px;align-items:center"><span class="dot" style="background:${colorOf(c)}"></span>${esc(c)}<span class="n">${n}</span></span></li>`).join("");
-
-    if (FIELD.length) {
-      map.createPane("field"); map.getPane("field").style.zIndex = 350;
-      let layer = null;
-      chipGroup(document.getElementById("field-layer"), [["", "Your library only"], ...FIELD.map(f => [f.id, "+ " + f.label])], "", id => {
-        if (layer) { map.removeLayer(layer); layer = null; }
-        const f = FIELD.find(x => x.id === id);
-        if (!f) return;
-        layer = L.layerGroup(f.points.map(([lat, lon, prec, title, year, doi]) =>
-          L.circleMarker([lat, lon], { pane: "field", radius: 3.5, weight: 0, fillColor: MUTED, fillOpacity: prec === "s" ? 0.55 : 0.25 })
-            .bindPopup(`${esc(title)} (${year || "n.d."})` + (doi ? `<br><a href="${esc(doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""))));
-        layer.addTo(map);
-        document.getElementById("sites-summary").textContent =
-          `Grey: ${f.points.length} mapped sites from the ${f.label.toLowerCase()} literature (${f.classified} of ${f.fetched} papers classified so far). Coloured: your library.`;
-      });
+    map.createPane("field"); map.getPane("field").style.zIndex = 350;
+    let layers = [];
+    function draw() {
+      layers.forEach(l => map.removeLayer(l)); layers = [];
+      const Lv = geoLevel(), F = scopeF(), bounds = [];
+      const showLib = VIEW.lens !== "field", showField = VIEW.lens !== "library" && F;
+      let libPapers = 0, libNoSite = 0, fieldPts = 0;
+      if (showField) {
+        const pts = F.points.filter(p => inGeo(p[6], p[7], Lv));
+        fieldPts = pts.length;
+        const g = L.layerGroup(pts.map(([lat, lon, prec, title, year, doi]) => {
+          bounds.push([lat, lon]);
+          return L.circleMarker([lat, lon], { pane: "field", radius: 3.5, weight: 0, fillColor: MUTED, fillOpacity: prec === "s" ? 0.55 : 0.25 })
+            .bindPopup(`${esc(title)} (${year || "n.d."})` + (doi ? `<br><a href="${esc(doi)}" target="_blank" rel="noopener">Open the paper</a>` : ""));
+        }));
+        g.addTo(map); layers.push(g);
+      }
+      const perCat = {};
+      if (showLib) {
+        const g = L.layerGroup();
+        DATA.library.forEach(p => {
+          const sites = p.sites.filter(s => inGeo(s.cc, s.state, Lv));
+          if (!p.sites.length) { libNoSite++; return; }
+          if (!sites.length) return;
+          libPapers++;
+          perCat[p.category] = (perCat[p.category] || 0) + 1;
+          sites.forEach(s => {
+            const c = colorOf(p.category);
+            const style = s.precision === "site" ? { radius: 7, fillOpacity: 0.9, weight: 1.5, color: INK }
+              : s.precision === "region" ? { radius: 8, fillOpacity: 0.15, weight: 2, color: c }
+              : { radius: 9, fillOpacity: 0.1, weight: 1, color: c, opacity: 0.6, dashArray: "3 3" };
+            L.circleMarker([s.lat, s.lon], { ...style, fillColor: c })
+              .bindPopup(`<strong>${esc(p.name)}</strong><br>${esc(p.title)}<br><span style="opacity:.7">${esc(s.label)} (${s.precision})</span>`
+                + (p.doi ? `<br><a href="${esc(p.doi)}" target="_blank" rel="noopener">Open the paper</a>` : "")).addTo(g);
+            bounds.push([s.lat, s.lon]);
+          });
+        });
+        g.addTo(map); layers.push(g);
+      }
+      if (bounds.length) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 7 });
+      const parts = [];
+      if (showLib) parts.push(`Coloured: ${libPapers} of your papers${Lv.country_code ? ` in ${Lv.label}` : ""} (${libNoSite} have no named site).`);
+      if (showField) parts.push(`Grey: ${fieldPts} study sites from the ${F.label.toLowerCase()} literature${Lv.country_code ? ` in ${Lv.label}` : ""} (${F.located || 0} of ${F.on_topic} on-topic papers classified so far could be located).`);
+      document.getElementById("sites-summary").textContent = parts.join(" ");
+      document.getElementById("sites-legend").innerHTML = Object.entries(perCat).map(([c, n]) =>
+        `<li><span style="display:flex;gap:8px;align-items:center"><span class="dot" style="background:${colorOf(c)}"></span>${esc(c)}<span class="n">${n}</span></span></li>`).join("");
     }
+    redrawers["t-sites"] = draw;
+    draw();
   };
 
-  // ---------- 3. evidence gaps (library, field, or comparison)
+  // ---------- 3. evidence gaps (library, field, or comparison; any scope; any geography)
   drawers["t-gaps"] = () => {
     const O = DATA.options;
-    let gas = "All", source = "lib";
+    let gas = "All";
     chipGroup(document.getElementById("gas-filter"), ["All", ...O.gases].map(g => [g, g]), "All", g => { gas = g; draw(); });
-    chipGroup(document.getElementById("gap-source"),
-      [["lib", "My library"], ...FIELD.map(f => ["f:" + f.id, f.label]), ...FIELD.map(f => ["c:" + f.id, "Compare with " + f.label.toLowerCase()])],
-      "lib", v => { source = v; draw(); });
-    const libCount = (e, q) => DATA.library.filter(p => (gas === "All" || p.gases.includes(gas)) && p.ecosystems.includes(e) && p.rqs.includes(q));
     function cellsTable(table, rows, cols, cell) {
       table.innerHTML = `<tr><th></th>${cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr>` +
         rows.map(r => `<tr><th class="row">${esc(r)}</th>${cols.map(c => cell(r, c)).join("")}</tr>`).join("");
     }
+    const shade = (n, max) => { const a = n ? 0.12 + 0.75 * n / max : 0; return n ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""; };
     function draw() {
       const box = document.getElementById("cell-papers"); box.innerHTML = "";
-      const table = document.getElementById("heat-rq");
-      const [mode, sid] = source.includes(":") ? source.split(":") : ["lib", null];
-      const F = FIELD.find(f => f.id === sid);
-      const lead = document.getElementById("gaps-lead");
-      if (mode === "lib") {
-        lead.textContent = "How many papers in your library address each research question in each ecosystem. Hatched cells are gaps. Click a cell to see the papers.";
+      const table = document.getElementById("heat-rq"), lead = document.getElementById("gaps-lead");
+      const Lv = geoLevel(), F = scopeF(), G = fieldGeo(F), where = Lv.country_code ? ` in ${Lv.label}` : "";
+      const lib = DATA.library.filter(p => libInGeo(p) && (gas === "All" || p.gases.includes(gas)));
+      const libCount = (e, q) => lib.filter(p => p.ecosystems.includes(e) && p.rqs.includes(q));
+      const lens = F ? VIEW.lens : "library";
+      if (lens === "library") {
+        lead.textContent = `Your library${where}: number of papers per research question and ecosystem. Hatched cells are empty. Click a cell to see the papers.`;
         const max = Math.max(1, ...O.ecosystems.flatMap(e => O.rqs.map(q => libCount(e, q).length)));
         cellsTable(table, O.ecosystems, O.rqs, (e, q) => {
-          const n = libCount(e, q).length, a = n ? 0.12 + 0.75 * n / max : 0;
-          return `<td class="${n ? "" : "zero"}" data-r="${esc(e)}" data-c="${esc(q)}" style="${n ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n || "gap"}</td>`;
+          const n = libCount(e, q).length;
+          return `<td class="${n ? "" : "zero"}" data-r="${esc(e)}" data-c="${esc(q)}" style="${shade(n, max)}">${n || "gap"}</td>`;
         });
         table.querySelectorAll("td").forEach(td => td.addEventListener("click", () => {
           const hits = libCount(td.dataset.r, td.dataset.c);
@@ -461,46 +536,68 @@ if (!DATA) {
             : `<p class="muted" style="margin:6px 0 0">No paper in your library covers this combination yet.</p>`}</div>`;
         }));
       } else {
-        const M = F.eco_rq[gas] || F.eco_rq.All;
-        const rowsIn = O.ecosystems.filter(e => O.rqs.some(q => M[e][q] > 0));   // ecosystems outside the scope's search are hidden
-        const thr = Math.max(3, Math.round(0.02 * (F.est_on_topic || 0)));
+        const M = G.eco_rq[gas] || G.eco_rq.All;
+        const rowsIn = O.ecosystems.filter(e => O.rqs.some(q => M[e][q] > 0));
+        const thr = Math.max(Lv.country_code ? 1 : 3, Math.round(0.02 * (G.est || 0)));
         const est = F.mode === "sample" ? "estimated " : "";
-        if (mode === "f") {
-          lead.textContent = `Number of ${est}papers in the ${F.label.toLowerCase()} literature per research question and ecosystem (${F.classified} of ${F.fetched} papers classified so far). Hatched cells are research gaps: fewer than ${thr} papers.`;
+        const basis = Lv.country_code ? ` Based on the ${G.n} classified papers whose study sites are located${where}.` : "";
+        if (lens === "field") {
+          lead.textContent = `The ${F.label.toLowerCase()} literature${where}: ${est}number of papers per research question and ecosystem. Hatched cells are research gaps (fewer than ${thr} papers).${basis}`;
           const max = Math.max(1, ...rowsIn.flatMap(e => O.rqs.map(q => M[e][q])));
           cellsTable(table, rowsIn, O.rqs, (e, q) => {
-            const n = M[e][q], a = n ? 0.12 + 0.75 * n / max : 0;
-            return `<td class="${n < thr ? "zero" : ""}" style="${n >= thr ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n < thr ? (n ? fmt(n) : "gap") : fmt(n)}</td>`;
+            const n = M[e][q];
+            return `<td class="${n < thr ? "zero" : ""}" style="${n >= thr ? shade(n, max) : ""}">${n < thr ? (n ? fmt(n) : "gap") : fmt(n)}</td>`;
           });
         } else {
-          lead.textContent = `Your library vs. the ${F.label.toLowerCase()} literature. Hatched: research gap (the field itself has fewer than ${thr} papers). Gold outline: reading gap (the field has papers, your library has none). Shading: share of the field's papers you hold.`;
+          lead.textContent = `Your library vs. the ${F.label.toLowerCase()} literature${where}. Hatched: research gap (the field itself has fewer than ${thr} papers). Gold outline: reading gap (the field has papers, your library has none). Shading: share of the field's papers you hold.${basis}`;
           cellsTable(table, rowsIn, O.rqs, (e, q) => {
-            const field = M[e][q], lib = libCount(e, q).length;
-            if (field < thr) return `<td class="zero">research gap<span class="sub">${lib} / ${fmt(field)}</span></td>`;
-            if (!lib) return `<td class="reading">reading gap<span class="sub">0 / ${fmt(field)}</span></td>`;
-            const cov = Math.min(1, lib / field), a = 0.15 + 0.7 * cov;
-            return `<td style="background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}">${pctf(cov)}<span class="sub" style="${a > .5 ? "color:#fff" : ""}">${lib} / ${fmt(field)}</span></td>`;
+            const field = M[e][q], n = libCount(e, q).length;
+            if (field < thr) return `<td class="zero">research gap<span class="sub">${n} / ${fmt(field)}</span></td>`;
+            if (!n) return `<td class="reading">reading gap<span class="sub">0 / ${fmt(field)}</span></td>`;
+            const cov = Math.min(1, n / field), a = 0.15 + 0.7 * cov;
+            return `<td style="background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}">${pctf(cov)}<span class="sub" style="${a > .5 ? "color:#fff" : ""}">${n} / ${fmt(field)}</span></td>`;
           });
         }
       }
-      const designs = DATA.options.designs || [...new Set(DATA.library.map(p => p.design).filter(Boolean))];
-      const biomes = O.biomes.filter(b => b !== "Not stated");
+      // study design x biome
+      const designs = O.designs || [], biomes = O.biomes.filter(b => b !== "Not stated");
       const dt = document.getElementById("heat-design");
-      if (mode === "lib") {
-        const max = Math.max(1, ...designs.flatMap(d => biomes.map(b => DATA.library.filter(p => p.design === d && p.biome === b).length)));
-        cellsTable(dt, designs, biomes, (d, b) => { const n = DATA.library.filter(p => p.design === d && p.biome === b).length, a = n ? 0.12 + 0.75 * n / max : 0;
-          return `<td class="${n ? "" : "zero"}" style="${n ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n || "gap"}</td>`; });
-      } else {
-        const DB = F.design_biome, max = Math.max(1, ...designs.flatMap(d => biomes.map(b => (DB[d] || {})[b] || 0)));
-        cellsTable(dt, designs, biomes, (d, b) => { const n = (DB[d] || {})[b] || 0, a = n ? 0.12 + 0.75 * n / max : 0;
-          return `<td class="${n ? "" : "zero"}" style="${n ? `background:rgba(${HEAT},${a});${a > .5 ? "color:#fff" : ""}` : ""}">${n ? fmt(n) : "gap"}</td>`; });
-      }
+      document.getElementById("design-lead").textContent = lens === "library"
+        ? `What kind of evidence your library holds${where}, and in which biomes.`
+        : `What kind of evidence the ${F.label.toLowerCase()} literature holds${where}, and in which biomes.`;
+      const DB = lens === "library" ? null : G.design_biome;
+      const val = (d, b) => DB ? ((DB[d] || {})[b] || 0) : lib.filter(p => p.design === d && p.biome === b).length;
+      const maxD = Math.max(1, ...designs.flatMap(d => biomes.map(b => val(d, b))));
+      cellsTable(dt, designs, biomes, (d, b) => { const n = val(d, b); return `<td class="${n ? "" : "zero"}" style="${shade(n, maxD)}">${n ? fmt(n) : "gap"}</td>`; });
+      drawGeoTable();
     }
+    // research questions across geographic levels
+    function drawGeoTable() {
+      const F = scopeF(), tbl = document.getElementById("geo-table"), lead = document.getElementById("geo-lead");
+      document.getElementById("geo-title").textContent = `From ${GEO[0].label.toLowerCase()} to ${GEO[GEO.length - 1].label}`;
+      if (!F || !F.geo || GEO.length < 2) { lead.textContent = "Needs the field map and at least two geographic levels in config.json."; tbl.innerHTML = ""; return; }
+      lead.textContent = `How much of the ${F.label.toLowerCase()} literature addresses each research question, from the whole world down to ${GEO[GEO.length - 1].label}. ` +
+        `Each cell: ${F.mode === "sample" ? "estimated " : ""}number of papers, and their share of that area's papers. Arrows flag a share less than half the worldwide share; "gap" means no paper at all. ` +
+        `Below the world level, counts only include papers whose study sites could be located (${F.located || 0} of ${F.on_topic} on-topic papers so far).` +
+        (VIEW.lens !== "field" ? " In brackets: your own papers in that area." : "");
+      const world = F.geo[GEO[0].id];
+      tbl.innerHTML = `<tr><th></th>${GEO.map(g => `<th>${esc(g.label)}<span class="sub">${fmt((F.geo[g.id] || {}).est)} papers</span></th>`).join("")}</tr>` +
+        DATA.options.rqs.map(q => `<tr><th class="row">${esc(q)}</th>${GEO.map((g, i) => {
+          const G = F.geo[g.id]; if (!G) return "<td>n/a</td>";
+          const d = G.rq[q], wp = world.rq[q].p;
+          const lib = DATA.library.filter(p => p.rqs.includes(q) && (!g.country_code || p.sites.some(s => inGeo(s.cc, s.state, g)))).length;
+          const flag = i === 0 ? "" : (d.n === 0 && wp >= 0.05 ? `<span class="geo-drop">gap</span>` : (d.p < wp / 2 && wp >= 0.05 ? `<span class="geo-drop">↓</span> ` : ""));
+          const a = Math.min(0.85, 0.1 + 1.5 * d.p);
+          return `<td style="${d.n ? `background:rgba(${HEAT},${a.toFixed(2)});${a > .5 ? "color:#fff" : ""}` : ""}">${flag}${d.n ? fmt(d.est) : (flag ? "" : "0")}<span class="sub" style="${a > .5 ? "color:#fff" : ""}">${G.n ? pctf(d.p) : "n/a"}${VIEW.lens !== "field" ? ` (${lib})` : ""}</span></td>`;
+        }).join("")}</tr>`).join("");
+    }
+    redrawers["t-gaps"] = draw;
     draw();
   };
 
   // ---------- 3b. field rings
-  drawers["t-rings"] = () => {
+  drawers["t-rings"] = () => { redrawers["t-rings"] = drawRings; drawRings(); };
+  function drawRings() {
     const host = document.getElementById("rings");
     if (!FIELD.length || !FIELD.some(f => f.classified)) {
       host.innerHTML = '<p class="muted">The field map is being built: the first papers will be classified on the next nightly run.</p>';
@@ -519,15 +616,16 @@ if (!DATA) {
       <rect width="6" height="6" fill="${BG}"/><line x1="0" y1="0" x2="0" y2="6" stroke="${V("--gap")}" stroke-width="1.6" opacity=".55"/></pattern></defs>`;
     FIELD.forEach((f, i) => {
       const r0 = core + i * w + 2, r1 = core + (i + 1) * w;
-      const ps = Q.map(q => f.rq[q].p), maxP = Math.max(0.01, ...ps);
+      const fg = fieldGeo(f);
+      const ps = Q.map(q => fg.rq[q].p), maxP = Math.max(0.01, ...ps);
       Q.forEach((q, k) => {
-        const d = f.rq[q], enough = f.on_topic >= 20;
+        const d = fg.rq[q], enough = fg.n >= 20;
         const isGap = enough && (d.p < 0.03 || d.est < 3);
-        const fill = !f.on_topic ? LINE : isGap ? "url(#hatch)" : `rgba(${HEAT},${(0.12 + 0.83 * d.p / maxP).toFixed(2)})`;
+        const fill = !fg.n ? LINE : isGap ? "url(#hatch)" : `rgba(${HEAT},${(0.12 + 0.83 * d.p / maxP).toFixed(2)})`;
         svg += `<path class="sector" data-s="${i}" data-q="${k}" d="${arc(r0, r1, ang(k) + gap, ang(k + 1) - gap)}" fill="${fill}" stroke="${isGap ? V("--gap") : "none"}" stroke-width="${isGap ? 1 : 0}"/>`;
       });
     });
-    const libN = Q.map(q => DATA.library.filter(p => p.rqs.includes(q)).length), maxL = Math.max(1, ...libN);
+    const libN = Q.map(q => DATA.library.filter(p => p.rqs.includes(q) && libInGeo(p)).length), maxL = Math.max(1, ...libN);
     Q.forEach((q, k) => {
       svg += `<path class="sector" data-s="lib" data-q="${k}" d="${arc(8, core - 2, ang(k) + gap * 3, ang(k + 1) - gap * 3)}" fill="rgba(181,101,43,${(0.12 + 0.8 * libN[k] / maxL).toFixed(2)})"/>`;
       const a = (ang(k) + ang(k + 1)) / 2, lx = cx + (R + 20) * Math.cos(a), ly = cy + (R + 20) * Math.sin(a);
@@ -544,17 +642,17 @@ if (!DATA) {
       host.querySelectorAll("path.sel").forEach(x => x.classList.remove("sel")); el.classList.add("sel");
       const q = Q[+el.dataset.q];
       if (el.dataset.s === "lib") {
-        const hits = DATA.library.filter(p => p.rqs.includes(q));
+        const hits = DATA.library.filter(p => p.rqs.includes(q) && libInGeo(p));
         detail.innerHTML = `<h2 style="margin-top:0">Your library: ${esc(q)}</h2><p>${hits.length} papers.</p>` +
           (hits.length ? `<ul class="papers-list">${hits.map(p => `<li>${esc(p.name)}</li>`).join("")}</ul>` : "");
         return;
       }
-      const f = FIELD[+el.dataset.s], d = f.rq[q];
-      const inScope = DATA.library.filter(p => p.rqs.includes(q) && f.library_in_scope.includes(p.oa)).length;
-      const estLo = Math.round(d.lo * (f.est_on_topic || 0)), estHi = Math.round(d.hi * (f.est_on_topic || 0));
+      const f = FIELD[+el.dataset.s], fg = fieldGeo(f), d = fg.rq[q], Lv = geoLevel();
+      const inScope = DATA.library.filter(p => p.rqs.includes(q) && f.library_in_scope.includes(p.oa) && libInGeo(p)).length;
+      const estLo = Math.round(d.lo * (fg.est || 0)), estHi = Math.round(d.hi * (fg.est || 0));
       const sample = f.mode === "sample";
-      detail.innerHTML = `<h2 style="margin-top:0">${esc(f.label)}: ${esc(q)}</h2>
-        <p><b style="font-size:20px">${pctf(d.p)}</b> of on-topic papers (95% CI ${pctf(d.lo)} to ${pctf(d.hi)}), based on ${d.n} of ${f.on_topic} classified papers.</p>
+      detail.innerHTML = `<h2 style="margin-top:0">${esc(f.label)}${Lv.country_code ? `, ${esc(Lv.label)}` : ""}: ${esc(q)}</h2>
+        <p><b style="font-size:20px">${pctf(d.p)}</b> of on-topic papers (95% CI ${pctf(d.lo)} to ${pctf(d.hi)}), based on ${d.n} of ${fg.n} classified papers${Lv.country_code ? ` located in ${esc(Lv.label)}` : ""}.</p>
         <p>${sample ? "Estimated" : "Projected"} number of papers in this scope: <b>${fmt(d.est)}</b> (${fmt(estLo)} to ${fmt(estHi)}).</p>
         <p>In your library: <b>${inScope}</b> of them${d.est ? ` (about ${pctf(Math.min(1, inScope / d.est))} coverage)` : ""}.</p>
         <p class="muted">${sample ? `This scope has ${fmt(f.total)} papers in OpenAlex; numbers come from a fixed random sample of ${f.fetched}.` : `All ${f.fetched} papers of this scope are in the corpus; ${f.classified} classified so far.`} ${f.title_only ? `${f.title_only} were classified from their title only (no abstract available).` : ""}</p>`;
@@ -563,26 +661,27 @@ if (!DATA) {
       FIELD.map(f => `<tr><td>${esc(f.label)}</td><td>${fmt(f.total)}</td><td>${f.mode}</td><td>${fmt(f.fetched)}</td><td>${fmt(f.classified)}</td>
         <td><div class="prog"><span style="width:${f.fetched ? (100 * f.classified / f.fetched).toFixed(0) : 0}%"></span></div></td>
         <td>${f.classified ? pctf(f.on_topic / f.classified) : "n/a"}</td><td>${fmt(f.est_on_topic)}</td></tr>`).join("");
-  };
+  }
 
   // ---------- 4. timeline
   drawers["t-time"] = () => {
     const lib = DATA.library.filter(p => p.year);
     let chart = null;
-    function draw(sid) {
-      const F = FIELD.find(f => f.id === sid);
+    function draw() {
+      const F = VIEW.lens === "library" ? null : scopeF(), showLib = VIEW.lens !== "field";
       const field = F ? Object.fromEntries(Object.entries(F.years).map(([y, n]) => [+y, n])) : {};
       const years = [...new Set([...lib.map(p => +p.year), ...Object.keys(field).map(Number)])].filter(y => y <= new Date().getFullYear()).sort((a, b) => a - b);
       const from = Math.min(...lib.map(p => +p.year), years.find(y => (field[y] || 0) > 0) || 9999);
       const span = years.filter(y => y >= from);
       const cats = [...new Set(lib.map(p => p.category))];
-      document.getElementById("time-lead").textContent = F
-        ? `Line and axis: papers per year in the ${F.label.toLowerCase()} literature (all matches of its OpenAlex search). Bars: your own papers by year and category, on their own scale so they stay visible; hover a bar for exact counts.`
-        : "Bars: your library by publication year and category; hover a bar for exact counts.";
+      document.getElementById("time-lead").textContent =
+        (F ? `Line and axis: papers per year in the ${F.label.toLowerCase()} literature (all matches of its OpenAlex search). ` : "") +
+        (showLib ? `Bars: your own papers by year and category${F ? ", on their own scale so they stay visible" : ""}; hover a bar for exact counts. ` : "") +
+        "Geography does not apply here: yearly counts cover the whole search.";
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById("timechart"), {
         data: { labels: span, datasets: [
-          ...cats.map(c => ({ type: "bar", label: c, data: span.map(y => lib.filter(p => +p.year === y && p.category === c).length),
+          ...(showLib ? cats : []).map(c => ({ type: "bar", label: c, data: span.map(y => lib.filter(p => +p.year === y && p.category === c).length),
             backgroundColor: colorOf(c) + "cc", stack: "lib", yAxisID: "y", maxBarThickness: 18 })),
           ...(F ? [{ type: "line", label: F.label, data: span.map(y => field[y] || 0),
             borderColor: MUTED, backgroundColor: MUTED, pointRadius: 0, borderWidth: 1.5, tension: .25, yAxisID: "y2" }] : [])
@@ -606,9 +705,8 @@ if (!DATA) {
           return `<tr><td>${name}</td><td>${f === null ? "n/a" : Math.round(f * 100) + "%"}</td><td>${Math.round(l * 100)}%</td><td class="muted">${flag}</td></tr>`;
         }).join("");
     }
-    const first = FIELD.length ? FIELD[0].id : null;
-    if (FIELD.length) chipGroup(document.getElementById("time-scope"), FIELD.map(f => [f.id, f.label]), first, draw);
-    draw(first);
+    redrawers["t-time"] = draw;
+    draw();
     document.getElementById("milestones").innerHTML = DATA.milestones.map(m =>
       `<li class="${m.in_library ? "" : "external"}"><span class="yr">${m.year}</span>${m.doi ? `<a href="${esc(m.doi)}" target="_blank" rel="noopener">${esc(m.label)}</a>` : esc(m.label)}
         <span class="tag">${m.in_library ? "in your library" : "not in your library"}</span><span class="tag">${m.citations} citations</span>
@@ -760,7 +858,7 @@ if (!DATA) {
     document.getElementById("vdetail").innerHTML = h;
   };
 
-  const start = "t-" + (location.hash.slice(1) || "map");
+  const start = "t-" + (readHash() || "map");
   openTab(document.getElementById(start) ? start : "t-map");
 }
 </script>

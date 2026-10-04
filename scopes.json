@@ -3,7 +3,7 @@
   "max_full": 4000,
   "sample_size": 1500,
   "max_classify_per_run": 200,
-  "max_new_geocodes_per_run": 120,
+  "max_new_geocodes_per_run": 300,
   "scopes": [
     {
       "id": "swamps",

@@ -1,5 +1,5 @@
 {
-  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list. research_question_descriptions: full wording of each research question, used by the semantic model. semantic: local embedding model settings (no AI quota).",
+  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list. research_question_descriptions: full wording of each research question, used by the semantic model. semantic: local embedding model settings (no AI quota). geography: levels for geographic filtering, from broadest to narrowest (country_code = ISO 2 letters; state = province or state name in English).",
   "notion": {
     "library_data_source": "87a4954a-4928-8345-b3a8-87caeb0b2c4a",
     "suggestions_data_source": "444be872-ca23-4e7e-8d93-665568721b36",
@@ -82,5 +82,22 @@
   },
   "digest": {
     "every_days": 7
-  }
+  },
+  "geography": [
+    {
+      "id": "world",
+      "label": "World"
+    },
+    {
+      "id": "canada",
+      "label": "Canada",
+      "country_code": "ca"
+    },
+    {
+      "id": "quebec",
+      "label": "Québec",
+      "country_code": "ca",
+      "state": "Quebec"
+    }
+  ]
 }

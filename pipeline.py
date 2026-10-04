@@ -743,8 +743,8 @@ _geo_budget = {"left": None}   # None = unlimited (library); a number during the
 def geocode(query, state):
     """Free geocoding with OpenStreetMap Nominatim (max 1 request per second), cached between runs."""
     cache = state.setdefault("geocode", {})
-    if query in cache:
-        return cache[query]
+    if query in cache and (cache[query] is None or len(cache[query]) >= 4):
+        return cache[query]          # entries from older versions (no country/province) are refreshed
     if _geo_budget["left"] is not None:
         if _geo_budget["left"] <= 0:
             raise GeocodeBudgetSpent()
@@ -752,13 +752,18 @@ def geocode(query, state):
     time.sleep(1.1)
     try:
         r = requests.get("https://nominatim.openstreetmap.org/search",
-                         params={"q": query, "format": "json", "limit": 1},
+                         params={"q": query, "format": "json", "limit": 1, "addressdetails": 1,
+                                 "accept-language": "en"},
                          headers={"User-Agent": f"lit-pipeline/1.0 ({CONTACT_EMAIL or 'personal research tool'})"},
                          timeout=30)
         hits = r.json() if r.ok else []
     except Exception:
         hits = []
-    result = [float(hits[0]["lat"]), float(hits[0]["lon"])] if hits else None
+    result = None
+    if hits:
+        addr = hits[0].get("address") or {}
+        result = [float(hits[0]["lat"]), float(hits[0]["lon"]), (addr.get("country_code") or "").lower(),
+                  addr.get("state") or addr.get("province") or addr.get("region") or ""]
     cache[query] = result
     return result
 
@@ -777,7 +782,8 @@ def locate_sites(sites, state):
             coords = geocode(query, state)
             if coords:
                 points.append({"label": ", ".join(x for x in (name, region, country) if x),
-                               "lat": coords[0], "lon": coords[1], "precision": precision})
+                               "lat": coords[0], "lon": coords[1], "precision": precision,
+                               "cc": coords[2], "state": coords[3] if precision != "country" else ""})
                 break
     return points
 
@@ -1575,14 +1581,46 @@ def classify_field(corpus, cfg, triager, scopes):
     return done
 
 
+def _norm_place(x):
+    import unicodedata
+    return "".join(ch for ch in unicodedata.normalize("NFKD", x or "") if not unicodedata.combining(ch)).strip().lower()
+
+
+GEO_LEVELS = CONFIG.get("geography") or [{"id": "world", "label": "World"}]
+
+
+def in_geo(cc, st, level):
+    if not level.get("country_code"):
+        return True
+    if (cc or "") != level["country_code"].lower():
+        return False
+    return not level.get("state") or _norm_place(st) == _norm_place(level["state"])
+
+
+def backfill_library_geo(state):
+    """Library sites located by older versions get their country and province."""
+    for pid, pts in (state.get("sites") or {}).items():
+        for pt in pts:
+            if "cc" in pt:
+                continue
+            parts = [x.strip() for x in pt["label"].split(",") if x.strip()]
+            for i in range(len(parts)):
+                res = geocode(", ".join(parts[i:]), state)
+                if res:
+                    pt["cc"], pt["state"] = res[2], (res[3] if i < len(parts) - 1 or len(parts) == 1 else "")
+                    break
+
+
 def geocode_field(corpus, cfg, state):
     _geo_budget["left"] = cfg["max_new_geocodes_per_run"]
     try:
         for rec in corpus.values():
             k = rec.get("k")
-            if not k or not k["o"] or "p" in k or not k["l"]:
+            if not k or not k["o"] or not k["l"]:
                 continue
-            k["p"] = [[round(pt["lat"], 3), round(pt["lon"], 3), pt["precision"][0]]
+            if "p" in k and all(len(pt) >= 5 for pt in k["p"]):
+                continue                     # already located with country and province
+            k["p"] = [[round(pt["lat"], 3), round(pt["lon"], 3), pt["precision"][0], pt["cc"], pt["state"]]
                       for pt in locate_sites(k["l"], state)]
     except GeocodeBudgetSpent:
         pass
@@ -1633,8 +1671,27 @@ def field_stats(corpus, scopes, state, papers):
                                for q in RESEARCH_QUESTIONS} for e in ECOSYSTEMS}
         design_biome = {d: {b: round(sum(1 for r in on if r["k"]["z"] == d and r["k"]["b"] == b) * scale)
                             for b in BIOMES} for d in STUDY_DESIGNS}
-        points = [[pt[0], pt[1], pt[2], (r["t"] or "")[:110], r["y"], r.get("d")]
+        points = [[pt[0], pt[1], pt[2], (r["t"] or "")[:110], r["y"], r.get("d"),
+                   pt[3] if len(pt) > 3 else "", pt[4] if len(pt) > 4 else ""]
                   for r in on for pt in r["k"].get("p", [])][:4000]
+        located = [r for r in on if any(len(pt) >= 5 for pt in r["k"].get("p", []))]
+        geo = {}
+        for level in GEO_LEVELS:
+            sub = on if not level.get("country_code") else \
+                [r for r in located if any(in_geo(pt[3], pt[4], level) for pt in r["k"]["p"] if len(pt) >= 5)]
+            rq = {}
+            for q in RESEARCH_QUESTIONS:
+                k_ = sum(1 for r in sub if q in r["k"]["q"])
+                p, lo, hi = wilson(k_, len(sub))
+                rq[q] = {"n": k_, "p": round(p, 4), "lo": round(lo, 4), "hi": round(hi, 4), "est": round(k_ * scale)}
+            mats = {}
+            for gas in ["All"] + GASES:
+                g_sub = sub if gas == "All" else [r for r in sub if gas in r["k"]["g"]]
+                mats[gas] = {e: {q: round(sum(1 for r in g_sub if e in r["k"]["e"] and q in r["k"]["q"]) * scale)
+                                 for q in RESEARCH_QUESTIONS} for e in ECOSYSTEMS}
+            geo[level["id"]] = {"n": len(sub), "est": round(len(sub) * scale), "rq": rq, "eco_rq": mats,
+                                "design_biome": {d: {b: round(sum(1 for r in sub if r["k"]["z"] == d and r["k"]["b"] == b) * scale)
+                                                     for b in BIOMES} for d in STUDY_DESIGNS}}
         out.append({
             "id": scope["id"], "label": scope["label"], "query": scope["query"],
             "mode": meta.get("mode", "full"), "total": total, "fetched": len(members),
@@ -1645,6 +1702,7 @@ def field_stats(corpus, scopes, state, papers):
             "ecosystems": dist(ECOSYSTEMS, lambda r: r["k"]["e"]),
             "eco_rq": eco_rq, "design_biome": design_biome,
             "years": meta.get("trend", {}), "points": points,
+            "located": len(located), "geo": geo,
             "library_in_scope": sorted(lib_ids & member_ids),
         })
     return out
@@ -1952,6 +2010,7 @@ def main():
 
     log("3. Extraction: study sites, design, reported values")
     extracted = extract_papers(papers, triager, state)
+    backfill_library_geo(state)
 
     log("4. Suggested papers")
     try:
@@ -2042,7 +2101,8 @@ def main():
                       if (DATA_DIR / "validation.json").exists() else {},
         "runs": state.get("runs", [])[-60:],
         "options": {"rqs": RESEARCH_QUESTIONS, "ecosystems": ECOSYSTEMS, "gases": GASES,
-                    "biomes": BIOMES, "categories": CATEGORIES, "designs": STUDY_DESIGNS},
+                    "biomes": BIOMES, "categories": CATEGORIES, "designs": STUDY_DESIGNS,
+                    "geography": GEO_LEVELS},
     }
     run = {
         "date": TODAY, "library": len(papers), "candidates_evaluated": len(candidates),

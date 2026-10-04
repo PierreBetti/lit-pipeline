@@ -990,6 +990,7 @@ def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None):
               + (3 if x in sem_extra else 0)
            for x in candidates}
     pool = [x for x, v in sorted(pre.items(), key=lambda kv: kv[1], reverse=True) if v >= 2][:CANDIDATE_POOL]
+    pool += [x for x in sem_extra if x not in pool]      # papers found by meaning are always scored in depth
 
     meta = {}
     for chunk in chunks(pool, 50):
@@ -1071,6 +1072,11 @@ def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None):
 
     scored.sort(key=lambda c: c["global"], reverse=True)
     top = scored[:keep_n or MAX_SUGGESTIONS]
+    # Papers found by meaning have few citation links, so they rank low on similarity: reserve them some slots.
+    reserved = int((CONFIG.get("semantic") or {}).get("reserved_slots", 8)) if keep_n is None else 0
+    sem_found = [c for c in scored if c["id"] in sem_extra and c not in top][:max(0, reserved - sum(c["id"] in sem_extra for c in top))]
+    if sem_found:
+        top = top[:len(top) - len(sem_found)] + sem_found
     top_ids = {c["id"] for c in top}
     # also refresh suggestions already in Notion that are still in the scored pool
     refresh = [c for c in scored if c["id"] in existing and c["id"] not in top_ids]
@@ -1190,7 +1196,7 @@ def track_decisions(existing, state):
     return len(events)
 
 
-def sync_suggestions(top, refresh, lib_ids, existing, triager, scorer):
+def sync_suggestions(top, refresh, lib_ids, existing, triager, scorer, emb=None):
     # Suggestions you have since added to Zotero get marked automatically.
     for oid, info in existing.items():
         if oid in lib_ids and info["decision"] == "To review":
@@ -1244,15 +1250,24 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager, scorer):
     log(f"   {created} new suggestions, {updated} updated")
     new_ids = {c["id"] for c in top + refresh if c["id"] not in existing}
 
-    # Personal score for older pending suggestions that were not re-scored this run
+    # Older pending suggestions not re-scored this run: refresh Personal score and Semantic match
     scored_ids = {c["id"] for c in top + refresh}
-    for oid, info in existing.items():
-        if oid in scored_ids or info["decision"] != "To review":
-            continue
+    older = [(oid, info) for oid, info in existing.items() if oid not in scored_ids and info["decision"] == "To review"]
+    sems = [None] * len(older)
+    if emb is not None and older:
+        import semantic
+        _, sems = semantic.match_scores(emb, CONFIG, RESEARCH_QUESTIONS,
+                                        [semantic.paper_text(i["title"], i["abstract"]) for _, i in older])
+    for (oid, info), sem in zip(older, sems):
+        props = {}
         ps = scorer(info["title"], info["abstract"], info["relevance"], info["similarity"], info["connections"],
                     info["percentile"], info["year"])
         if ps is not None and ps != info["personal"]:
-            update_page(info["page_id"], {"Personal score": p_num(ps)})
+            props["Personal score"] = p_num(ps)
+        if sem is not None and sem != info["semantic"]:
+            props["Semantic match"] = p_num(sem)
+        if props:
+            update_page(info["page_id"], props)
 
     stats = {"created": created, "new_ids": new_ids, "new_relevant": 0, "triaged": 0}
     # AI relevance for suggestions, best candidates first, within the free quota left today
@@ -1977,7 +1992,7 @@ def main():
     state["seen_candidates"] = sorted(seen)
     stats = {"created": 0, "new_relevant": 0, "triaged": 0}
     if existing is not None:
-        stats = sync_suggestions(top, refresh, lib_ids, existing, triager, scorer)
+        stats = sync_suggestions(top, refresh, lib_ids, existing, triager, scorer, emb=emb)
         existing = load_existing_suggestions()   # fresh view including today's additions
     stopping = None
     pending = [i for i in (existing or {}).values() if i["decision"] == "To review"]

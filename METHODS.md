@@ -51,12 +51,14 @@ similarity ≥ 40 or no other role.
 **Semantic match.** A local open-source sentence-embedding model (default BAAI/bge-small-en-v1.5, run on CPU
 inside the workflow, so no AI quota and identical results across runs) embeds each research question (full
 wording in `config.json`, with the model's query instruction) and each candidate's title and abstract. The
-Semantic match M is the best cosine similarity across questions, mapped linearly from [0.45, 0.80] to [0, 100].
+Semantic match M is the best cosine similarity across questions, mapped linearly from [0.62, 0.84] to [0, 100] (range calibrated on the first real runs, where cosines fell
+between about 0.65 and 0.82). Pending suggestions are re-scored every run so the scale stays consistent.
 
 **Semantic discovery.** Each research question is also sent to OpenAlex's relevance search (60 results per
 question); the pooled results are re-ranked by Semantic match and the 30 closest join the candidate pool
-(pre-ranking bonus +3, source "Semantic search"). This reaches papers that use different vocabulary and are
-not linked to the library by citations.
+(always scored in depth, source "Semantic search"). Because such papers have few citation links, and so a
+low Similarity, 8 of the 40 proposed suggestions are reserved for the best of them. This reaches papers
+that use different vocabulary and are not linked to the library by citations.
 
 **Global score** (identical in Python and in Notion):
 `G = 100 × (0.30·r/5 + 0.25·S/100 + 0.15·M/100 + 0.12·min(C,5)/5 + 0.10·pct/100 + 0.08·rec)`, where C is the

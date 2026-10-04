@@ -74,10 +74,11 @@
   "semantic": {
     "enabled": true,
     "model": "BAAI/bge-small-en-v1.5",
-    "cos_low": 0.45,
-    "cos_high": 0.8,
+    "cos_low": 0.62,
+    "cos_high": 0.84,
     "discovery_per_question": 60,
-    "discovery_keep": 30
+    "discovery_keep": 30,
+    "reserved_slots": 8
   },
   "digest": {
     "every_days": 7

@@ -18,8 +18,9 @@ SEM_DEFAULTS = {
     "enabled": True,
     "model": "BAAI/bge-small-en-v1.5",
     "query_prefix": "Represent this sentence for searching relevant passages: ",
-    "cos_low": 0.45,             # cosine mapped to a Semantic match of 0
-    "cos_high": 0.80,            # cosine mapped to a Semantic match of 100
+    "cos_low": 0.62,             # cosine mapped to a Semantic match of 0 (calibrated on real runs)
+    "cos_high": 0.84,            # cosine mapped to a Semantic match of 100
+    "reserved_slots": 8,         # suggestions reserved for papers found by meaning
     "discovery_per_question": 60,
     "discovery_keep": 30,
 }

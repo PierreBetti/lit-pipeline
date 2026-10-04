@@ -155,6 +155,10 @@
    "Added to Zotero",
    ""
   ],
+  "W2162652530": [
+   "To review",
+   ""
+  ],
   "W2168684237": [
    "To review",
    ""
@@ -200,6 +204,10 @@
    ""
   ],
   "W2582743722": [
+   "To review",
+   ""
+  ],
+  "W2588945361": [
    "To review",
    ""
   ],
@@ -647,40 +655,58 @@
   "Alberta boreal fens, Alberta, Canada": null,
   "Alberta, Canada": [
    55.001251,
-   -115.002136
+   -115.002136,
+   "ca",
+   "Alberta"
   ],
   "Alligator River, North Carolina, United States": [
    35.6928531,
-   -76.1197173
+   -76.1197173,
+   "us",
+   "North Carolina"
   ],
   "Alps, Slovenia": [
    46.224243,
-   13.6800995
+   13.6800995,
+   "si",
+   "Julian Alps"
   ],
   "Alps, Switzerland": [
    46.4356252,
-   7.7323671
+   7.7323671,
+   "ch",
+   "Bern"
   ],
   "Altai Republic, Russia": [
    50.7114101,
-   86.8572186
+   86.8572186,
+   "ru",
+   "Altai Republic"
   ],
   "Altai, Russia": [
    50.7114101,
-   86.8572186
+   86.8572186,
+   "ru",
+   "Altai Republic"
   ],
   "Amapá, Brazil": [
    1.3545442,
-   -51.9161977
+   -51.9161977,
+   "br",
+   "Amapá"
   ],
   "Amazon basin, Peru": null,
   "Amazon, Brazil": [
    -0.0685858,
-   -51.1010454
+   -51.1010454,
+   "br",
+   "Amapá"
   ],
   "Amazon, Peru": [
    -3.8932882,
-   -73.1868553
+   -73.1868553,
+   "pe",
+   "Loreto"
   ],
   "Amazonian floodplains, Amazon, Brazil": null,
   "Andean-Amazon transition zone, Caquetá / Amazonia, Colombia": null,
@@ -688,16 +714,22 @@
   "Appalachian peatlands, West Virginia and Western Maryland, USA": null,
   "Argentina / Chile": [
    -33.0473517,
-   -71.4731364
+   -71.4731364,
+   "cl",
+   "Valparaiso Region"
   ],
   "Atchafalaya River, Louisiana, United States": [
    30.1250596,
-   -91.4955297
+   -91.4955297,
+   "us",
+   "Louisiana"
   ],
   "Atlantic Maritime, Canada, Canada": null,
   "Bacho, Narathiwat Province, Thailand": [
    6.5532944,
-   101.6579885
+   101.6579885,
+   "th",
+   "Narathiwat Province"
   ],
   "Balanak Swamp, Altai Republic, Russia": null,
   "Bear Creek watershed, central Iowa, USA": null,
@@ -707,57 +739,81 @@
   "Berbak Delta, Jambi, Indonesia": null,
   "Big Cypress National Preserve, Florida, United States": [
    25.9361216,
-   -81.0951271
+   -81.0951271,
+   "us",
+   "Florida"
   ],
   "Big Cypress Swamp, Florida, United States": [
    30.0818677,
-   -85.1007483
+   -85.1007483,
+   "us",
+   "Florida"
   ],
   "Bocas del Toro, Panama": [
    9.2684749,
-   -81.9932387
+   -81.9932387,
+   "pa",
+   "Bocas del Toro"
   ],
   "Bohemia, Czech Republic": [
-   49.8653861,
-   13.5696396
+   49.8036756,
+   14.5182783,
+   "cz",
+   ""
   ],
   "Boreal Plains, Canada, Canada": null,
   "Boreal Shield East, Canada, Canada": null,
   "Boreal Shield West, Canada, Canada": null,
   "Brunei": [
    4.4137155,
-   114.5653908
+   114.5653908,
+   "bn",
+   ""
   ],
   "Brunei Darussalam": [
    4.4137155,
-   114.5653908
+   114.5653908,
+   "bn",
+   ""
   ],
   "Brunei degraded tropical peatland, Southeast Asia, Brunei": null,
   "Brunei peat swamp forests, Belait or Temburong, Brunei": null,
   "Canada": [
    61.0666922,
-   -107.991707
+   -107.991707,
+   "ca",
+   ""
   ],
   "Canada, Canada": [
    -11.743613,
-   -67.1366534
+   -67.1366534,
+   "bo",
+   "Pando"
   ],
   "Caquetá / Amazonia, Colombia": [
    1.183361,
-   -75.703284
+   -75.703284,
+   "co",
+   "Caquetá"
   ],
   "Catalonia, Spain": [
    41.8523094,
-   1.5745043
+   1.5745043,
+   "es",
+   "Catalonia"
   ],
   "Central Africa, Democratic Republic of the Congo": [
    -4.3027436,
-   15.310832
+   15.310832,
+   "cd",
+   "Kinshasa"
   ],
   "Central Forest State Nature Biosphere Reserve, European Russia, Russia": null,
   "Central Java, Indonesia": [
    -7.3032412,
-   110.0044145
+   110.0044145,
+   "id",
+   "Central Java"
   ],
   "Central Kalimantan peat dome, Central Kalimantan, Indonesia": null,
   "Central Kalimantan peat swamp forest, Central Kalimantan, Indonesia": null,
@@ -765,45 +821,69 @@
   "Central Kalimantan transects, Central Kalimantan, Indonesia": null,
   "Central Kalimantan, Central Kalimantan, Indonesia": [
    -2.2138314,
-   113.9255363
+   113.9255363,
+   "id",
+   "Central Kalimantan"
   ],
   "Central Kalimantan, Indonesia": [
    -1.499583,
-   113.2903307
+   113.2903307,
+   "id",
+   "Central Kalimantan"
   ],
   "Central Kalimantan, Kalimantan, Indonesia": [
    -2.2138314,
-   113.9255363
+   113.9255363,
+   "id",
+   "Central Kalimantan"
   ],
   "Central New York wetlands, New York, USA": null,
   "Central Siberia, Russia": [
    65.2539737,
-   106.7898242
+   106.7898242,
+   "ru",
+   "Far Eastern Federal District"
   ],
   "Changbai Mountain, China": [
    42.1810777,
-   128.1710394
+   128.1710394,
+   "cn",
+   "Jilin"
   ],
   "China": [
    34.5412252,
-   108.9237067
+   108.9237067,
+   "cn",
+   ""
   ],
   "Churchill, Manitoba, Canada": [
    58.769268,
-   -94.1729517
+   -94.1729517,
+   "ca",
+   "Manitoba"
   ],
   "Coastal forested wetlands of North Carolina, North Carolina, United States": null,
   "Cochrane, Ontario, Canada": [
    50.630898,
-   -82.1914444
+   -82.1914444,
+   "ca",
+   "Ontario"
   ],
   "Congo Basin, Central Africa, Democratic Republic of the Congo": null,
   "Congo Basin, Congo Basin, Not stated": null,
   "Congo Basin, Not stated": null,
   "Congo Basin, Republic of the Congo": null,
+  "Cors Erddreiniog, Anglesey, United Kingdom": [
+   53.3128751,
+   -4.2985512,
+   "gb",
+   "Wales"
+  ],
   "Cranesville Swamp Preserve, West Virginia, USA": [
    39.5407146,
-   -79.4830058
+   -79.4830058,
+   "us",
+   "West Virginia"
   ],
   "Cricamola, Bocas del Toro, Panama": null,
   "Cuvette Centrale, Congo Basin, Republic of the Congo": null,
@@ -811,7 +891,9 @@
   "Cuvette Centrale, Democratic Republic of the Congo": null,
   "Czerwone Bagno, Podlaskie, Poland": [
    54.1909236,
-   22.8727733
+   22.8727733,
+   "pl",
+   "Podlachia Voivodeship"
   ],
   "Da Hinggan Mountains, Heilongjiang / Inner Mongolia, China": null,
   "Da Xing'an Mountains, Northeast China, China": null,
@@ -819,14 +901,19 @@
   "Danube National Park, Lower Austria, Austria": null,
   "Daxing'an Mountains, Northeast China, China": null,
   "Daxing'anling, Heilongjiang / Inner Mongolia, China": null,
+  "Delta Berbak, Jambi, Indonesia": null,
   "Democratic Republic of the Congo": [
    -2.9814344,
-   23.8222636
+   23.8222636,
+   "cd",
+   ""
   ],
   "East Kalimantan peat swamp forest, East Kalimantan, Indonesia": null,
   "East Kalimantan, Indonesia": [
    0.7884397,
-   116.2419977
+   116.2419977,
+   "id",
+   "East Kalimantan"
   ],
   "Eastern Amazon, Para, Brazil": null,
   "Eastern Great Xing'an Mountains, Heilongjiang / Inner Mongolia, China": null,
@@ -834,123 +921,191 @@
   "Everglades (Water Conservation Area 2A), Florida, USA": null,
   "Everglades National Park, Florida, United States": [
    25.3679443,
-   -80.8783066
+   -80.8783066,
+   "us",
+   "Florida"
   ],
   "Everglades, Florida, USA": [
    25.3679443,
-   -80.8783066
+   -80.8783066,
+   "us",
+   "Florida"
   ],
   "Fenghuo-shan, Qinghai-Tibet Plateau, China": null,
   "Fenghuoshan Mountain area, Tibetan Plateau, China": null,
   "Finland, National, Finland": null,
   "Florida site, Florida, United States": [
    27.3441959,
-   -81.0312841
+   -81.0312841,
+   "us",
+   "Florida"
   ],
   "Florida, USA": [
    27.7567667,
-   -81.4639835
+   -81.4639835,
+   "us",
+   "Florida"
   ],
   "Florida, United States": [
    27.7567667,
-   -81.4639835
+   -81.4639835,
+   "us",
+   "Florida"
   ],
   "Fort McMurray, Alberta, Canada": [
    56.7291997,
-   -111.3885221
+   -111.3885221,
+   "ca",
+   "Alberta"
   ],
   "Fuegian Archipelago, Tierra del Fuego, Argentina / Chile": null,
   "Georgia / Florida, USA": [
-   31.9339436,
-   -83.7482925
+   31.9369641,
+   -83.7436343,
+   "us",
+   "Georgia"
   ],
   "Georgia, USA": [
    32.3293809,
-   -83.1137366
+   -83.1137366,
+   "us",
+   "Georgia"
   ],
   "Germany": [
    51.1638175,
-   10.4478313
+   10.4478313,
+   "de",
+   ""
   ],
   "Germany floodplain forests, Not stated, Germany": null,
   "Giam Siak Kecil–Bukit Batu Biosphere Reserve, Sumatra, Indonesia": null,
   "Goldstream Valley, Alaska, USA": [
    64.912874,
-   -147.9093046
+   -147.9093046,
+   "us",
+   "Alaska"
   ],
   "Gornyi Altai swamps, Altai, Russia": null,
   "Gornyi Altai, Altai, Russia": null,
+  "Great Dismal Swamp National Wildlife Refuge, North Carolina, United States": [
+   36.601032,
+   -76.4890459,
+   "us",
+   "Virginia"
+  ],
   "Great Dismal Swamp, Virginia / North Carolina, USA": [
    36.5375826,
-   -76.4204223
+   -76.4204223,
+   "us",
+   "North Carolina"
   ],
   "Great Lakes–St. Lawrence forest region, Ontario, Canada": null,
   "Greater Everglades, Florida, USA": [
    26.0984266,
-   -80.1230716
+   -80.1230716,
+   "us",
+   "Florida"
   ],
   "Greater Khingan Mountains, Heilongjiang / Inner Mongolia, China": null,
   "Gulf of Carpentaria, Northern Australia, Australia": null,
   "Hainan mangrove swamp, Hainan, China": null,
   "Hainan, China": [
    19.2000001,
-   109.5999999
+   109.5999999,
+   "cn",
+   "Hainan"
   ],
   "Harvard Forest, Massachusetts, USA": [
    42.5366748,
-   -72.1810985
+   -72.1810985,
+   "us",
+   "Massachusetts"
+  ],
+  "Harvard Forest, Massachusetts, United States": [
+   42.5366748,
+   -72.1810985,
+   "us",
+   "Massachusetts"
   ],
   "Heilongjiang / Inner Mongolia, China": [
    51.4168549,
-   125.5884656
+   125.5884656,
+   "cn",
+   "Heilongjiang"
   ],
   "Heilongjiang, China": [
    48.0000047,
-   127.999992
+   127.999992,
+   "cn",
+   "Heilongjiang"
   ],
   "Hudson Bay Lowland, Northern Ontario / Manitoba, Canada": null,
   "Hudson Bay Lowland, Northern Ontario / Quebec / Manitoba, Canada": null,
+  "Hudson Bay Lowlands, Ontario, Canada": [
+   55.92,
+   -87.82,
+   "ca",
+   "Ontario"
+  ],
   "Hudson Plains, Canada, Canada": null,
   "Indonesia": [
    -2.4833826,
-   117.8902853
+   117.8902853,
+   "id",
+   ""
   ],
   "Indonesia, Southeast Asia, Indonesia": null,
   "Iquitos region, Loreto, Peru": null,
   "Iquitos, Loreto, Peru": [
    -3.749365,
-   -73.2444145
+   -73.2444145,
+   "pe",
+   "Loreto"
   ],
   "Jambi peat dome, Jambi, Sumatra, Indonesia": null,
   "Jambi, Indonesia": [
    -1.7069965,
-   102.7140041
+   102.7140041,
+   "id",
+   "Jambi"
   ],
   "Jambi, Jambi, Indonesia": [
    -1.6296917,
-   103.6077806
+   103.6077806,
+   "id",
+   "Jambi"
   ],
   "Jambi, Sumatra, Indonesia": [
    -1.6123473,
-   103.5186977
+   103.5186977,
+   "id",
+   "Jambi"
   ],
   "Jinchuan peatland, Changbai Mountain, China": null,
   "Kaamanen, Lapland, Finland": [
    69.1047373,
-   27.1978479
+   27.1978479,
+   "fi",
+   "Lapland"
   ],
   "Kalampangan, Central Kalimantan, Indonesia": [
    -2.2787149,
-   114.0112539
+   114.0112539,
+   "id",
+   "Central Kalimantan"
   ],
   "Kalimantan Barat, West Kalimantan, Indonesia": [
    -0.0596325,
-   109.3540116
+   109.3540116,
+   "id",
+   "West Kalimantan"
   ],
   "Kampar Peninsula, Riau Province, Indonesia": null,
   "Kenya": [
    0.2793165,
-   37.5164935
+   37.5164935,
+   "ke",
+   ""
   ],
   "Khanty-Mansiysk region, West Siberia, Russia": null,
   "Klyuch River basin, Western Siberia, Russia": null,
@@ -958,9 +1113,17 @@
   "Komi Republic transitional swamp, Komi Republic, Russia": null,
   "Komi Republic, Russia": [
    63.9881421,
-   54.3326073
+   54.3326073,
+   "ru",
+   "Komi Republic"
   ],
   "Kutyushskoe Swamp, Altai Republic, Russia": null,
+  "Kuznetsk Alatau, Kemerovo Oblast / Siberia, Russia": [
+   54.5464906,
+   88.2597433,
+   "ru",
+   "Kemerovo Oblast–Kuzbass"
+  ],
   "Kuznetsk Alatau, Republic of Khakassia, Russia": null,
   "La Tordera catchment, Catalonia, Spain": null,
   "Lago Piratuba Biosphere Reserve, Amapá, Brazil": null,
@@ -968,60 +1131,85 @@
   "Lake St-Pierre floodplain, Quebec, Canada": null,
   "Lamu Archipelago, Kenya": [
    -2.2717426,
-   40.9027109
+   40.9027109,
+   "ke",
+   "Lamu"
   ],
   "Lanžhot, South Moravia, Czech Republic": null,
   "Lapland, Finland": [
    67.6922371,
-   26.728139
+   26.728139,
+   "fi",
+   "Lapland"
   ],
   "Lesser Xing'an Mountains, Heilongjiang, China": null,
+  "Lettosuo, southern Finland, Finland": null,
   "Leyte Sab-A Basin peatland, Leyte, Philippines": null,
   "Leyte, Philippines": [
    10.7841157,
-   124.892321
+   124.892321,
+   "ph",
+   "Leyte"
   ],
   "Loreto, Peru": [
    -5.0,
-   -75.0
+   -75.0,
+   "pe",
+   "Loreto"
   ],
   "Lost Creek, WI, United States": [
    44.4717007,
-   -92.1791073
+   -92.1791073,
+   "us",
+   "Wisconsin"
   ],
   "Louisiana coastal saline marsh, Louisiana, USA": null,
   "Louisiana coastal wetlands, Louisiana, United States": null,
   "Louisiana gulf coast swamp forest, Louisiana, USA": null,
   "Louisiana, USA": [
    30.8703881,
-   -92.007126
+   -92.007126,
+   "us",
+   "Louisiana"
   ],
   "Louisiana, United States": [
    30.8703881,
-   -92.007126
+   -92.007126,
+   "us",
+   "Louisiana"
   ],
   "Lower Austria, Austria": [
    48.2817813,
-   15.7632457
+   15.7632457,
+   "at",
+   "Lower Austria"
   ],
   "Lower Mississippi Alluvial Valley, Lower Mississippi, USA": null,
   "Lower Mississippi, USA": [
    32.3534423,
-   -90.8818093
+   -90.8818093,
+   "us",
+   "Mississippi"
   ],
   "Lower Savannah River, Georgia, USA": [
    32.0800487,
-   -81.0856252
+   -81.0856252,
+   "us",
+   "Georgia"
   ],
   "Luanhaizi peatland, Qinghai—Tibet Plateau, China": null,
   "Maine forested wetland, Maine, United States": null,
   "Maine, United States": [
    45.709097,
-   -68.8590201
+   -68.8590201,
+   "us",
+   "Maine"
   ],
   "Malaysia": [
    4.5693754,
-   102.2656823
+   102.2656823,
+   "my",
+   ""
   ],
   "Malaysia and Indonesia": null,
   "Malaysia and Indonesia, Malaysia and Indonesia": null,
@@ -1029,46 +1217,64 @@
   "Malaysia tropical peat swamp forest and oil palm plantation transects, Malaysia, Malaysia": null,
   "Malaysia, Malaysia": [
    5.2265873,
-   100.4504672
+   100.4504672,
+   "my",
+   "Penang"
   ],
   "Malaysia, Southeast Asia, Malaysia": null,
   "Maludam National Park, Sarawak, Malaysia": null,
   "Marang, Central Kalimantan, Indonesia": [
    -2.0618142,
-   113.7965159
+   113.7965159,
+   "id",
+   "Central Kalimantan"
   ],
   "Mauritia flexuosa palm swamp peat forest, Peruvian Amazon, Peru": null,
   "Mazagão, Amapá, Brazil": [
    -0.0431531,
-   -51.9758941
+   -51.9758941,
+   "br",
+   "Amapá"
   ],
   "Mekong Delta, Vietnam": [
    9.7508958,
-   105.2224602
+   105.2224602,
+   "vn",
+   "Mekong Delta"
   ],
   "Mer Bleue, Ontario, Canada": [
    45.4006154,
-   -75.4994842
+   -75.4994842,
+   "ca",
+   "Ontario"
   ],
   "Merang peat swamp forest, South Sumatra, Indonesia": null,
   "Meulaboh District, West Aceh, Indonesia": null,
   "Meulaboh, West Aceh, Indonesia": null,
   "Michigan, United States": [
    43.6211955,
-   -84.6824346
+   -84.6824346,
+   "us",
+   "Michigan"
   ],
   "Mid-Atlantic region, Mid-Atlantic, United States": null,
   "Mid-Atlantic, United States": [
    43.1606855,
-   -77.444328
+   -77.444328,
+   "us",
+   "New York"
   ],
   "Mindanao, Philippines": [
    7.6897787,
-   125.2365313
+   125.2365313,
+   "ph",
+   "Northern Mindanao"
   ],
   "Minnesota site, Minnesota, United States": [
    44.0142802,
-   -92.4162336
+   -92.4162336,
+   "us",
+   "Minnesota"
   ],
   "Mississippi River Alluvial Valley, Southern United States, United States": null,
   "Mississippi River deltaic plain, Louisiana, United States": null,
@@ -1077,88 +1283,126 @@
   "Moloi River, Not stated, Kenya": null,
   "Mont-Saint-Hilaire, Québec, Canada": [
    45.5623512,
-   -73.1918864
+   -73.1918864,
+   "ca",
+   "Quebec"
   ],
   "Moscow region, Moscow Oblast, Russia": [
    55.8858149,
-   37.4562282
+   37.4562282,
+   "ru",
+   "Moscow Oblast"
   ],
   "NE Switzerland, Switzerland": [
    47.5164429,
-   7.8685933
+   7.8685933,
+   "ch",
+   "Basel-Landschaft"
   ],
   "Nam Co region, Tibetan Plateau, China": null,
   "Napahai wetland, Yunnan, China": null,
   "Napahai, Yunnan, China": [
-   27.8336987,
-   99.6712489
+   27.8593598,
+   99.6478256,
+   "cn",
+   "Yunnan"
   ],
   "Narathiwat province swamp forest, Narathiwat, Thailand": null,
   "Narathiwat, Thailand": [
    6.3210758,
-   101.5972971
+   101.5972971,
+   "th",
+   "Narathiwat Province"
   ],
   "National, Belize": [
    17.4999116,
-   -88.2113735
+   -88.2113735,
+   "bz",
+   "Belize District"
   ],
   "National, Finland": [
-   14.6553047,
-   121.0897395
+   14.6572947,
+   121.087624,
+   "ph",
+   "Metro Manila"
   ],
   "New England forested wetlands, New England, USA": null,
   "New England, USA": [
    44.2057083,
-   -70.7537839
+   -70.7537839,
+   "us",
+   "New England"
   ],
   "New South Wales, Australia": [
    -32.1629594,
-   147.0320469
+   147.0320469,
+   "au",
+   "New South Wales"
   ],
   "New York State forested peatland, New York, United States": null,
   "New York State peatlands, New York, USA": null,
   "New York, USA": [
    40.7127281,
-   -74.0060152
+   -74.0060152,
+   "us",
+   "New York"
   ],
   "New York, United States": [
    40.7127281,
-   -74.0060152
+   -74.0060152,
+   "us",
+   "New York"
   ],
   "Ngamiland, Botswana": [
    -19.9875533,
-   23.4267468
+   23.4267468,
+   "bw",
+   "North-West District"
   ],
   "North Carolina coast tidal freshwater swamp, North Carolina, United States": null,
   "North Carolina coastal plain, North Carolina, USA": null,
   "North Carolina, USA": [
    35.6729639,
-   -79.0392919
+   -79.0392919,
+   "us",
+   "North Carolina"
   ],
   "North Carolina, United States": [
    35.6729639,
-   -79.0392919
+   -79.0392919,
+   "us",
+   "North Carolina"
   ],
   "North Florida swamp forest, Florida, United States": null,
   "North Selangor Peat Swamp Forest, Selangor, Malaysia": [
    3.5685312,
-   101.2667034
+   101.2667034,
+   "my",
+   "Selangor"
   ],
   "North Selangor, Selangor, Malaysia": [
-   2.9687015,
-   101.7415901
+   3.0217016,
+   101.7141359,
+   "my",
+   "Selangor"
   ],
   "Northeast China, China": [
    45.965277,
-   126.756667
+   126.756667,
+   "cn",
+   "Northeast China"
   ],
   "Northeast, China": [
    -11.929081,
-   -42.5580312
+   -42.5580312,
+   "br",
+   "Bahia"
   ],
   "Northern Australia, Australia": [
-   -30.9737292,
-   116.2124733
+   -30.9719339,
+   116.2138489,
+   "au",
+   "Western Australia"
   ],
   "Northern Borneo peat swamp, Belait / Tutong / Temburong, Brunei Darussalam": null,
   "Northern Lower Michigan forested ecosystems, Michigan, United States": null,
@@ -1167,7 +1411,9 @@
   "Northern Ontario / Quebec / Manitoba, Canada": null,
   "Northwest Territories, Canada": [
    65.0000004,
-   -118.0
+   -118.0,
+   "ca",
+   "Northwest Territories"
   ],
   "Not stated": null,
   "Not stated, Germany": null,
@@ -1178,61 +1424,85 @@
   "Not stated, West Kalimantan, Indonesia": null,
   "Nova Scotia, Canada": [
    45.1960403,
-   -63.1653789
+   -63.1653789,
+   "ca",
+   "Nova Scotia"
   ],
   "Nxaraga, Ngamiland, Botswana": null,
   "Ogeechee River floodplain, Georgia, USA": null,
   "Ogeechee River, Georgia, USA": [
    32.71105,
-   -81.8989865
+   -81.8989865,
+   "us",
+   "Georgia"
   ],
   "Okavango Delta, Ngamiland, Botswana": null,
   "Okefenokee Swamp, Georgia, United States": [
    30.6668928,
-   -82.3331791
+   -82.3331791,
+   "us",
+   "Georgia"
   ],
   "Okefenokee swamp, Georgia / Florida, USA": null,
   "Oldman River, southern Alberta, Canada": null,
   "Ontario, Canada": [
    50.000678,
-   -86.000977
+   -86.000977,
+   "ca",
+   "Ontario"
   ],
   "PT. Rimba Makmur Utama, Central Kalimantan, Indonesia": null,
   "Pacific Northwest estuarine wetlands, Pacific Northwest, USA": null,
   "Pacific Northwest, USA": [
    40.8452094,
-   -96.739953
+   -96.739953,
+   "us",
+   "Nebraska"
   ],
   "Pahang, Malaysia": [
    3.6168822,
-   102.5994547
+   102.5994547,
+   "my",
+   "Pahang"
   ],
   "Palangkaraya, Central Kalimantan, Indonesia": [
    -2.2072919,
-   113.9164372
+   113.9164372,
+   "id",
+   "Central Kalimantan"
   ],
   "Pantanal Mato-Grossense, Mato Grosso, Brazil": [
    -16.4067745,
-   -56.6699368
+   -56.6699368,
+   "br",
+   "Mato Grosso"
   ],
   "Pantanal, Mato Grosso, Brazil": [
    -17.6750684,
-   -57.4553363
+   -57.4553363,
+   "br",
+   "Mato Grosso"
   ],
   "Papua Barat, West Papua, Indonesia": [
    -0.86573,
-   134.0755946
+   134.0755946,
+   "id",
+   "West Papua"
   ],
   "Para, Brazil": [
    -4.7493933,
-   -52.8973006
+   -52.8973006,
+   "br",
+   "Pará"
   ],
   "Pastaza-Marañon foreland basin, Amazon, Peru": null,
   "Pastaza-Marañón foreland basin, Amazon basin, Peru": null,
   "Pate Islands, Lamu Archipelago, Kenya": null,
   "Peace River, Alberta, Canada": [
    56.2337111,
-   -117.2910839
+   -117.2910839,
+   "ca",
+   "Alberta"
   ],
   "Peat swamp forest sites in Indonesia, Southeast Asia, Indonesia": null,
   "Peat swamp forests of Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
@@ -1241,11 +1511,15 @@
   "Peninsular Malaysia peatlands, Peninsular Malaysia, Malaysia": null,
   "Peninsular Malaysia, Malaysia": [
    3.0839554,
-   101.7442451
+   101.7442451,
+   "my",
+   "Selangor"
   ],
   "Peru": [
    -6.8699697,
-   -75.0458515
+   -75.0458515,
+   "pe",
+   ""
   ],
   "Peruvian Amazon, Amazon, Peru": null,
   "Peruvian Amazon, Peru": null,
@@ -1254,7 +1528,9 @@
   "Qinghai-Tibet Plateau, Qinghai-Tibet, China": null,
   "Qinghai-Tibet, China": [
    37.3371261,
-   97.4152619
+   97.4152619,
+   "cn",
+   "Qinghai"
   ],
   "Qinghai-Tibetan Plateau swamp meadow, Qinghai-Tibetan Plateau, China": null,
   "Qinghai-Tibetan Plateau swamp soils, Qinghai-Tibet, China": null,
@@ -1264,49 +1540,69 @@
   "Quebec peatlands, Quebec, Canada": null,
   "Quebec, Canada": [
    52.4760892,
-   -71.8258668
+   -71.8258668,
+   "ca",
+   "Quebec"
   ],
   "Queensland riparian rainforest, Queensland, Australia": null,
   "Queensland, Australia": [
    -22.1646782,
-   144.5844903
+   144.5844903,
+   "au",
+   "Queensland"
   ],
   "Quistococha Forest Reserve, Loreto, Peru": null,
   "Raja Musa Forest Reserve, Selangor, Malaysia": [
    3.511314,
-   101.3126147
+   101.3126147,
+   "my",
+   "Selangor"
   ],
   "Republic of Khakassia, Russia": [
    53.4399379,
-   90.0664303
+   90.0664303,
+   "ru",
+   "Khakassia"
   ],
   "Republic of the Congo": [
    -0.7264327,
-   15.6419155
+   15.6419155,
+   "cg",
+   ""
   ],
   "Research Station of Indonesian Agricultural Environment Research Institute, Central Java, Indonesia": null,
   "Riau Province, Indonesia": null,
   "Riau Province, Riau, Indonesia": null,
   "Riau, Indonesia": [
    1.0498079,
-   101.6548433
+   101.6548433,
+   "id",
+   "Riau"
   ],
   "Rift Valley, Kenya": [
    1.1328606,
-   36.293934
+   36.293934,
+   "ke",
+   ""
   ],
   "Russia": [
    64.6863136,
-   97.7453061
+   97.7453061,
+   "ru",
+   ""
   ],
   "SAFE project landscape, Sabah, Malaysia": null,
   "SPRUCE, Minnesota, United States": [
    47.4274291,
-   -92.5629627
+   -92.5629627,
+   "us",
+   "Minnesota"
   ],
   "Sabah, Malaysia": [
    5.4257359,
-   117.0326392
+   117.0326392,
+   "my",
+   "Sabah"
   ],
   "Sabaju, Southeast Asia, Not stated": null,
   "Sanjiang Plain, Heilongjiang, China": null,
@@ -1317,99 +1613,141 @@
   "Sarawak peatland, Sarawak, Malaysia": null,
   "Sarawak, Malaysia": [
    2.5023855,
-   112.9547283
+   112.9547283,
+   "my",
+   "Sarawak"
   ],
   "Sarawak, Sarawak, Malaysia": [
    1.4668506,
-   110.4331946
+   110.4331946,
+   "my",
+   "Sarawak"
   ],
   "Saskatchewan boreal forest wetland, Saskatchewan, Canada": null,
   "Saskatchewan, Canada": [
    55.5321257,
-   -106.141224
+   -106.141224,
+   "ca",
+   "Saskatchewan"
   ],
   "Savannah River floodplain, South Carolina / Georgia, USA": null,
   "Savannah River, Georgia / South Carolina, USA": [
    33.1478707,
-   -81.7516388
+   -81.7516388,
+   "us",
+   "South Carolina"
   ],
   "Schleswig-Holstein, Schleswig-Holstein, Germany": [
    53.6550707,
-   9.9309123
+   9.9309123,
+   "de",
+   "Schleswig-Holstein"
   ],
   "Scotland, United Kingdom": [
    56.7861112,
-   -4.1140518
+   -4.1140518,
+   "gb",
+   "Scotland"
   ],
   "Scottish saltmarshes, Scotland, United Kingdom": null,
   "Scotty Creek Landscape, Taiga Plains, Canada": null,
   "Sebangau National Park, Central Kalimantan, Indonesia": [
    -2.4769018,
-   113.6931414
+   113.6931414,
+   "id",
+   "Central Kalimantan"
   ],
   "Sebungan, Southeast Asia, Not stated": null,
   "Selangor peat swamp forest and oil palm plantation, Selangor, Malaysia": null,
   "Selangor, Malaysia": [
    3.2083304,
-   101.304146
+   101.304146,
+   "my",
+   "Selangor"
   ],
   "Selangor, Selangor, Malaysia": [
    2.9240809,
-   101.7812216
+   101.7812216,
+   "my",
+   "Selangor"
   ],
   "Shaubac Wetlands, Nova Scotia, Canada": null,
   "Shiga Prefecture, Shiga, Japan": [
    35.1632605,
-   136.2059576
+   136.2059576,
+   "jp",
+   "Shiga Prefecture"
   ],
   "Simpang Village, Meulaboh District, West Aceh, Indonesia": null,
   "Smithsonian Environmental Research Center, Maryland, USA": [
    38.8793738,
-   -76.5577299
+   -76.5577299,
+   "us",
+   "Maryland"
   ],
   "Sodankylä, Lapland, Finland": [
    67.4189716,
-   26.5902179
+   26.5902179,
+   "fi",
+   "Lapland"
   ],
   "South Bohemia, Czech Republic": [
    48.9766916,
-   14.4507334
+   14.4507334,
+   "cz",
+   "South Bohemian Region"
   ],
   "South Carolina / Georgia, USA": [
    34.3834751,
-   -85.3640747
+   -85.3640747,
+   "us",
+   "Georgia"
   ],
   "South Carolina coastal forested wetland, South Carolina, USA": null,
   "South Carolina, USA": [
    33.6874388,
-   -80.4363743
+   -80.4363743,
+   "us",
+   "South Carolina"
   ],
   "South Kalimantan coastal area, South Kalimantan, Indonesia": null,
   "South Kalimantan, Indonesia": [
    -2.9285686,
-   115.3700718
+   115.3700718,
+   "id",
+   "South Kalimantan"
   ],
   "South Moravia, Czech Republic": [
    49.3624352,
-   16.6436349
+   16.6436349,
+   "cz",
+   "South Moravian Region"
   ],
   "South Sumatra, Indonesia": [
    -3.1931356,
-   104.0181254
+   104.0181254,
+   "id",
+   "South Sumatra"
   ],
   "Southeast Asia": [
    -22.0159585,
-   -47.897938
+   -47.897938,
+   "br",
+   "São Paulo"
   ],
   "Southeast Asia tropical peatlands, Malaysia and Indonesia, Malaysia and Indonesia": null,
   "Southeast Asia, Brunei": null,
   "Southeast Asia, Indonesia": [
    -8.7287308,
-   115.2365646
+   115.2365646,
+   "id",
+   "Bali"
   ],
   "Southeast Asia, Malaysia": [
    3.140489,
-   101.6834074
+   101.6834074,
+   "my",
+   ""
   ],
   "Southeast Asia, Not stated": null,
   "Southeast Asian tropical forested peatland, Not stated, Southeast Asia": null,
@@ -1419,102 +1757,150 @@
   "Southern Ontario swamps, Southern Ontario, Canada": null,
   "Southern Ontario, Canada": [
    43.2231351,
-   -79.9798581
+   -79.9798581,
+   "ca",
+   "Ontario"
   ],
   "Southern Swamp, Lamu Archipelago, Kenya": null,
   "Southern Thailand wetlands, Southern Thailand, Thailand": null,
   "Southern Thailand, Thailand": [
    7.9863072,
-   98.3019903
+   98.3019903,
+   "th",
+   "Phuket Province"
   ],
   "Southern United States, United States": [
    35.3217247,
-   -81.8596491
+   -81.8596491,
+   "us",
+   "North Carolina"
   ],
   "Southwest Florida cypress swamps, Florida, United States": null,
   "Soča, Alps, Slovenia": null,
   "Sumatra, Indonesia": [
    -0.1432941,
-   101.6241024
+   101.6241024,
+   "id",
+   ""
   ],
   "Sunny Hill Farm, Florida, USA": null,
   "Taiga Plains, Canada": null,
   "Tamban sub district, South Kalimantan, Indonesia": null,
   "The Glades, Maryland, United States": [
    39.5695328,
-   -79.2772589
+   -79.2772589,
+   "us",
+   "Maryland"
   ],
   "Thur River, NE Switzerland, Switzerland": null,
   "Tibet, China": [
    29.8556443,
-   90.8749807
+   90.8749807,
+   "cn",
+   "Xizang"
   ],
   "Tibetan Plateau permafrost transect, Tibetan Plateau, China": null,
   "Tibetan Plateau, China": [
    31.8280766,
-   87.4064278
+   87.4064278,
+   "cn",
+   "Xizang"
   ],
   "Tibetan Plateau, Tibet, China": [
    31.8280766,
-   87.4064278
+   87.4064278,
+   "cn",
+   "Xizang"
   ],
   "Tibetan alpine permafrost region, Tibet, China": null,
   "Tierra del Fuego, Argentina / Chile": null,
   "To-Daeng, Narathiwat Province, Thailand": [
    6.3656142,
-   101.7654954
+   101.7654954,
+   "th",
+   "Narathiwat Province"
   ],
   "Trumon and Singkil, Southern Aceh, Indonesia": null,
   "Turochak Swamp, Altai Republic, Russia": null,
   "Tver region swamp, Tver, Russia": null,
   "Tver, Russia": [
    56.858675,
-   35.9208284
+   35.9208284,
+   "ru",
+   "Tver Oblast"
   ],
   "U Minh Thuong National Park, Mekong Delta, Vietnam": null,
   "US-NC4 NC_AlligatorRiver, North Carolina, USA": null,
   "USA": [
    39.7837304,
-   -100.445882
+   -100.445882,
+   "us",
+   ""
+  ],
+  "Udmurt Republic, Russia": [
+   57.1961165,
+   52.6959832,
+   "ru",
+   "Udmurtia"
   ],
   "United States": [
    39.7837304,
-   -100.445882
+   -100.445882,
+   "us",
+   ""
   ],
   "United States wetlands, Not stated, United States": null,
   "Urbach, Alps, Switzerland": null,
   "Vasyugan Swamp, West Siberia, Russia": null,
   "Vasyugan Swamp, Western Siberia, Russia": null,
+  "Veracruz / Tabasco, Mexico": [
+   17.9740394,
+   -92.9468818,
+   "mx",
+   "Tabasco"
+  ],
   "Veracruz coastal freshwater wetlands, Veracruz, Mexico": null,
   "Veracruz coastal plain, Veracruz, Mexico": null,
   "Veracruz, Mexico": [
    19.333333,
-   -96.666667
+   -96.666667,
+   "mx",
+   "Veracruz"
   ],
   "Virginia, USA": [
    37.1232245,
-   -78.4927721
+   -78.4927721,
+   "us",
+   "Virginia"
   ],
   "Vrouwe Vennepolder, unknown, Netherlands": null,
   "Waccamaw River floodplain, South Carolina, USA": null,
   "Waccamaw River, South Carolina, USA": [
    33.8874211,
-   -78.8190042
+   -78.8190042,
+   "us",
+   "South Carolina"
   ],
   "Wally Creek experimental drainage site, Cochrane, Ontario, Canada": null,
   "West Aceh, Indonesia": null,
   "West Kalimantan, Indonesia": [
    -0.1322387,
-   111.0968901
+   111.0968901,
+   "id",
+   "West Kalimantan"
   ],
   "West Kalimantan, West Kalimantan, Indonesia": [
    -0.0596325,
-   109.3540116
+   109.3540116,
+   "id",
+   "West Kalimantan"
   ],
   "West Siberia Lowland, West Siberia, Russia": null,
   "West Siberia, Russia": [
    62.0,
-   76.0
+   76.0,
+   "ru",
+   "Khanty-Mansiysk Autonomous Okrug – Ugra"
   ],
   "West Siberian Lowland, Russia": null,
   "West Siberian plain, West Siberia, Russia": null,
@@ -1524,16 +1910,22 @@
   "Western Siberia taiga, Western Siberia, Russia": null,
   "Western Siberia, Russia": [
    55.0959197,
-   82.9627763
+   82.9627763,
+   "ru",
+   "Novosibirsk Oblast"
   ],
   "Western Siberia, Western Siberia, Russia": null,
   "Winyah Bay, South Carolina, USA": [
    33.2662776,
-   -79.233105
+   -79.233105,
+   "us",
+   "South Carolina"
   ],
   "Wolf Swamp, Maryland, United States": [
    39.6692519,
-   -79.0864174
+   -79.0864174,
+   "us",
+   "Maryland"
   ],
   "XiaoXing'an Mountains, Heilongjiang, China": null,
   "Xiaobohu swamp, Qinghai—Tibet Plateau, China": null,
@@ -1544,19 +1936,27 @@
   "Yamalo-Nenets Autonomous Okrug, West Siberian Lowland, Russia": null,
   "Yunnan, China": [
    25.0,
-   102.0
+   102.0,
+   "cn",
+   "Yunnan"
   ],
   "ZOTTO observatory, Central Siberia, Russia": null,
+  "Zakamye lowlands, Udmurt Republic, Russia": null,
   "central Iowa, USA": [
-   41.8967802,
-   -87.7655592
+   41.896572,
+   -87.7653745,
+   "us",
+   "Illinois"
   ],
   "central Ontario, Ontario, Canada": [
    44.9376036,
-   -78.9925565
+   -78.9925565,
+   "ca",
+   "Ontario"
   ],
   "coastal freshwater forested wetland, North Carolina, USA": null,
   "coastal plain of North Carolina, North Carolina, United States": null,
+  "coastal plain of the Gulf of Mexico, Veracruz / Tabasco, Mexico": null,
   "forested swamp near Ithaca, New York, USA": null,
   "north-eastern New South Wales wetlands, New South Wales, Australia": null,
   "northern Alberta peatland, Alberta, Canada": null,
@@ -1564,27 +1964,43 @@
   "northern Alberta swamp, Alberta, Canada": null,
   "northern Alberta, Alberta, Canada": [
    58.7131298,
-   -111.1591342
+   -111.1591342,
+   "ca",
+   "Alberta"
   ],
   "northern Finnish Lapland, Lapland, Finland": null,
   "northern Ontario peatlands, Ontario, Canada": null,
   "southeast Alaska, Alaska, USA": [
    58.3923365,
-   -134.6478123
+   -134.6478123,
+   "us",
+   "Alaska"
   ],
   "southeast Virginia bottomland hardwood swamp, Virginia, USA": null,
   "southern Alberta, Canada": [
    51.0631292,
-   -114.0878809
+   -114.0878809,
+   "ca",
+   "Alberta"
+  ],
+  "southern Finland, Finland": [
+   60.7373759,
+   25.8143982,
+   "fi",
+   "Mainland Finland"
   ],
   "southern Finland, Southern Finland, Finland": [
    60.1725502,
-   24.9329194
+   24.9329194,
+   "fi",
+   "Uusimaa"
   ],
   "southern Ontario peat swamp, Ontario, Canada": null,
   "southern Ontario, Ontario, Canada": [
    43.2231351,
-   -79.9798581
+   -79.9798581,
+   "ca",
+   "Ontario"
   ],
   "southern Quebec drained swamp peatland sites, Quebec, Canada": null,
   "southern Taiga Plains, Northwest Territories, Canada": null,
@@ -1592,7 +2008,9 @@
   "umava Mountains, South Bohemia, Czech Republic": null,
   "unknown, Netherlands": [
    52.3866987,
-   4.9236056
+   4.9236056,
+   "nl",
+   "North Holland"
   ],
   "Šumava National Park, Bohemia, Czech Republic": null
  },
@@ -2166,6 +2584,26 @@
    "retractions": 0,
    "suggested_to_date": 87,
    "triaged": 2,
+   "unique_candidates": 37374
+  },
+  {
+   "candidates_evaluated": 26617,
+   "date": "2026-10-04",
+   "decisions": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 97,
+   "field_progress": "Forested swamps 346/346; Forested wetlands 1296/1748; All wetlands 93/1500",
+   "library": 21,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 74,
+   "retained": 12,
+   "retractions": 0,
+   "suggested_to_date": 87,
+   "triaged": 0,
    "unique_candidates": 37374
   }
  ],
@@ -39549,46 +39987,56 @@
   "3eb4954a-4928-8102-8f48-e67c45b54f24": [],
   "3eb4954a-4928-8102-bdaa-d94ee69edf19": [
    {
+    "cc": "ca",
     "label": "Southern Ontario swamps, Southern Ontario, Canada",
     "lat": 43.2231351,
     "lon": -79.9798581,
-    "precision": "region"
+    "precision": "region",
+    "state": "Ontario"
    }
   ],
   "3eb4954a-4928-8130-b15b-de61a2b12cbe": [],
   "3eb4954a-4928-8175-b7c1-ee612a30493c": [
    {
+    "cc": "ca",
     "label": "southern Ontario, Ontario, Canada",
     "lat": 43.2231351,
     "lon": -79.9798581,
-    "precision": "site"
+    "precision": "site",
+    "state": "Ontario"
    }
   ],
   "3eb4954a-4928-8195-8245-d461953a6d34": [],
   "3eb4954a-4928-81c5-9e23-cf843686f116": [
    {
+    "cc": "us",
     "label": "Lost Creek, WI, United States",
     "lat": 44.4717007,
     "lon": -92.1791073,
-    "precision": "site"
+    "precision": "site",
+    "state": "Wisconsin"
    }
   ],
   "3eb4954a-4928-81c9-8964-f63be4933d52": [],
   "3eb4954a-4928-81ca-a365-d4f130cac843": [],
   "3eb4954a-4928-81d1-b897-c1fb4d1bd018": [
    {
+    "cc": "ca",
     "label": "northern Alberta, Alberta, Canada",
     "lat": 58.7131298,
     "lon": -111.1591342,
-    "precision": "site"
+    "precision": "site",
+    "state": "Alberta"
    }
   ],
   "3eb4954a-4928-81f9-a347-feb1137bde54": [
    {
+    "cc": "us",
     "label": "United States wetlands, Not stated, United States",
     "lat": 39.7837304,
     "lon": -100.445882,
-    "precision": "country"
+    "precision": "country",
+    "state": ""
    }
   ],
   "3ec4954a-4928-817f-ad88-c0f7d0db5dfb": [],
@@ -39597,18 +40045,22 @@
   "3ed4954a-4928-8111-9a01-ec5eec364a95": [],
   "3ed4954a-4928-8115-b861-f76585c32bdb": [
    {
+    "cc": "br",
     "label": "Southeast Asian tropical forested peatland, Not stated, Southeast Asia",
     "lat": -22.0159585,
     "lon": -47.897938,
-    "precision": "country"
+    "precision": "country",
+    "state": ""
    }
   ],
   "3ed4954a-4928-8143-9788-d5eb4a36411a": [
    {
+    "cc": "ca",
     "label": "northern Alberta, Alberta, Canada",
     "lat": 58.7131298,
     "lon": -111.1591342,
-    "precision": "site"
+    "precision": "site",
+    "state": "Alberta"
    }
   ],
   "3ed4954a-4928-8167-9c1b-cdc15d29cb12": [],

@@ -10,19 +10,19 @@
   "scopes": [
    {
     "scope": "Forested swamps",
-    "population": 278,
+    "population": 346,
     "sizes": {
      "50": {
-      "coverage": 0.93,
-      "mean_abs_error_pts": 4.99
+      "coverage": 0.957,
+      "mean_abs_error_pts": 5.34
      },
      "100": {
-      "coverage": 0.966,
-      "mean_abs_error_pts": 3.1
+      "coverage": 0.947,
+      "mean_abs_error_pts": 3.34
      },
      "200": {
-      "coverage": 0.968,
-      "mean_abs_error_pts": 1.46
+      "coverage": 0.962,
+      "mean_abs_error_pts": 1.82
      }
     }
    }
@@ -30,51 +30,51 @@
  },
  "consistency": {
   "status": "ok",
-  "n": 30,
+  "n": 1,
   "model": "gemini-3.5-flash-lite",
-  "exact_rq_match": 0.667,
+  "exact_rq_match": 1.0,
   "agreement": {
-   "n": 30,
+   "n": 1,
    "on_topic": {
-    "n": 30,
-    "positives": 20,
-    "accuracy": 0.9,
-    "precision": 0.947,
-    "recall": 0.9,
-    "f1": 0.923,
-    "kappa": 0.78
+    "n": 1,
+    "positives": 0,
+    "accuracy": 1.0,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "kappa": null
    },
    "rqs": {
     "per_label": {
      "RQ1 Source/sink controls": {
-      "n": 30,
-      "positives": 14,
-      "accuracy": 0.833,
-      "precision": 0.846,
-      "recall": 0.786,
-      "f1": 0.815,
-      "kappa": 0.664
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
      },
      "RQ2 Disturbed vs intact": {
-      "n": 30,
-      "positives": 9,
-      "accuracy": 0.867,
-      "precision": 0.727,
-      "recall": 0.889,
-      "f1": 0.8,
-      "kappa": 0.701
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
      },
      "RQ3 Anthropogenic impact": {
-      "n": 30,
-      "positives": 5,
-      "accuracy": 0.833,
-      "precision": 0.5,
-      "recall": 0.6,
-      "f1": 0.545,
-      "kappa": 0.444
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
      },
      "RQ4 Soil vs water C sources": {
-      "n": 30,
+      "n": 1,
       "positives": 0,
       "accuracy": 1.0,
       "precision": null,
@@ -83,67 +83,7 @@
       "kappa": null
      },
      "RQ5 Microbial taxonomy & function": {
-      "n": 30,
-      "positives": 4,
-      "accuracy": 1.0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
-      "kappa": 1.0
-     }
-    },
-    "micro_f1": 0.788,
-    "mean_kappa": 0.702
-   },
-   "ecosystems": {
-    "per_label": {
-     "Forested swamp": {
-      "n": 30,
-      "positives": 16,
-      "accuracy": 0.933,
-      "precision": 0.938,
-      "recall": 0.938,
-      "f1": 0.938,
-      "kappa": 0.866
-     },
-     "Peatland / bog / fen": {
-      "n": 30,
-      "positives": 14,
-      "accuracy": 1.0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
-      "kappa": 1.0
-     },
-     "Marsh": {
-      "n": 30,
-      "positives": 3,
-      "accuracy": 0.967,
-      "precision": 1.0,
-      "recall": 0.667,
-      "f1": 0.8,
-      "kappa": 0.783
-     },
-     "Upland forest": {
-      "n": 30,
-      "positives": 3,
-      "accuracy": 0.967,
-      "precision": 0.75,
-      "recall": 1.0,
-      "f1": 0.857,
-      "kappa": 0.839
-     },
-     "Other wetland": {
-      "n": 30,
-      "positives": 7,
-      "accuracy": 0.833,
-      "precision": 0.75,
-      "recall": 0.429,
-      "f1": 0.545,
-      "kappa": 0.453
-     },
-     "Other": {
-      "n": 30,
+      "n": 1,
       "positives": 0,
       "accuracy": 1.0,
       "precision": null,
@@ -152,51 +92,111 @@
       "kappa": null
      }
     },
-    "micro_f1": 0.892,
-    "mean_kappa": 0.788
+    "micro_f1": null,
+    "mean_kappa": null
+   },
+   "ecosystems": {
+    "per_label": {
+     "Forested swamp": {
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
+     },
+     "Peatland / bog / fen": {
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
+     },
+     "Marsh": {
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
+     },
+     "Upland forest": {
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
+     },
+     "Other wetland": {
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
+     },
+     "Other": {
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
+     }
+    },
+    "micro_f1": null,
+    "mean_kappa": null
    },
    "gases": {
     "per_label": {
      "CO2": {
-      "n": 30,
-      "positives": 20,
-      "accuracy": 0.933,
-      "precision": 1.0,
-      "recall": 0.9,
-      "f1": 0.947,
-      "kappa": 0.857
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
      },
      "CH4": {
-      "n": 30,
-      "positives": 16,
-      "accuracy": 0.933,
-      "precision": 0.938,
-      "recall": 0.938,
-      "f1": 0.938,
-      "kappa": 0.866
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
      },
      "N2O": {
-      "n": 30,
-      "positives": 10,
-      "accuracy": 0.933,
-      "precision": 0.9,
-      "recall": 0.9,
-      "f1": 0.9,
-      "kappa": 0.85
+      "n": 1,
+      "positives": 0,
+      "accuracy": 1.0,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "kappa": null
      }
     },
-    "micro_f1": 0.933,
-    "mean_kappa": 0.858
+    "micro_f1": null,
+    "mean_kappa": null
    },
    "biome": {
-    "n": 30,
-    "accuracy": 0.9,
-    "kappa": 0.871
+    "n": 1,
+    "accuracy": 1.0,
+    "kappa": null
    },
    "design": {
-    "n": 30,
-    "accuracy": 0.933,
-    "kappa": 0.9
+    "n": 1,
+    "accuracy": 1.0,
+    "kappa": null
    }
   }
  },

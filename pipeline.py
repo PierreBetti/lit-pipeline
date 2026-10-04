@@ -1315,11 +1315,14 @@ def build_graph(papers, suggestions):
     lib_by_name = {p["name"]: short_id(p["work"]["id"]) for p in lib}
     nodes, edges, seen = [], [], set()
 
-    def add_edge(a, b, kind):
+    def add_edge(a, b, kind, strength=None):
         key = (a, b, kind) if kind == "cites" else (tuple(sorted((a, b))), kind)
         if key not in seen:
             seen.add(key)
-            edges.append({"from": a, "to": b, "kind": kind})
+            e = {"from": a, "to": b, "kind": kind}
+            if strength is not None:
+                e["strength"] = strength
+            edges.append(e)
 
     seen_ids = set()
     for p in lib:
@@ -1344,6 +1347,21 @@ def build_graph(papers, suggestions):
             rid = short_id(ref)
             if rid in lib_ids:
                 add_edge(short_id(w["id"]), rid, "cites")
+
+    # Similarity links between your own papers (shared references), Connected Papers-style:
+    # each paper keeps its 3 strongest links with at least 2 shared references.
+    refs = {short_id(p["work"]["id"]): {short_id(r) for r in (p["work"].get("referenced_works") or [])} for p in lib}
+    ids = [i for i in refs if i in seen_ids]
+    for a in ids:
+        links = []
+        for b in ids:
+            if a == b or not refs[a] or not refs[b]:
+                continue
+            shared = len(refs[a] & refs[b])
+            if shared >= 2:
+                links.append((shared / math.sqrt(len(refs[a]) * len(refs[b])), b))
+        for strength, b in sorted(links, reverse=True)[:3]:
+            add_edge(a, b, "libsim", round(strength, 3))
 
     shown = sorted(suggestions, key=lambda c: c["global"], reverse=True)[:GRAPH_SUGGESTIONS]
     for c in shown:

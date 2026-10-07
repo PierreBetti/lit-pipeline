@@ -59,6 +59,10 @@
    "To review",
    ""
   ],
+  "W1997134228": [
+   "To review",
+   ""
+  ],
   "W2003875103": [
    "To review",
    ""
@@ -155,6 +159,10 @@
    "Added to Zotero",
    ""
   ],
+  "W2145431748": [
+   "To review",
+   ""
+  ],
   "W2148837059": [
    "To review",
    ""
@@ -196,6 +204,10 @@
    ""
   ],
   "W2168684237": [
+   "To review",
+   ""
+  ],
+  "W2191767709": [
    "To review",
    ""
   ],
@@ -599,7 +611,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 18882,
+   "total": 18892,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -711,12 +723,24 @@
   }
  },
  "geocode": {
+  "Abisko, Sweden": [
+   68.3501695,
+   18.8300059,
+   "se",
+   ""
+  ],
   "Agusan Marsh Wildlife Sanctuary, Mindanao, Philippines": null,
   "Alabama, United States": [
    33.2588817,
    -86.8295337,
    "us",
    "Alabama"
+  ],
+  "Alaska, Alaska, United States": [
+   64.8671599,
+   -147.8507674,
+   "us",
+   "Alaska"
   ],
   "Alberta boreal fens, Alberta, Canada": null,
   "Alberta, Canada": [
@@ -799,6 +823,7 @@
    "Louisiana"
   ],
   "Atlantic Maritime, Canada, Canada": null,
+  "Attawapiskat River Fen, Ontario, Canada": null,
   "Bacho, Narathiwat Province, Thailand": [
    6.5532944,
    101.6579885,
@@ -814,6 +839,13 @@
    "Tocantins"
   ],
   "Barkukovka River floodplain, Primorsky Krai, Russia": null,
+  "Barley Mill dam, Delaware, United States": null,
+  "Bavaria, Germany": [
+   48.9467562,
+   11.4038717,
+   "de",
+   "Bavaria"
+  ],
   "Bear Creek watershed, central Iowa, USA": null,
   "Belait / Tutong / Temburong, Brunei Darussalam": null,
   "Belait or Temburong, Brunei": null,
@@ -855,6 +887,7 @@
    "cz",
    ""
   ],
+  "Boreal Plains, Alberta, Canada": null,
   "Boreal Plains, Canada, Canada": null,
   "Boreal Shield East, Canada, Canada": null,
   "Boreal Shield West, Canada, Canada": null,
@@ -896,6 +929,12 @@
    -89.9064555,
    "us",
    "Louisiana"
+  ],
+  "California, USA": [
+   36.7014631,
+   -118.755997,
+   "us",
+   "California"
   ],
   "Canada": [
    61.0666922,
@@ -959,6 +998,12 @@
    "Central Kalimantan"
   ],
   "Central New York wetlands, New York, USA": null,
+  "Central Ontario, Ontario, Canada": [
+   44.9376036,
+   -78.9925565,
+   "ca",
+   "Ontario"
+  ],
   "Central Siberia, Russia": [
    65.2539737,
    106.7898242,
@@ -1028,6 +1073,7 @@
   "Da Hinggan Mountains, Heilongjiang / Inner Mongolia, China": null,
   "Da Xing'an Mountains, Northeast China, China": null,
   "Da Xing'an Mountains, Northeast, China": null,
+  "Dalat Sago Plantation, Sarawak, Malaysia": null,
   "Danube Delta, Tulcea, Romania": [
    45.1801969,
    28.8055782,
@@ -1037,6 +1083,12 @@
   "Danube National Park, Lower Austria, Austria": null,
   "Daxing'an Mountains, Northeast China, China": null,
   "Daxing'anling, Heilongjiang / Inner Mongolia, China": null,
+  "Delaware, United States": [
+   38.6920451,
+   -75.4013315,
+   "us",
+   "Delaware"
+  ],
   "Delta Berbak, Jambi, Indonesia": null,
   "Democratic Republic of the Congo": [
    -2.9814344,
@@ -1045,6 +1097,13 @@
    ""
   ],
   "Democratic Republic of the Congo and Republic of the Congo": null,
+  "East Anglia, United Kingdom": [
+   52.4617238,
+   0.6975642,
+   "gb",
+   "England"
+  ],
+  "East Anglian Fens, East Anglia, United Kingdom": null,
   "East Kalimantan peat swamp forest, East Kalimantan, Indonesia": null,
   "East Kalimantan, Indonesia": [
    0.7884397,
@@ -1111,6 +1170,12 @@
    "Alberta"
   ],
   "Fuegian Archipelago, Tierra del Fuego, Argentina / Chile": null,
+  "Fujian, China": [
+   26.193218,
+   118.2208721,
+   "cn",
+   "Fujian"
+  ],
   "Georgia / Florida, USA": [
    31.9369641,
    -83.7436343,
@@ -1199,6 +1264,18 @@
    "cn",
    "Heilongjiang"
   ],
+  "Himmelmoor, Quickborn, Germany": [
+   53.7388077,
+   9.8366889,
+   "de",
+   "Schleswig-Holstein"
+  ],
+  "Howland Research Forest, Maine, USA": [
+   45.20541,
+   -68.7435127,
+   "us",
+   "Maine"
+  ],
   "Hudson Bay Lowland, Northern Ontario / Manitoba, Canada": null,
   "Hudson Bay Lowland, Northern Ontario / Quebec / Manitoba, Canada": null,
   "Hudson Bay Lowlands, Ontario, Canada": [
@@ -1208,6 +1285,12 @@
    "Ontario"
   ],
   "Hudson Plains, Canada, Canada": null,
+  "Igarka, Siberia, Russia": [
+   67.4566185,
+   86.5308425,
+   "ru",
+   "Krasnoyarsk Krai"
+  ],
   "Indiana, United States": [
    40.3270127,
    -86.1746933,
@@ -1246,6 +1329,12 @@
    103.5186977,
    "id",
    "Jambi"
+  ],
+  "Jiangsu, China": [
+   33.0000001,
+   119.9999999,
+   "cn",
+   "Jiangsu"
   ],
   "Jinchuan peatland, Changbai Mountain, China": null,
   "Kaamanen, Lapland, Finland": [
@@ -1448,6 +1537,12 @@
    ""
   ],
   "Michigan's Upper Peninsula, USA": null,
+  "Michigan, USA": [
+   43.6211955,
+   -84.6824346,
+   "us",
+   "Michigan"
+  ],
   "Michigan, United States": [
    43.6211955,
    -84.6824346,
@@ -1468,9 +1563,16 @@
    "ph",
    "Northern Mindanao"
   ],
+  "Minjiang River estuarine wetland, Fujian, China": null,
   "Minnesota site, Minnesota, United States": [
    44.0142802,
    -92.4162336,
+   "us",
+   "Minnesota"
+  ],
+  "Minnesota, Minnesota, United States": [
+   44.9863418,
+   -93.1794451,
    "us",
    "Minnesota"
   ],
@@ -1499,6 +1601,12 @@
    37.4562282,
    "ru",
    "Moscow Oblast"
+  ],
+  "Mukah, Sarawak, Malaysia": [
+   2.8118528,
+   112.291206,
+   "my",
+   "Sarawak"
   ],
   "NE Switzerland, Switzerland": [
    47.5164429,
@@ -1538,6 +1646,12 @@
    121.087624,
    "ph",
    "Metro Manila"
+  ],
+  "Netherlands": [
+   52.2434979,
+   5.6343227,
+   "nl",
+   ""
   ],
   "New England forested wetlands, New England, USA": null,
   "New England, USA": [
@@ -1605,6 +1719,7 @@
    "my",
    "Selangor"
   ],
+  "North-Eastern NSW coastal wetlands, New South Wales, Australia": null,
   "Northeast China, China": [
    45.965277,
    126.756667,
@@ -1624,6 +1739,7 @@
    "Bahia"
   ],
   "Northern Alberta conifer swamp, Alberta, Canada": null,
+  "Northern Alberta fen, Alberta, Canada": null,
   "Northern Australia, Australia": [
    -30.9719339,
    116.2138489,
@@ -1645,6 +1761,7 @@
   "Not stated, Germany": null,
   "Not stated, Kenya": null,
   "Not stated, Malaysia": null,
+  "Not stated, Netherlands": null,
   "Not stated, Southeast Asia": null,
   "Not stated, United States": null,
   "Not stated, West Kalimantan, Indonesia": null,
@@ -1780,6 +1897,18 @@
    "ca",
    "Saskatchewan"
   ],
+  "Qinghai Province, China": [
+   36.0,
+   96.0,
+   "cn",
+   "Qinghai"
+  ],
+  "Qinghai, China": [
+   36.0,
+   96.0,
+   "cn",
+   "Qinghai"
+  ],
   "Qinghai-Tibet Plateau, China": null,
   "Qinghai-Tibet Plateau, Qinghai-Tibet, China": null,
   "Qinghai-Tibet, China": [
@@ -1793,6 +1922,7 @@
   "Qinghai-Tibetan Plateau, China": null,
   "Qinghai-Tibetan Plateau, Qinghai-Tibet, China": null,
   "Qinghai—Tibet Plateau, China": null,
+  "Qixing River Wetland, Heilongjiang, China": null,
   "Quebec peatlands, Quebec, Canada": null,
   "Quebec, Canada": [
    52.4760892,
@@ -1841,6 +1971,7 @@
    "ke",
    ""
   ],
+  "Rio Moat bog, Tierra del Fuego, Argentina": null,
   "Russia": [
    64.6863136,
    97.7453061,
@@ -1873,6 +2004,7 @@
    "Sabah"
   ],
   "Sabaju, Southeast Asia, Not stated": null,
+  "Sacramento-San Joaquin Delta, California, USA": null,
   "San San Pond Sak wetland, Bocas del Toro Province, Panama": null,
   "Sanjiang Plain, Heilongjiang, China": null,
   "Sarawak peat dome, Sarawak, Malaysia": null,
@@ -1912,6 +2044,7 @@
    "de",
    "Schleswig-Holstein"
   ],
+  "Schlöppnerbrunnen, Bavaria, Germany": null,
   "Scotland, United Kingdom": [
    56.7861112,
    -4.1140518,
@@ -1946,6 +2079,12 @@
    136.2059576,
    "jp",
    "Shiga Prefecture"
+  ],
+  "Siberia, Russia": [
+   60.0,
+   100.0,
+   "ru",
+   "Krasnoyarsk Krai"
   ],
   "Simpang Village, Meulaboh District, West Aceh, Indonesia": null,
   "Smithsonian Environmental Research Center, Maryland, USA": [
@@ -2026,6 +2165,13 @@
   ],
   "Southeast Asia, Not stated": null,
   "Southeast Asian tropical forested peatland, Not stated, Southeast Asia": null,
+  "Southeast, United States": [
+   41.4134491,
+   -73.6231505,
+   "us",
+   "New York"
+  ],
+  "Southeastern U.S., Southeast, United States": null,
   "Southeastern Virginia wetland sites, Virginia, USA": null,
   "Southern Aceh, Indonesia": null,
   "Southern Ontario riparian forest, Ontario, Canada": null,
@@ -2059,6 +2205,8 @@
   ],
   "Southwest Florida cypress swamps, Florida, United States": null,
   "Soča, Alps, Slovenia": null,
+  "Staroselsky Moch, Tver, Russia": null,
+  "Stordalen Mire, Abisko, Sweden": null,
   "Sudan": [
    14.5844444,
    29.4917691,
@@ -2089,6 +2237,7 @@
    "us",
    "Maryland"
   ],
+  "The Netherlands, Not stated, Netherlands": null,
   "Thur River, NE Switzerland, Switzerland": null,
   "Tibet, China": [
    29.8556443,
@@ -2110,6 +2259,12 @@
    "Xizang"
   ],
   "Tibetan alpine permafrost region, Tibet, China": null,
+  "Tierra del Fuego, Argentina": [
+   -54.3815213,
+   -67.5678997,
+   "ar",
+   "Tierra del Fuego"
+  ],
   "Tierra del Fuego, Argentina / Chile": null,
   "To-Daeng, Narathiwat Province, Thailand": [
    6.3656142,
@@ -2118,8 +2273,27 @@
    "Narathiwat Province"
   ],
   "Tourbiere du Forbonnet, Massif du Jura, France": null,
+  "Trail Valley Creek, Northwest Territories, Canada": [
+   68.7570118,
+   -133.4237875,
+   "ca",
+   "Northwest Territories"
+  ],
   "Trumon and Singkil, Southern Aceh, Indonesia": null,
+  "Tura, Siberia, Russia": [
+   64.2702274,
+   100.207565,
+   "ru",
+   "Krasnoyarsk Krai"
+  ],
   "Turochak Swamp, Altai Republic, Russia": null,
+  "Tver oblast bogs, Tver oblast, Russia": null,
+  "Tver oblast, Russia": [
+   57.1134475,
+   35.1744428,
+   "ru",
+   "Tver Oblast"
+  ],
   "Tver region swamp, Tver, Russia": null,
   "Tver, Russia": [
    56.858675,
@@ -2149,6 +2323,7 @@
    ""
   ],
   "United States wetlands, Not stated, United States": null,
+  "Upper Peninsula of Michigan, Michigan, USA": null,
   "Upper Peninsula of Michigan, Michigan, United States": null,
   "Urbach, Alps, Switzerland": null,
   "Vasyugan Swamp, West Siberia, Russia": null,
@@ -2203,6 +2378,7 @@
    "Khanty-Mansiysk Autonomous Okrug – Ugra"
   ],
   "West Siberian Lowland, Russia": null,
+  "West Siberian Lowland, Siberia, Russia": null,
   "West Siberian bogs, Western Siberia, Russia": null,
   "West Siberian plain, West Siberia, Russia": null,
   "West Virginia and Western Maryland, USA": null,
@@ -2248,7 +2424,9 @@
   "Xiaoxing'an Mountains, Northeast China, China": null,
   "Xiaoxing'anling region, Heilongjiang, China": null,
   "Xiaoxing’an Mountains, Northeast China, China": null,
+  "Xining City urban wetland, Qinghai Province, China": null,
   "Yamalo-Nenets Autonomous Okrug, West Siberian Lowland, Russia": null,
+  "Yancheng coastal wetland, Jiangsu, China": null,
   "Yunnan, China": [
    25.0,
    102.0,
@@ -2258,6 +2436,13 @@
   "ZOTTO observatory, Central Siberia, Russia": null,
   "ZOtino Tall Tower Observatory (ZOTTO), Central Siberia, Russia": null,
   "Zakamye lowlands, Udmurt Republic, Russia": null,
+  "Zoige peatland, Zoige, China": null,
+  "Zoige, China": [
+   33.6910838,
+   102.8566026,
+   "cn",
+   "Sichuan"
+  ],
   "central Iowa, USA": [
    41.896572,
    -87.7653745,
@@ -2274,6 +2459,7 @@
   "coastal plain of North Carolina, North Carolina, United States": null,
   "coastal plain of the Gulf of Mexico, Veracruz / Tabasco, Mexico": null,
   "dry continental treed bog in boreal Alberta, Alberta, Canada": null,
+  "eastern edge of Qinghai-Tibetan Plateau, Qinghai, China": null,
   "forested swamp near Ithaca, New York, USA": null,
   "north-eastern New South Wales wetlands, New South Wales, Australia": null,
   "northern Alberta peatland, Alberta, Canada": null,
@@ -2976,6 +3162,26 @@
    "suggested_to_date": 103,
    "triaged": 3,
    "unique_candidates": 49726
+  },
+  {
+   "candidates_evaluated": 32127,
+   "date": "2026-10-07",
+   "decisions": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 191,
+   "field_progress": "Forested swamps 346/346; Forested wetlands 1748/1748; All wetlands 264/1500",
+   "library": 33,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 82,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 103,
+   "triaged": 0,
+   "unique_candidates": 49727
   }
  ],
  "seen_candidates": [
@@ -52494,6 +52700,7 @@
   "W7214550558",
   "W7214611646",
   "W7214706167",
+  "W7214913909",
   "W7214961646",
   "W7215031634",
   "W7216476079",

@@ -476,6 +476,7 @@
    "3eb4954a-4928-8175-b7c1-ee612a30493c"
   ]
  },
+ "drafted": [],
  "field_scopes": {
   "forested": {
    "fetched": 1748,
@@ -754,6 +755,7 @@
    "us",
    "Alaska"
   ],
+  "Alaskan rich fen, Alaska, United States": null,
   "Alberta boreal fens, Alberta, Canada": null,
   "Alberta, Canada": [
    55.001251,
@@ -894,6 +896,7 @@
    "us",
    "Florida"
   ],
+  "Big Run Bog, West Virginia, USA": null,
   "Björköfjärden, Västernorrland, Sweden": [
    62.214029,
    17.5378188,
@@ -918,6 +921,12 @@
    "cz",
    ""
   ],
+  "Bonanza Creek, Alaska, United States": [
+   61.0615267,
+   -159.759702,
+   "us",
+   "Alaska"
+  ],
   "Boreal Plains, Alberta, Canada": null,
   "Boreal Plains, Canada, Canada": null,
   "Boreal Shield East, Canada, Canada": null,
@@ -929,6 +938,13 @@
    "West Kalimantan"
   ],
   "Boundary fen, Saskatchewan, Canada": null,
+  "Brandenburg fen site, Brandenburg, Germany": null,
+  "Brandenburg, Germany": [
+   52.8455492,
+   13.2461296,
+   "de",
+   "Brandenburg"
+  ],
   "Brazil": [
    -10.3333333,
    -53.2,
@@ -955,6 +971,12 @@
   ],
   "Brunei degraded tropical peatland, Southeast Asia, Brunei": null,
   "Brunei peat swamp forests, Belait or Temburong, Brunei": null,
+  "CA-WP3, Alberta, Canada": [
+   51.0899188,
+   -115.376603,
+   "ca",
+   "Alberta"
+  ],
   "Caernarvon, Louisiana, United States": [
    29.8638171,
    -89.9064555,
@@ -962,6 +984,12 @@
    "Louisiana"
   ],
   "Caimpugan peatland, Agusan del Sur, Philippines": null,
+  "California Delta, USA": [
+   38.2014877,
+   -121.6126407,
+   "us",
+   "California"
+  ],
   "California, USA": [
    36.7014631,
    -118.755997,
@@ -1062,6 +1090,13 @@
    "ru",
    "Far Eastern Federal District"
   ],
+  "Central Sweden drained peatlands, Central Sweden, Sweden": null,
+  "Central Sweden, Sweden": [
+   43.2036958,
+   -77.9518746,
+   "us",
+   "New York"
+  ],
   "Changbai Mountain, China": [
    42.1810777,
    128.1710394,
@@ -1082,6 +1117,12 @@
    -94.1729517,
    "ca",
    "Manitoba"
+  ],
+  "Clara Bog, Offaly, Ireland": [
+   53.3260262,
+   -7.6249346,
+   "ie",
+   "The Municipal District of Tullamore"
   ],
   "Coastal British Columbia headwater streams, British Columbia, Canada": null,
   "Coastal forested wetlands of North Carolina, North Carolina, United States": null,
@@ -1185,6 +1226,12 @@
    "Eastern Sayan"
   ],
   "Elkhorn Slough Hester Marsh, California, United States": null,
+  "Etang de la Gruere, Jura, Switzerland": [
+   47.2389464,
+   7.0457319,
+   "ch",
+   "Jura"
+  ],
   "European Russia, Russia": null,
   "Everglades (Water Conservation Area 2A), Florida, USA": null,
   "Everglades National Park, Florida, United States": [
@@ -1199,6 +1246,7 @@
    "us",
    "Florida"
   ],
+  "Exmoor National Park, Southwest England, United Kingdom": null,
   "Experimental Lakes Area (L979), Ontario, Canada": [
    49.6601381,
    -93.7276629,
@@ -1276,7 +1324,9 @@
    ""
   ],
   "Germany floodplain forests, Not stated, Germany": null,
+  "Germany, National, Germany": null,
   "Giam Siak Kecil–Bukit Batu Biosphere Reserve, Sumatra, Indonesia": null,
+  "Glacial Lake Agassiz peatlands, northern Minnesota, United States": null,
   "Glennamong forest, West, Ireland": null,
   "Goldstream Valley, Alaska, USA": [
    64.912874,
@@ -1352,6 +1402,7 @@
    "cn",
    "Heilongjiang"
   ],
+  "Hengsha Island, Yangtze Estuary, China": null,
   "Himmelmoor, Quickborn, Germany": [
    53.7388077,
    9.8366889,
@@ -1367,6 +1418,7 @@
   ],
   "Hudson Bay Lowland, Northern Ontario / Manitoba, Canada": null,
   "Hudson Bay Lowland, Northern Ontario / Quebec / Manitoba, Canada": null,
+  "Hudson Bay Lowland, Ontario, Canada": null,
   "Hudson Bay Lowlands, Ontario, Canada": [
    55.92,
    -87.82,
@@ -1374,6 +1426,12 @@
    "Ontario"
   ],
   "Hudson Plains, Canada, Canada": null,
+  "Humedal el Burro, Bogota, Colombia": [
+   4.6414169,
+   -74.1495759,
+   "co",
+   "Bogota, Capital District"
+  ],
   "Igarka, Siberia, Russia": [
    67.4566185,
    86.5308425,
@@ -1395,6 +1453,12 @@
   ],
   "Indonesia, Southeast Asia, Indonesia": null,
   "Innoko Flats Wildlife Refuge, Alaska, United States": null,
+  "Interior Alaska, Alaska, United States": [
+   64.8139368,
+   -147.767928,
+   "us",
+   "Alaska"
+  ],
   "Iquitos region, Loreto, Peru": null,
   "Iquitos, Loreto, Peru": [
    -3.749365,
@@ -1446,6 +1510,7 @@
    "id",
    "Central Kalimantan"
   ],
+  "Kalevansuo, Southern Finland, Finland": null,
   "Kalimantan Barat, West Kalimantan, Indonesia": [
    -0.0596325,
    109.3540116,
@@ -1453,6 +1518,12 @@
    "West Kalimantan"
   ],
   "Kampar Peninsula, Riau Province, Indonesia": null,
+  "Kentucky, USA": [
+   37.5726028,
+   -85.1551411,
+   "us",
+   "Kentucky"
+  ],
   "Kenya": [
    0.2793165,
    37.5164935,
@@ -1470,6 +1541,7 @@
    "ru",
    "Komi Republic"
   ],
+  "Kopuatai bog, Waikato, New Zealand": null,
   "Kutyushskoe Swamp, Altai Republic, Russia": null,
   "Kuznetsk Alatau, Kemerovo Oblast / Siberia, Russia": [
    54.5464906,
@@ -1482,7 +1554,11 @@
   "La Tordera catchment, Catalonia, Spain": null,
   "Lago Piratuba Biosphere Reserve, Amapá, Brazil": null,
   "Lake Baringo, Rift Valley, Kenya": null,
+  "Lake Kevätön, Not stated, Finland": null,
+  "Lake Mangueira, Rio Grande do Sul, Brazil": null,
+  "Lake Mekrijärvi, Not stated, Finland": null,
   "Lake St-Pierre floodplain, Quebec, Canada": null,
+  "Lake St-Pierre floodplain, Québec, Canada": null,
   "Lamu Archipelago, Kenya": [
    -2.2717426,
    40.9027109,
@@ -1545,6 +1621,7 @@
    "us",
    "Louisiana"
   ],
+  "Louisville streams, Kentucky, USA": null,
   "Lower Austria, Austria": [
    48.2817813,
    15.7632457,
@@ -1661,6 +1738,7 @@
    "mx",
    ""
   ],
+  "Michigan peatland, Michigan, United States": null,
   "Michigan peatlands, Michigan, United States": null,
   "Michigan's Upper Peninsula, USA": null,
   "Michigan, USA": [
@@ -1705,6 +1783,12 @@
   "Minnesota, Minnesota, United States": [
    44.9863418,
    -93.1794451,
+   "us",
+   "Minnesota"
+  ],
+  "Minnesota, USA": [
+   45.9896587,
+   -94.6113288,
    "us",
    "Minnesota"
   ],
@@ -1793,7 +1877,19 @@
    "ph",
    "Metro Manila"
   ],
+  "National, Germany": [
+   53.6306085,
+   10.0063069,
+   "de",
+   ""
+  ],
   "Nationwide, Finland": null,
+  "Nebraska, United States": [
+   41.7370229,
+   -99.5873816,
+   "us",
+   "Nebraska"
+  ],
   "Netherlands": [
    52.2434979,
    5.6343227,
@@ -1915,6 +2011,12 @@
   "Northern Minnesota wetlands, Minnesota, United States": null,
   "Northern Ontario / Manitoba, Canada": null,
   "Northern Ontario / Quebec / Manitoba, Canada": null,
+  "Northern Quebec, Canada": [
+   62.2075734,
+   -75.6393443,
+   "ca",
+   "Quebec"
+  ],
   "Northern Study Area, north-central Canada, Canada": null,
   "Northwest Territories, Canada": [
    65.0000004,
@@ -1923,6 +2025,7 @@
    "Northwest Territories"
   ],
   "Not stated": null,
+  "Not stated, Finland": null,
   "Not stated, Germany": null,
   "Not stated, Kenya": null,
   "Not stated, Malaysia": null,
@@ -2047,6 +2150,7 @@
    "ca",
    "Alberta"
   ],
+  "Peat Research Station, Sarawak, Malaysia": null,
   "Peat swamp forest sites in Indonesia, Southeast Asia, Indonesia": null,
   "Peat swamp forests of Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
   "Pekan peat swamp forest, Pahang, Malaysia": null,
@@ -2058,6 +2162,7 @@
    "my",
    "Selangor"
   ],
+  "Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
   "Peru": [
    -6.8699697,
    -75.0458515,
@@ -2067,6 +2172,7 @@
   "Peruvian Amazon, Amazon, Peru": null,
   "Peruvian Amazon, Peru": null,
   "Petushikha black alder swamp, European Russia, Russia": null,
+  "Platte River Basin, Nebraska, United States": null,
   "Prairie Pothole Region, North America, Not stated": null,
   "Primorsky Krai, Russia": [
    45.0819456,
@@ -2101,6 +2207,7 @@
    "cn",
    "Qinghai"
   ],
+  "Qinghai-Tibetan Plateau alpine wetland, Qinghai-Tibetan Plateau, China": null,
   "Qinghai-Tibetan Plateau swamp meadow, Qinghai-Tibetan Plateau, China": null,
   "Qinghai-Tibetan Plateau swamp soils, Qinghai-Tibet, China": null,
   "Qinghai-Tibetan Plateau, China": null,
@@ -2122,6 +2229,12 @@
    "Queensland"
   ],
   "Quistococha Forest Reserve, Loreto, Peru": null,
+  "Québec, Canada": [
+   52.4760892,
+   -71.8258668,
+   "ca",
+   "Quebec"
+  ],
   "Raja Musa Forest Reserve, Selangor, Malaysia": [
    3.511314,
    101.3126147,
@@ -2140,6 +2253,7 @@
    "cg",
    ""
   ],
+  "Republican River Basin, Nebraska, United States": null,
   "Research Station of Indonesian Agricultural Environment Research Institute, Central Java, Indonesia": null,
   "Riau Province, Indonesia": null,
   "Riau Province, Riau, Indonesia": null,
@@ -2154,6 +2268,12 @@
    36.293934,
    "ke",
    ""
+  ],
+  "Rio Grande do Sul, Brazil": [
+   -29.8425284,
+   -53.7680577,
+   "br",
+   "Rio Grande do Sul"
   ],
   "Rio Moat bog, Tierra del Fuego, Argentina": null,
   "Russia": [
@@ -2189,6 +2309,7 @@
   ],
   "Sabaju, Southeast Asia, Not stated": null,
   "Sacramento-San Joaquin Delta, California, USA": null,
+  "Sacramento–San Joaquin Delta, California, USA": null,
   "Salmisuo fen, Eastern Finland, Finland": null,
   "San San Pond Sak wetland, Bocas del Toro Province, Panama": null,
   "Sandhill Fen Watershed, Alberta, Canada": null,
@@ -2230,6 +2351,7 @@
    "us",
    "South Carolina"
   ],
+  "Schefferville, Northern Quebec, Canada": null,
   "Schleswig-Holstein, Schleswig-Holstein, Germany": [
    53.6550707,
    9.9309123,
@@ -2272,6 +2394,7 @@
    "Selangor"
   ],
   "Shaubac Wetlands, Nova Scotia, Canada": null,
+  "Sherman Island, California Delta, USA": null,
   "Shiga Prefecture, Shiga, Japan": [
    35.1632605,
    136.2059576,
@@ -2315,6 +2438,12 @@
    26.5902179,
    "fi",
    "Lapland"
+  ],
+  "Solvatnet, Svalbard, Norway": [
+   78.9256913,
+   11.9406435,
+   "no",
+   "Svalbard"
   ],
   "Somerset Levels and Moors, Somerset, United Kingdom": null,
   "Somerset, United Kingdom": [
@@ -2404,6 +2533,13 @@
   "Southeastern U.S., Southeast, United States": null,
   "Southeastern Virginia wetland sites, Virginia, USA": null,
   "Southern Aceh, Indonesia": null,
+  "Southern Finland, Finland": [
+   60.7373759,
+   25.8143982,
+   "fi",
+   "Mainland Finland"
+  ],
+  "Southern Ontario agricultural catchment, Ontario, Canada": null,
   "Southern Ontario poor fen, Ontario, Canada": null,
   "Southern Ontario riparian forest, Ontario, Canada": null,
   "Southern Ontario swamps, Ontario, Canada": null,
@@ -2436,6 +2572,7 @@
    "North Carolina"
   ],
   "Southern taiga mires of Western Siberia, Western Siberia, Russia": null,
+  "Southwest England, United Kingdom": null,
   "Southwest Florida cypress swamps, Florida, United States": null,
   "Southwestern Finland, Finland": null,
   "Soča, Alps, Slovenia": null,
@@ -2455,6 +2592,7 @@
   "Stordalen Mire, Abisko, Sweden": null,
   "Stordalen Mire, Norrbotten, Sweden": null,
   "Stordalen catchment, Norrbotten, Sweden": null,
+  "Stuphallet, Svalbard, Norway": null,
   "Sudan": [
    14.5844444,
    29.4917691,
@@ -2477,6 +2615,12 @@
    "South Sumatra"
   ],
   "Sunny Hill Farm, Florida, USA": null,
+  "Svalbard, Norway": [
+   78.7198519,
+   20.3493328,
+   "no",
+   "Svalbard"
+  ],
   "São Paulo, Brazil": [
    -23.5506507,
    -46.6333824,
@@ -2537,6 +2681,7 @@
    "Northwest Territories"
   ],
   "Trumon and Singkil, Southern Aceh, Indonesia": null,
+  "Truro constructed wetlands, Nova Scotia, Canada": null,
   "Tura, Siberia, Russia": [
    64.2702274,
    100.207565,
@@ -2558,10 +2703,12 @@
    "ru",
    "Tver Oblast"
   ],
+  "Twitchell Island, California Delta, USA": null,
   "U Minh Thuong National Park, Mekong Delta, Vietnam": null,
   "US-BZo Bonanza Creek Old Thermokarst Bog, Tanana Lowlands, Interior Alaska, United States": null,
   "US-NC4 NC_AlligatorRiver, North Carolina, USA": null,
   "US-TLR Timberlake Observatory for Wetland Restoration, North Carolina, USA": null,
+  "US-YK2, Yukon-Kuskokwim Delta, United States": null,
   "USA": [
    39.7837304,
    -100.445882,
@@ -2573,6 +2720,12 @@
    52.6959832,
    "ru",
    "Udmurtia"
+  ],
+  "United Kingdom": [
+   54.7023545,
+   -3.2765753,
+   "gb",
+   ""
   ],
   "United States": [
    39.7837304,
@@ -2615,6 +2768,12 @@
    "us",
    "South Carolina"
   ],
+  "Waikato, New Zealand": [
+   -37.7792272,
+   175.2010324,
+   "nz",
+   "Waikato"
+  ],
   "Wally Creek experimental drainage site, Cochrane, Ontario, Canada": null,
   "West Aceh, Indonesia": null,
   "West Kalimantan, Indonesia": [
@@ -2630,6 +2789,7 @@
    "West Kalimantan"
   ],
   "West Siberia Lowland, West Siberia, Russia": null,
+  "West Siberia tundra mires, West Siberia, Russia": null,
   "West Siberia, Russia": [
    62.0,
    76.0,
@@ -2641,6 +2801,12 @@
   "West Siberian bogs, Western Siberia, Russia": null,
   "West Siberian plain, West Siberia, Russia": null,
   "West Virginia and Western Maryland, USA": null,
+  "West Virginia, USA": [
+   38.4758406,
+   -80.8408415,
+   "us",
+   "West Virginia"
+  ],
   "West, Ireland": [
    38.8156551,
    -80.4617541,
@@ -2649,6 +2815,7 @@
   ],
   "Western Boreal Plain, Alberta, Canada": null,
   "Western Siberia oligotrophic swamp, Western Siberia, Russia": null,
+  "Western Siberia southern taiga mire ecosystems, Western Siberia, Russia": null,
   "Western Siberia taiga, Western Siberia, Russia": null,
   "Western Siberia, Russia": [
    55.0959197,
@@ -2687,6 +2854,12 @@
   "Yakutsk, Eastern Siberia, Russia": null,
   "Yamalo-Nenets Autonomous Okrug, West Siberian Lowland, Russia": null,
   "Yancheng coastal wetland, Jiangsu, China": null,
+  "Yangtze Estuary, China": [
+   31.5001392,
+   122.0691185,
+   "cn",
+   "Shanghai"
+  ],
   "Yangtze estuary, China": [
    31.5001392,
    122.0691185,
@@ -2699,11 +2872,18 @@
    "cn",
    "Shanghai"
   ],
+  "Yarlung Zangbo River basin, Tibet, China": null,
   "Yellow River Delta, Shandong, China": [
    37.3785328,
    118.0792465,
    "cn",
    "Shandong"
+  ],
+  "Yukon-Kuskokwim Delta, United States": [
+   60.7885629,
+   -161.7859668,
+   "us",
+   "Alaska"
   ],
   "Yunnan, China": [
    25.0,
@@ -2714,8 +2894,10 @@
   "ZOTTO observatory, Central Siberia, Russia": null,
   "ZOtino Tall Tower Observatory (ZOTTO), Central Siberia, Russia": null,
   "Zakamye lowlands, Udmurt Republic, Russia": null,
+  "Zhalong wetland, Heilongjiang, China": null,
   "Zoige Plateau, Sichuan, China": null,
   "Zoige peatland, Zoige, China": null,
+  "Zoige plateau peatland, Zoige, China": null,
   "Zoige, China": [
    33.6910838,
    102.8566026,
@@ -2754,6 +2936,7 @@
    "Alberta"
   ],
   "northern Finnish Lapland, Lapland, Finland": null,
+  "northern Minnesota peatland, Minnesota, USA": null,
   "northern Minnesota, United States": [
    48.8443315,
    -95.7466915,
@@ -3040,6 +3223,109 @@
     "name": "record_field_map"
    },
    "system": "You classify papers for a systematic map of a research field, so a PhD student can see what the field as a whole has and has not studied.\n\nThe student's research context, including the research questions to tag:\n<context>\n# PhD research context (used by the AI to judge relevance)\n\nEdit this file whenever your project evolves. The more specific it is, the better\nthe relevance scores and research-question tags will be.\n\n## Project\n\nPhD in biology (UQAM). Carbon and greenhouse gas dynamics (CO2, CH4, N2O) in\nforested wetlands, mainly forested swamps, of southern Québec, with the aim of\ninforming nature-based climate solutions.\n\nFluxes are measured with closed chambers on soil collars and on tree stems\n(LI-COR LI-7810 / LI-7820 trace gas analyzers). No aquatic (water surface)\nflux measurements.\n\n## Planned chapters\n\n1. Flux budget and microclimate controls (soil and stem fluxes, temperature,\n   water table, seasonal and spatial variability).\n2. Vegetation: role of trees and understory, stem fluxes, plant-mediated transport.\n3. Soil and water microbial communities: taxonomic and functional diversity,\n   methanogens, methanotrophs, nitrifiers / denitrifiers.\n4. Hydrology, biogeochemistry and contaminants (water chemistry, DOC, nutrients,\n   redox, anthropogenic inputs).\n\n## Research questions\n\n- RQ1: What controls whether a southern Québec forested swamp is a net GHG source or sink?\n- RQ2: How does a disturbed forested wetland compare to an intact one?\n- RQ3: How is anthropogenic impact expressed in forested wetlands?\n- RQ4: What is the distribution of carbon sources between soil and water in wetlands?\n- RQ5: What is the role of taxonomic and functional microbial diversity in the\n  belowground systems of forested wetlands in southern Québec?\n\n</context>\n\nThe paper may be written in French or another language: classify it all the same, using the English labels provided.\nClassify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome \"Not stated\" when there is no clue. Answer in the requested JSON format."
+  },
+  "61bec4a5eb5a": {
+   "kind": "restance",
+   "schema": {
+    "description": "Record the stance of each finding relative to the working claim.",
+    "input_schema": {
+     "properties": {
+      "stances": {
+       "items": {
+        "properties": {
+         "n": {
+          "description": "Number of the finding in the list.",
+          "type": "integer"
+         },
+         "stance": {
+          "enum": [
+           "Supports",
+           "Counters",
+           "Mixed",
+           "Describes"
+          ],
+          "type": "string"
+         }
+        },
+        "required": [
+         "n",
+         "stance"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      }
+     },
+     "required": [
+      "stances"
+     ],
+     "type": "object"
+    },
+    "name": "record_stances"
+   },
+   "system": "You help a PhD student keep a literature synthesis matrix consistent.\n\nFor each numbered finding below, judge its stance relative to the working claim of the theme:\n- Supports: the finding is evidence for the claim.\n- Counters: the finding is evidence against the claim.\n- Mixed: it supports the claim under some conditions and counters it under others.\n- Describes: relevant to the theme but takes no side on the claim.\nJudge only from the finding as written. Do not assume anything the finding does not state.\nAnswer in the requested JSON format."
+  },
+  "8ea29c8ab6f8": {
+   "kind": "findings",
+   "schema": {
+    "description": "Record the findings of one paper, each tied to a theme of the thesis.",
+    "input_schema": {
+     "properties": {
+      "findings": {
+       "items": {
+        "properties": {
+         "finding": {
+          "description": "One claim the paper supports with its own evidence, paraphrased in one or two sentences, with numbers when the paper gives them.",
+          "type": "string"
+         },
+         "locator": {
+          "description": "Section where the evidence is (e.g. Results, Fig. 3, Table 2).",
+          "type": "string"
+         },
+         "new_theme": {
+          "description": "Short name for a new theme, only when no existing theme fits. Otherwise empty.",
+          "type": "string"
+         },
+         "quote": {
+          "description": "Short verbatim passage (under 40 words) copied exactly from the text, supporting the finding.",
+          "type": "string"
+         },
+         "stance": {
+          "description": "Relative to the theme's working claim.",
+          "enum": [
+           "Supports",
+           "Counters",
+           "Mixed",
+           "Describes"
+          ],
+          "type": "string"
+         },
+         "theme": {
+          "description": "Exact name of the closest existing theme, or empty if none fits.",
+          "type": "string"
+         }
+        },
+        "required": [
+         "finding",
+         "theme",
+         "new_theme",
+         "stance",
+         "locator",
+         "quote"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      }
+     },
+     "required": [
+      "findings"
+     ],
+     "type": "object"
+    },
+    "name": "record_findings"
+   },
+   "system": "You help a PhD student build a synthesis matrix for a literature review.\n\nResearch context:\n# PhD research context (used by the AI to judge relevance)\n\nEdit this file whenever your project evolves. The more specific it is, the better\nthe relevance scores and research-question tags will be.\n\n## Project\n\nPhD in biology (UQAM). Carbon and greenhouse gas dynamics (CO2, CH4, N2O) in\nforested wetlands, mainly forested swamps, of southern Québec, with the aim of\ninforming nature-based climate solutions.\n\nFluxes are measured with closed chambers on soil collars and on tree stems\n(LI-COR LI-7810 / LI-7820 trace gas analyzers). No aquatic (water surface)\nflux measurements.\n\n## Planned chapters\n\n1. Flux budget and microclimate controls (soil and stem fluxes, temperature,\n   water table, seasonal and spatial variability).\n2. Vegetation: role of trees and understory, stem fluxes, plant-mediated transport.\n3. Soil and water microbial communities: taxonomic and functional diversity,\n   methanogens, methanotrophs, nitrifiers / denitrifiers.\n4. Hydrology, biogeochemistry and contaminants (water chemistry, DOC, nutrients,\n   redox, anthropogenic inputs).\n\n## Research questions\n\n- RQ1: What controls whether a southern Québec forested swamp is a net GHG source or sink?\n- RQ2: How does a disturbed forested wetland compare to an intact one?\n- RQ3: How is anthropogenic impact expressed in forested wetlands?\n- RQ4: What is the distribution of carbon sources between soil and water in wetlands?\n- RQ5: What is the role of taxonomic and functional microbial diversity in the\n  belowground systems of forested wetlands in southern Québec?\n\n\nThe thesis is organized in themes. Each theme has a working claim:\n- Microbial drivers of GHG production: Methanotroph abundance and activity explain more of the variation in net CH4 flux than methanogen abundance does.\n- Disturbed vs intact forested wetlands: The type of disturbance matters more than disturbance itself: disturbances that raise the water table (canopy loss, impoundment by roads or beavers) increase CH4, while those that lower it (drainage) increase CO2.\n- Controls on the net GHG balance of forested swamps: Water table depth sets the sign of the CH4 flux (emission when the water table is near the surface, uptake when it drops below the rooting zone), while soil temperature mainly sets the size of CO2 and CH4 fluxes within a season.\n- Soil vs water carbon sources: Dissolved CO2 and CH4 in swamp water come mostly from soil respiration and methane production within the swamp itself, not from lateral or groundwater carbon inputs.\n- Anthropogenic impacts on wetland GHG fluxes: Nutrient inputs from surrounding agriculture raise N2O emissions from forested swamps more than they change CO2 or CH4 emissions.\n- Tree stems as GHG conduits: Tree stems in forested swamps mostly emit CH4 produced in the saturated soil and carried up through the stem, not CH4 produced within the wood, and this pathway is a substantial share of ecosystem CH4 emissions.\n\nRead the paper and list its findings: the claims it supports with its own data or analysis (for a review, the\nconclusions it draws from the literature). At most 8, the most important first. Skip background\nstatements the paper only cites from others.\n\nRules:\n- Paraphrase each finding in one or two sentences, keeping the numbers, units, site and conditions.\n- theme: copy the exact name of the closest theme above. If none fits, leave theme empty and give a short new_theme.\n- stance, relative to that theme's working claim: Supports, Counters, Mixed (supports under some conditions and\n  counters under others), or Describes (relevant but takes no side).\n- quote: copy a passage of under 40 words exactly as written in the text, so it can be found again. Never\n  reconstruct or merge sentences.\n- Only the text provided counts. Never invent results. If only the abstract is available, keep to what it says.\nAnswer in the requested JSON format."
   },
   "ab1a27d51183": {
    "kind": "extract",
@@ -3501,6 +3787,28 @@
    "new_suggestions": 0,
    "notes": "",
    "pending": 82,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 103,
+   "triaged": 0,
+   "unique_candidates": 49884
+  },
+  {
+   "candidates_evaluated": 32145,
+   "date": "2026-10-09",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 200,
+   "field_progress": "Forested swamps 346/346; Forested wetlands 1748/1748; All wetlands 864/1500",
+   "library": 33,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 82,
+   "pending_findings": 0,
    "retained": 20,
    "retractions": 0,
    "suggested_to_date": 103,
@@ -53500,5 +53808,14 @@
   "3ef4954a-4928-8180-9c4a-d3e36ed69125": [],
   "3ef4954a-4928-81a8-b7dc-dc73f3e7280c": [],
   "3ef4954a-4928-81f0-a7a8-dc304f663e46": []
+ },
+ "synthesis_stats": {
+  "accepted_as_is": 0,
+  "accepted_edited": 0,
+  "by_source": {},
+  "drafted": 0,
+  "quotes_unverified": 0,
+  "quotes_verified": 0,
+  "rejected": 0
  }
 }

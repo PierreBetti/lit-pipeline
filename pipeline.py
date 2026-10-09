@@ -209,6 +209,12 @@ def read(prop):
         return prop[t]["name"] if prop[t] else None
     if t == "date":
         return prop["date"]["start"] if prop["date"] else None
+    if t == "rollup":
+        r = prop["rollup"]
+        return r.get("number") if r.get("type") == "number" else None
+    if t == "formula":
+        f = prop["formula"]
+        return f.get(f.get("type"))
     return None
 
 
@@ -247,7 +253,7 @@ def p_date(d):
 OPENALEX = "https://api.openalex.org"
 WORK_FIELDS = ("id,doi,display_name,publication_year,type,cited_by_count,fwci,is_retracted,"
                "citation_normalized_percentile,referenced_works,authorships,"
-               "primary_location,abstract_inverted_index")
+               "primary_location,best_oa_location,abstract_inverted_index")
 
 
 def openalex(path, params=None):
@@ -392,6 +398,10 @@ def load_library():
             "percentile": read(pr.get("Citation percentile")),
             "fwci": read(pr.get("FWCI")),
             "openalex_url": read(pr.get("OpenAlex ID")),
+            "zotero_uri": read(pr.get("Zotero URI")),
+            "tier": read(pr.get("Tier")),
+            "findings_count": read(pr.get("Findings count")) or 0,
+            "drafts_count": read(pr.get("Drafts count")) or 0,
         })
     return papers
 
@@ -552,7 +562,7 @@ def ask_claude(client, system, user, tool=None):
     tool = tool or TRIAGE_TOOL
     msg = client.messages.create(
         model=CLAUDE_MODEL,
-        max_tokens=1500,
+        max_tokens=4000,
         system=system,
         tools=[tool],
         tool_choice={"type": "tool", "name": tool["name"]},
@@ -1828,7 +1838,8 @@ def library_rows(papers, state):
 def write_run_log(row):
     header = ["date", "library", "candidates_evaluated", "unique_candidates", "suggested_to_date",
               "new_suggestions", "new_relevant", "pending", "retained", "excluded", "decisions",
-              "triaged", "extracted", "retractions", "field_classified", "field_progress", "model"]
+              "triaged", "extracted", "retractions", "field_classified", "field_progress",
+              "drafts_added", "pending_findings", "model"]
     append_csv("review_log.csv", header, [[row.get(k, "") for k in header]])
     if DRY_RUN or not REVIEW_LOG_DS:
         return
@@ -2012,6 +2023,14 @@ def main():
     extracted = extract_papers(papers, triager, state)
     backfill_library_geo(state)
 
+    log("3b. Synthesis matrix: your reviews, new draft findings, reading tiers")
+    import synthesis
+    synth = {"drafts_added": 0, "pending_review": 0, "tiers": 0}
+    try:
+        synth = synthesis.run(sys.modules[__name__], papers, triager, state, CONFIG)
+    except Exception as e:
+        log(f"   synthesis step skipped: {type(e).__name__}: {str(e)[:200]}")
+
     log("4. Suggested papers")
     try:
         existing = load_existing_suggestions()
@@ -2100,6 +2119,8 @@ def main():
         "validation": json.loads((DATA_DIR / "validation.json").read_text(encoding="utf-8"))
                       if (DATA_DIR / "validation.json").exists() else {},
         "runs": state.get("runs", [])[-60:],
+        "synthesis": {k: synth.get(k) for k in ("drafts_added", "pending_review", "tiers")}
+                     | {"stats": state.get("synthesis_stats", {})},
         "options": {"rqs": RESEARCH_QUESTIONS, "ecosystems": ECOSYSTEMS, "gases": GASES,
                     "biomes": BIOMES, "categories": CATEGORIES, "designs": STUDY_DESIGNS,
                     "geography": GEO_LEVELS},
@@ -2112,6 +2133,7 @@ def main():
         "decisions": decisions, "triaged": (triaged or 0) + stats["triaged"], "extracted": extracted,
         "retractions": len(metrics["retractions"]), "model": triager.model,
         "field_classified": field_done, "field_progress": field_progress,
+        "drafts_added": synth.get("drafts_added", 0), "pending_findings": synth.get("pending_review", 0),
         "notes": ("Retracted in library: " + "; ".join(metrics["retractions"])) if metrics["retractions"] else "",
     }
     state.setdefault("runs", []).append(run)
@@ -2120,6 +2142,8 @@ def main():
     write_dashboard(data)
     alerts = ([f"Retracted: {r}" for r in metrics["retractions"]]
               + [f"Duplicate in your library: {d} (merge it in Zotero)" for d in metrics["duplicates"]])
+    if synth.get("pending_review"):
+        alerts.append(f"{synth['pending_review']} draft findings wait in your Synthesis matrix review queue")
     write_digest(papers, existing, field, stopping, alerts, state)
     export_dataset()
     write_run_log(run)

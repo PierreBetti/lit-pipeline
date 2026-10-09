@@ -111,13 +111,31 @@ is below max(3, 2% of N_on), and a *reading gap* when the field is above that th
 no paper in the cell. In the rings figure, a sector is a gap when `p_k < 3%` or its estimate is below 3
 (shown only once ≥ 20 on-topic works are classified).
 
-## 5. Weekly digest
+## 5. Synthesis matrix (assisted extraction of findings)
+
+For each paper marked as read (by descending AI relevance, a few per night), the full text is obtained from
+the researcher's Zotero library (web API; stored PDF, else Zotero's full-text index), else the open-access PDF
+reported by OpenAlex (`best_oa_location`), else the abstract; PDFs are converted to text with page markers
+(pypdf) and truncated to 60 000 characters. The language model receives the researcher's themes with their
+working claims and returns up to 8 findings, each with a theme (or a proposed new theme), a stance relative to
+the working claim, a section locator and a verbatim quote of under 40 words. Quotes are verified by normalized
+substring matching (case, punctuation, line breaks and hyphenation ignored); the page of a verified quote is
+derived from the page markers. Drafts go to a review queue and count only once accepted by the researcher;
+whether the text was edited before acceptance is recorded (string comparison with the stored AI original).
+Reported: proportion accepted as is, accepted after editing and rejected, and proportion of quotes verified,
+by text source. A paper is drafted once; full texts are never stored. Each finding stores the working claim its stance was
+judged against; when the claim of its theme changes (normalized text comparison), the stance is re-judged by the
+language model from the finding text alone, in batches per theme, and every change is logged with its previous value. A reading tier is proposed where empty:
+Core if relevance is 5, or 4 and the paper is central (cited by at least two library papers, or in the top
+10% of its field by citations); Supporting if relevance ≥ 3; Background otherwise.
+
+## 6. Weekly digest
 
 Every 7 days a Notion page summarizes: the best new suggestions (by AI relevance, then Personal score, then
 Semantic match), papers added to the library, ecosystem × research question cells newly covered by the
 library, field map progress, the stopping estimate, and alerts (retractions, duplicates).
 
-## 6. Reproducibility
+## 7. Reproducibility
 
 - Temperature 0; the exact model version returned by the API is recorded for every answer.
 - Every prompt (system text + output schema) is hashed; all prompt versions are archived in
@@ -128,7 +146,7 @@ library, field map progress, the stopping estimate, and alerts (retractions, dup
 - `config.json` can pin a single model version for a study (`ai.pinned_model`).
 - The classified field corpus is exported nightly to `export/field_corpus.csv` (no abstracts).
 
-## 7. Validation protocol (`validate.py`)
+## 8. Validation protocol (`validate.py`)
 
 1. **AI vs human classification.** Random sample of 50 classified works per scope; 30 double-coded.
    Coding is blind (AI labels are not shown in Notion). Metrics: Cohen's kappa (binary and single-choice
@@ -139,16 +157,17 @@ library, field map progress, the stopping estimate, and alerts (retractions, dup
    95% of the time; mean absolute error in percentage points.
 3. **Test-retest consistency.** 30 random works re-classified; agreement with the first classification.
 4. **Preference model.** Cross-validated and prospective AUC (section 3).
-5. **Discovery recall.** Ground truth: the included studies of published systematic reviews
+5. **Drafted findings.** Acceptance, editing and rejection rates and quote verification rate (section 5),
+   computed continuously from the researcher's review decisions.
+6. **Discovery recall.** Ground truth: the included studies of published systematic reviews
    (`benchmarks/*.json`). Seeded with k = 5 random included studies (3 repetitions), the researcher is
    simulated: each round, the top 50 unscreened candidates are screened and any included study found joins
    the library before the next round (3 rounds). Reported: recall and number screened per round, against
    one round of plain citation chasing (all references and citing papers of the seeds, unranked), and
    against other tools run manually with the same seeds.
 
-## 8. Known limitations
+## 9. Known limitations
 
 OpenAlex coverage of grey literature, non-English work, abstracts (some publishers withhold them, so a
-share of works is classified from titles only, reported separately) and reference lists; English-only
-search queries; dependence on a commercial language model whose versions change (mitigated by version
+share of works is classified from titles only, reported separately) and reference lists; search queries in English and French only; dependence on a commercial language model whose versions change (mitigated by version
 logging and pinning); the AI ranks and classifies but every inclusion decision remains human.

@@ -1,11 +1,14 @@
 {
-  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list. research_question_descriptions: full wording of each research question, used by the semantic model. semantic: local embedding model settings (no AI quota). geography: levels for geographic filtering, from broadest to narrowest (country_code = ISO 2 letters; state = province or state name in English).",
+  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list. research_question_descriptions: full wording of each research question, used by the semantic model. semantic: local embedding model settings (no AI quota). geography: levels for geographic filtering, from broadest to narrowest (country_code = ISO 2 letters; state = province or state name in English). synthesis: settings of the Synthesis matrix (draft findings, tiers).",
   "notion": {
     "library_data_source": "87a4954a-4928-8345-b3a8-87caeb0b2c4a",
     "suggestions_data_source": "444be872-ca23-4e7e-8d93-665568721b36",
     "review_log_data_source": "4e18753f-4ddc-4caa-911c-04eacc6a4d90",
     "validation_data_source": "89c1a1e0-42c5-4229-8428-d092a6ef5533",
-    "digest_data_source": "771aea1a-9b0a-4637-ba2c-98ea19e0b398"
+    "digest_data_source": "771aea1a-9b0a-4637-ba2c-98ea19e0b398",
+    "themes_data_source": "27cbc3f1-6c9b-4382-95ad-491898642e6f",
+    "findings_data_source": "ea1e518b-f8a5-4cf7-a2e9-f94c40efa4c4",
+    "review_queue_data_source": "3fe370e3-75e8-4cf0-b7d8-3a226bf37ced"
   },
   "ai": {
     "temperature": 0,
@@ -99,5 +102,12 @@
       "country_code": "ca",
       "state": "Quebec"
     }
-  ]
+  ],
+  "synthesis": {
+    "_help": "AI-drafted findings for papers you mark Read. max_papers_per_run keeps the free AI quota for triage; max_chars caps how much full text is sent (about 15 000 tokens). suggest_tiers fills an empty Tier, never overwrites.",
+    "max_papers_per_run": 3,
+    "max_findings_per_paper": 8,
+    "max_chars": 60000,
+    "suggest_tiers": true
+  }
 }

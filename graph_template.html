@@ -843,6 +843,16 @@ if (!DATA) {
       ? `<p class="lead">From ${pref.n} decisions: in-sample AUC ${num(pref.auc)} (optimistic), cross-validated AUC <b>${num(pref.auc_cv)}</b> (on decisions it did not learn from). Prospective test, scores recorded before you decided: ${pro.n ? `AUC <b>${num(pro.auc)}</b> on ${pro.n} decisions` : "accumulating"}. 0.5 means no better than chance.</p>`
       : `<p class="lead">Needs at least ${pref.needed || 12} screening decisions (3 kept and 3 excluded minimum); ${pref.n || 0} so far.</p>`;
 
+    // drafted findings
+    h += `<h2>How good are the AI-drafted findings?</h2>`;
+    const Sy = (DATA.synthesis || {}).stats || {};
+    const asIs = Sy.accepted_as_is || 0, edited = Sy.accepted_edited || 0, rej = Sy.rejected || 0, dec = asIs + edited + rej;
+    const qv = Sy.quotes_verified || 0, qn = Sy.quotes_unverified || 0;
+    const pc = (k, n) => n ? Math.round(100 * k / n) + "%" : "n/a";
+    h += dec
+      ? `<p class="lead">From your ${dec} decisions in the Review queue: <b class="${asIs / dec >= .6 ? "good" : "fair"}">${pc(asIs, dec)}</b> accepted as is, ${pc(edited, dec)} accepted after editing, <b class="${rej / dec <= .2 ? "good" : "poor"}">${pc(rej, dec)}</b> rejected. Quotes found word for word in the source text: <b class="${qv / Math.max(1, qv + qn) >= .8 ? "good" : "fair"}">${pc(qv, qv + qn)}</b> of ${qv + qn}. Papers drafted: ${Sy.drafted || 0} (${Object.entries(Sy.by_source || {}).map(([k, v]) => `${esc(k)}: ${v}`).join(", ") || "none"}). Every decision is in logs/findings_review.csv.</p>`
+      : `<p class="lead">No decisions yet. Mark papers as Read in Notero: findings are drafted the next night in the ✅ Review queue of the Synthesis matrix. Accept, edit or reject them there and this section fills in.${qv + qn ? ` Quotes verified so far: ${pc(qv, qv + qn)} of ${qv + qn}.` : ""}</p>`;
+
     // benchmarks
     h += `<h2>Does it find the studies a systematic review found?</h2>`;
     if (bench.length) {

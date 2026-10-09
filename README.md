@@ -70,6 +70,8 @@ Repository > **Settings > Secrets and variables > Actions > New repository secre
 | `GEMINI_API_KEY` | your Gemini key |
 | `CONTACT_EMAIL` | your email (polite pool for OpenAlex) |
 | `S2_API_KEY` | optional |
+| `ZOTERO_API_KEY` | optional: lets AI-drafted findings use your PDFs (zotero.org/settings/keys, read-only access to your library) |
+| `ZOTERO_USER_ID` | optional: the number shown as "Your user ID for use in API calls" on that same page |
 
 ### 5. First run
 Repository > **Actions** > **Literature pipeline** > **Run workflow**. Watch the log: it lists how many
@@ -102,6 +104,30 @@ Québec by default, editable in `config.json` under `geography`). The choice is 
 embed can show a fixed view, for example `…/lit-pipeline/#gaps?lens=field&scope=forested&geo=quebec`.
 The Evidence gaps tab also has a table following each research question from the world level down to the
 most local one. Below the world level, numbers rely on papers whose study sites could be located.
+
+## Synthesis matrix (findings, themes, gaps)
+
+In Notion, under Literature Matrix > **📖 Synthesis matrix**. The unit is a *finding*: one claim, from one
+paper, tied to one theme, with a stance (Supports / Counters / Mixed / Describes) relative to that theme's
+**working claim**. Each theme then gets a colored verdict: GAP (no finding), THIN (one or two), CONTESTED
+(findings on both sides), COVERED (three or more, consistent).
+
+- **What runs by itself.** When you mark a paper **Read**, the next night drafts up to 8 findings for it
+  (3 papers per night by default, `config.json` > `synthesis`). The text comes from your Zotero PDF, else an
+  open-access PDF, else the abstract (shown in *Source*). Each draft carries a short quote; the quote is checked
+  word for word against the text and its page number is added to *Locator*. A quote that cannot be found is
+  flagged ⚠ and is never copied to an accepted finding. Empty **Tier** fields are filled with a proposal
+  (Core / Supporting / Background, from relevance and how central the paper is); yours are never overwritten.
+- **What stays yours.** Drafts wait in **✅ Review queue**. Set *Decision* to Accept (edit the text first if
+  needed) or Reject; the next run turns accepted drafts into Findings and removes the queue rows. Only accepted
+  findings count in the verdicts. You also own the themes and their working claims, which drive the stances.
+- **Editing a working claim is safe.** Each finding remembers the claim its stance was judged against
+  (*Claim used*). When you change a claim, or move a finding to another theme, the next run re-judges those
+  stances from the finding text and explains any change in *Stance note* (`logs/stance_updates.csv`).
+  Findings you wrote yourself are never re-judged the first time: your stance is taken as given.
+- **Measured.** Accept-as-is / edited / rejected rates and the share of verified quotes appear in the
+  Validation tab (decisions in `logs/findings_review.csv`).
+- Full texts are read in memory only and never saved to the repository.
 
 ## Validation (numbers for a methods paper)
 

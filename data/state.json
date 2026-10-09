@@ -484,7 +484,7 @@
    "last_fetch": "2026-10-04",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1747,
+   "total": 1697,
    "trend": {
     "1930": 1,
     "1934": 1,
@@ -563,7 +563,7 @@
    "last_fetch": "2026-10-04",
    "mode": "full",
    "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 346,
+   "total": 338,
    "trend": {
     "1968": 2,
     "1988": 2,
@@ -611,7 +611,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 18870,
+   "total": 18078,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -748,6 +748,12 @@
    "us",
    "Alaska"
   ],
+  "Alaska, United States": [
+   64.4459613,
+   -149.680909,
+   "us",
+   "Alaska"
+  ],
   "Alberta boreal fens, Alberta, Canada": null,
   "Alberta, Canada": [
    55.001251,
@@ -760,6 +766,12 @@
    -76.1197173,
    "us",
    "North Carolina"
+  ],
+  "Alps, Italy": [
+   45.9083263,
+   9.1420628,
+   "it",
+   "Alps"
   ],
   "Alps, Slovenia": [
    46.224243,
@@ -864,6 +876,12 @@
   "Belait or Temburong, Brunei": null,
   "Belize coastal and terrestrial peatlands, National, Belize": null,
   "Berbak Delta, Jambi, Indonesia": null,
+  "Bibai, Hokkaido, Japan": [
+   43.3325763,
+   141.8537339,
+   "jp",
+   "Hokkaido Prefecture"
+  ],
   "Big Cypress National Preserve, Florida, United States": [
    25.9361216,
    -81.0951271,
@@ -988,6 +1006,20 @@
    "cd",
    "Kinshasa"
   ],
+  "Central Amazon floodplain, Central Amazon, Brazil": null,
+  "Central Amazon, Brazil": [
+   -2.9999799,
+   -60.2643734,
+   "br",
+   "Amazonas"
+  ],
+  "Central Europe soils, Central Europe, Poland": null,
+  "Central Europe, Poland": [
+   50.2731831,
+   18.9645194,
+   "pl",
+   "Silesian Voivodeship"
+  ],
   "Central Forest State Nature Biosphere Reserve, European Russia, Russia": null,
   "Central Java, Indonesia": [
    -7.3032412,
@@ -1044,6 +1076,7 @@
    ""
   ],
   "Chokurdakh, Indigirka River lowland, Russia": null,
+  "Chongming Dongtan, Yangtze estuary, China": null,
   "Churchill, Manitoba, Canada": [
    58.769268,
    -94.1729517,
@@ -1096,6 +1129,7 @@
   "Da Xing'an Mountains, Northeast China, China": null,
   "Da Xing'an Mountains, Northeast, China": null,
   "Dalat Sago Plantation, Sarawak, Malaysia": null,
+  "Dangxiong, Qinghai-Tibetan Plateau, China": null,
   "Danube Delta, Tulcea, Romania": [
    45.1801969,
    28.8055782,
@@ -1144,6 +1178,12 @@
    "Mainland Finland"
   ],
   "Eastern Great Xing'an Mountains, Heilongjiang / Inner Mongolia, China": null,
+  "Eastern Siberia, Russia": [
+   53.7066631,
+   96.7547987,
+   "ru",
+   "Eastern Sayan"
+  ],
   "Elkhorn Slough Hester Marsh, California, United States": null,
   "European Russia, Russia": null,
   "Everglades (Water Conservation Area 2A), Florida, USA": null,
@@ -1168,6 +1208,8 @@
   "Falkland Islands, South Atlantic, Falkland Islands": null,
   "Fenghuo-shan, Qinghai-Tibet Plateau, China": null,
   "Fenghuoshan Mountain area, Tibetan Plateau, China": null,
+  "Fennoscandia, Multiple": null,
+  "Fennoscandinavian Peninsula, Fennoscandia, Multiple": null,
   "Finland": [
    63.2467777,
    25.9209164,
@@ -1207,6 +1249,7 @@
    "ca",
    "Alberta"
   ],
+  "French Jura mountains, Jura, France": null,
   "Fuegian Archipelago, Tierra del Fuego, Argentina / Chile": null,
   "Fujian, China": [
    26.193218,
@@ -1256,6 +1299,12 @@
    "us",
    "North Carolina"
   ],
+  "Great Lakes Region, United States": [
+   43.6195817,
+   -84.1757559,
+   "us",
+   "Michigan"
+  ],
   "Great Lakes–St. Lawrence forest region, Ontario, Canada": null,
   "Greater Everglades, Florida, USA": [
    26.0984266,
@@ -1271,6 +1320,7 @@
   ],
   "Greater Khingan Mountains, Heilongjiang / Inner Mongolia, China": null,
   "Gulf of Carpentaria, Northern Australia, Australia": null,
+  "Gussola oxbow lake, Lombardy, Italy": null,
   "Hainan mangrove swamp, Hainan, China": null,
   "Hainan, China": [
    19.2000001,
@@ -1308,6 +1358,7 @@
    "de",
    "Schleswig-Holstein"
   ],
+  "Hongyuan, Qinghai-Tibetan Plateau, China": null,
   "Howland Research Forest, Maine, USA": [
    45.20541,
    -68.7435127,
@@ -1343,6 +1394,7 @@
    ""
   ],
   "Indonesia, Southeast Asia, Indonesia": null,
+  "Innoko Flats Wildlife Refuge, Alaska, United States": null,
   "Iquitos region, Loreto, Peru": null,
   "Iquitos, Loreto, Peru": [
    -3.749365,
@@ -1376,6 +1428,12 @@
    "Jiangsu"
   ],
   "Jinchuan peatland, Changbai Mountain, China": null,
+  "Jura, France": [
+   46.7833625,
+   5.7832857,
+   "fr",
+   "Bourgogne – Franche-Comté"
+  ],
   "Kaamanen, Lapland, Finland": [
    69.1047373,
    27.1978479,
@@ -1448,6 +1506,18 @@
    "ph",
    "Leyte"
   ],
+  "Liaoning, China": [
+   41.2374106,
+   122.9955469,
+   "cn",
+   "Liaoning"
+  ],
+  "Lombardy, Italy": [
+   45.5703694,
+   9.7732524,
+   "it",
+   "Lombardy"
+  ],
   "Loreto, Peru": [
    -5.0,
    -75.0,
@@ -1497,6 +1567,7 @@
    "Georgia"
   ],
   "Luanhaizi peatland, Qinghai—Tibet Plateau, China": null,
+  "Lutose, Taiga Plains, Alberta, Canada": null,
   "Madoi wetland, Qinghai, Tibetan plateau, China": null,
   "Madre de Dios peatland, Madre de Dios, Peru": null,
   "Madre de Dios, Peru": [
@@ -1505,6 +1576,7 @@
    "pe",
    "Madre de Dios"
   ],
+  "Maduo, Qinghai-Tibetan Plateau, China": null,
   "Maine forested wetland, Maine, United States": null,
   "Maine, United States": [
    45.709097,
@@ -1636,6 +1708,12 @@
    "us",
    "Minnesota"
   ],
+  "Minnesota, United States": [
+   45.9896587,
+   -94.6113288,
+   "us",
+   "Minnesota"
+  ],
   "Mississippi River Alluvial Valley, Southern United States, United States": null,
   "Mississippi River Basin, Lower Mississippi valley, United States": null,
   "Mississippi River deltaic plain, Louisiana, United States": null,
@@ -1669,6 +1747,12 @@
    "my",
    "Sarawak"
   ],
+  "Multiple": [
+   32.7979615,
+   -117.1509655,
+   "us",
+   "California"
+  ],
   "NE Switzerland, Switzerland": [
    47.5164429,
    7.8685933,
@@ -1681,6 +1765,7 @@
    "es",
    "Andalusia"
   ],
+  "Nadym region, Western Siberia, Russia": null,
   "Nam Co region, Tibetan Plateau, China": null,
   "Napahai wetland, Yunnan, China": null,
   "Napahai, Yunnan, China": [
@@ -1748,6 +1833,7 @@
    "bw",
    "North-West District"
   ],
+  "Nhecolandia, Pantanal, Brazil": null,
   "Nome, Alaska, United States": [
    64.4975098,
    -165.4061701,
@@ -1826,6 +1912,7 @@
   "Northern Borneo peat swamp, Belait / Tutong / Temburong, Brunei Darussalam": null,
   "Northern Lower Michigan forested ecosystems, Michigan, United States": null,
   "Northern Michigan forest wetlands, Michigan, United States": null,
+  "Northern Minnesota wetlands, Minnesota, United States": null,
   "Northern Ontario / Manitoba, Canada": null,
   "Northern Ontario / Quebec / Manitoba, Canada": null,
   "Northern Study Area, north-central Canada, Canada": null,
@@ -1873,6 +1960,14 @@
    "ca",
    "Ontario"
   ],
+  "Osaka Nanko Bird Sanctuary, Osaka, Japan": null,
+  "Osaka, Japan": [
+   34.6937569,
+   135.5014539,
+   "jp",
+   "Osaka Prefecture"
+  ],
+  "Ottawa National Forest, Great Lakes Region, United States": null,
   "Ottawa National Forest, Michigan, United States": [
    46.6782607,
    -88.8233366,
@@ -1900,9 +1995,16 @@
    "id",
    "Central Kalimantan"
   ],
+  "Panjin wetland, Liaoning, China": null,
   "Pantanal Mato-Grossense, Mato Grosso, Brazil": [
    -16.4067745,
    -56.6699368,
+   "br",
+   "Mato Grosso"
+  ],
+  "Pantanal, Brazil": [
+   -17.6750684,
+   -57.4553363,
    "br",
    "Mato Grosso"
   ],
@@ -1930,6 +2032,8 @@
   "Pastaza-Marañon foreland basin, Amazon, Peru": null,
   "Pastaza-Marañón foreland basin, Amazon basin, Peru": null,
   "Pastaza-Marañón foreland basin, Loreto, Peru": null,
+  "Patagonia, Argentina / Chile": null,
+  "Patagonia, Patagonia, Argentina / Chile": null,
   "Pate Islands, Lamu Archipelago, Kenya": null,
   "Patuxent River, Maryland, USA": [
    38.8142728,
@@ -2180,6 +2284,12 @@
    "ru",
    "Krasnoyarsk Krai"
   ],
+  "Siberia, Siberia, Russia": [
+   60.0,
+   100.0,
+   "ru",
+   "Krasnoyarsk Krai"
+  ],
   "Sichuan / Tibetan Plateau, China": null,
   "Sichuan, China": [
    30.5000001,
@@ -2205,6 +2315,13 @@
    26.5902179,
    "fi",
    "Lapland"
+  ],
+  "Somerset Levels and Moors, Somerset, United Kingdom": null,
+  "Somerset, United Kingdom": [
+   51.1617509,
+   -3.0753867,
+   "gb",
+   "England"
   ],
   "South Atlantic, Falkland Islands": [
    -51.6913747,
@@ -2244,6 +2361,12 @@
    "cz",
    "South Moravian Region"
   ],
+  "South Sudan, South Sudan": [
+   4.8554377,
+   31.6102497,
+   "ss",
+   ""
+  ],
   "South Sumatra, Indonesia": [
    -3.1931356,
    104.0181254,
@@ -2281,6 +2404,7 @@
   "Southeastern U.S., Southeast, United States": null,
   "Southeastern Virginia wetland sites, Virginia, USA": null,
   "Southern Aceh, Indonesia": null,
+  "Southern Ontario poor fen, Ontario, Canada": null,
   "Southern Ontario riparian forest, Ontario, Canada": null,
   "Southern Ontario swamps, Ontario, Canada": null,
   "Southern Ontario swamps, Southern Ontario, Canada": null,
@@ -2316,7 +2440,20 @@
   "Southwestern Finland, Finland": null,
   "Soča, Alps, Slovenia": null,
   "Staroselsky Moch, Tver, Russia": null,
+  "Staten Island, California, USA": [
+   38.1643617,
+   -121.5163415,
+   "us",
+   "California"
+  ],
+  "Stor Åmyran, Västerbotten, Sweden": [
+   63.7386182,
+   20.0936345,
+   "se",
+   ""
+  ],
   "Stordalen Mire, Abisko, Sweden": null,
+  "Stordalen Mire, Norrbotten, Sweden": null,
   "Stordalen catchment, Norrbotten, Sweden": null,
   "Sudan": [
    14.5844444,
@@ -2324,6 +2461,7 @@
    "sd",
    ""
   ],
+  "Sudd wetlands, South Sudan, South Sudan": null,
   "Sudd, Sudan": null,
   "Sudd, Sudd, Sudan": null,
   "Sumatra, Indonesia": [
@@ -2345,6 +2483,7 @@
    "br",
    "São Paulo"
   ],
+  "Taiga Plains, Alberta, Canada": null,
   "Taiga Plains, Canada": null,
   "Tamban sub district, South Kalimantan, Indonesia": null,
   "Tanana Lowlands, Interior Alaska, United States": null,
@@ -2447,6 +2586,7 @@
   "Urbach, Alps, Switzerland": null,
   "Vasyugan Swamp, West Siberia, Russia": null,
   "Vasyugan Swamp, Western Siberia, Russia": null,
+  "Velké Dářko, Bohemia, Czech Republic": null,
   "Veracruz / Tabasco, Mexico": [
    17.9740394,
    -92.9468818,
@@ -2544,8 +2684,27 @@
   "Xiaoxing'anling region, Heilongjiang, China": null,
   "Xiaoxing’an Mountains, Northeast China, China": null,
   "Xining City urban wetland, Qinghai Province, China": null,
+  "Yakutsk, Eastern Siberia, Russia": null,
   "Yamalo-Nenets Autonomous Okrug, West Siberian Lowland, Russia": null,
   "Yancheng coastal wetland, Jiangsu, China": null,
+  "Yangtze estuary, China": [
+   31.5001392,
+   122.0691185,
+   "cn",
+   "Shanghai"
+  ],
+  "Yangtze estuary, Shanghai, China": [
+   31.5001392,
+   122.0691185,
+   "cn",
+   "Shanghai"
+  ],
+  "Yellow River Delta, Shandong, China": [
+   37.3785328,
+   118.0792465,
+   "cn",
+   "Shandong"
+  ],
   "Yunnan, China": [
    25.0,
    102.0,
@@ -2616,6 +2775,7 @@
    "ca",
    "Alberta"
   ],
+  "southern Alps bog, Alps, Italy": null,
   "southern California coastal wetland, California, USA": null,
   "southern Finland, Finland": [
    60.7373759,
@@ -3326,6 +3486,26 @@
    "suggested_to_date": 103,
    "triaged": 0,
    "unique_candidates": 49807
+  },
+  {
+   "candidates_evaluated": 32145,
+   "date": "2026-10-09",
+   "decisions": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 200,
+   "field_progress": "Forested swamps 346/346; Forested wetlands 1748/1748; All wetlands 664/1500",
+   "library": 33,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 82,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 103,
+   "triaged": 0,
+   "unique_candidates": 49884
   }
  ],
  "seen_candidates": [
@@ -3915,6 +4095,7 @@
   "W1500951721",
   "W1501021547",
   "W1501042058",
+  "W1501244682",
   "W1501275580",
   "W1501282187",
   "W1501463866",
@@ -8214,6 +8395,7 @@
   "W1977635368",
   "W1977635733",
   "W1977657498",
+  "W1977661830",
   "W1977664008",
   "W1977666256",
   "W1977672479",
@@ -8501,6 +8683,7 @@
   "W1980000261",
   "W1980019008",
   "W1980038816",
+  "W1980053870",
   "W1980054906",
   "W1980055427",
   "W1980060691",
@@ -9180,6 +9363,7 @@
   "W1985450515",
   "W1985455767",
   "W1985463151",
+  "W1985466161",
   "W1985469234",
   "W1985479415",
   "W1985479482",
@@ -10063,6 +10247,7 @@
   "W1992321939",
   "W1992339039",
   "W1992343621",
+  "W1992344202",
   "W1992355635",
   "W1992357382",
   "W1992365636",
@@ -10379,6 +10564,7 @@
   "W1994785657",
   "W1994791572",
   "W1994792890",
+  "W1994803647",
   "W1994806182",
   "W1994813335",
   "W1994825310",
@@ -10446,6 +10632,7 @@
   "W1995259333",
   "W1995272878",
   "W1995276263",
+  "W1995293754",
   "W1995298045",
   "W1995303406",
   "W1995318043",
@@ -11212,6 +11399,7 @@
   "W2001510610",
   "W2001518877",
   "W2001523737",
+  "W2001538541",
   "W2001543499",
   "W2001545677",
   "W2001549991",
@@ -11314,6 +11502,7 @@
   "W2002459745",
   "W2002463790",
   "W2002476444",
+  "W2002478543",
   "W2002480151",
   "W2002486217",
   "W2002486562",
@@ -12359,6 +12548,7 @@
   "W2010738369",
   "W2010747867",
   "W2010754999",
+  "W2010768249",
   "W2010784770",
   "W2010789364",
   "W2010813693",
@@ -13571,6 +13761,7 @@
   "W2020733257",
   "W2020735904",
   "W2020742407",
+  "W2020752703",
   "W2020767027",
   "W2020776517",
   "W2020791640",
@@ -14502,6 +14693,7 @@
   "W2028443916",
   "W2028455084",
   "W2028458597",
+  "W2028462240",
   "W2028473145",
   "W2028475223",
   "W2028482297",
@@ -14788,6 +14980,7 @@
   "W2030736945",
   "W2030748335",
   "W2030753464",
+  "W2030755002",
   "W2030755045",
   "W2030774683",
   "W2030803203",
@@ -14928,6 +15121,7 @@
   "W2031953804",
   "W2031975833",
   "W2031978333",
+  "W2031994903",
   "W2031996597",
   "W2031997491",
   "W2031999342",
@@ -15609,6 +15803,7 @@
   "W2038090713",
   "W2038090715",
   "W2038093716",
+  "W2038093803",
   "W2038093804",
   "W2038104770",
   "W2038107223",
@@ -18948,6 +19143,7 @@
   "W2066218073",
   "W2066232493",
   "W2066237377",
+  "W2066246812",
   "W2066278997",
   "W2066286529",
   "W2066293299",
@@ -20463,6 +20659,7 @@
   "W2078907620",
   "W2078908882",
   "W2078916222",
+  "W2078925277",
   "W2078934114",
   "W2078934506",
   "W2078953155",
@@ -20901,6 +21098,7 @@
   "W2082493148",
   "W2082494455",
   "W2082500074",
+  "W2082511538",
   "W2082530841",
   "W2082534432",
   "W2082534763",
@@ -21078,6 +21276,7 @@
   "W2084080994",
   "W2084094775",
   "W2084106845",
+  "W2084110897",
   "W2084124713",
   "W2084133270",
   "W2084167564",
@@ -22983,6 +23182,7 @@
   "W2100193160",
   "W2100194365",
   "W2100195673",
+  "W2100222013",
   "W2100222675",
   "W2100226976",
   "W2100256561",
@@ -23316,6 +23516,7 @@
   "W2103425624",
   "W2103441770",
   "W2103445295",
+  "W2103450462",
   "W2103451987",
   "W2103466666",
   "W2103480604",
@@ -24449,6 +24650,7 @@
   "W2114027222",
   "W2114044277",
   "W2114045225",
+  "W2114056667",
   "W2114072239",
   "W2114075170",
   "W2114081018",
@@ -25001,6 +25203,7 @@
   "W2118788317",
   "W2118792253",
   "W2118792424",
+  "W2118797943",
   "W2118798820",
   "W2118818049",
   "W2118822691",
@@ -26099,6 +26302,7 @@
   "W2129145352",
   "W2129161539",
   "W2129163149",
+  "W2129170391",
   "W2129178025",
   "W2129180479",
   "W2129183594",
@@ -26425,6 +26629,7 @@
   "W2132211464",
   "W2132216283",
   "W2132226745",
+  "W2132228161",
   "W2132247705",
   "W2132250747",
   "W2132262663",
@@ -28121,6 +28326,7 @@
   "W2147683582",
   "W2147690605",
   "W2147691588",
+  "W2147704403",
   "W2147706244",
   "W2147708615",
   "W2147715310",
@@ -28774,6 +28980,7 @@
   "W2153623133",
   "W2153628173",
   "W2153628939",
+  "W2153633857",
   "W2153646785",
   "W2153651524",
   "W2153666586",
@@ -29145,6 +29352,7 @@
   "W2157039621",
   "W2157047547",
   "W2157052700",
+  "W2157062135",
   "W2157081715",
   "W2157084334",
   "W2157090148",
@@ -30929,6 +31137,7 @@
   "W2176637474",
   "W2176676104",
   "W2176708081",
+  "W2176711581",
   "W2176713729",
   "W2176787918",
   "W2176844433",
@@ -32531,6 +32740,7 @@
   "W2324551982",
   "W2324585644",
   "W2324629182",
+  "W2324775990",
   "W2324841838",
   "W2324843167",
   "W2324903092",
@@ -32759,6 +32969,7 @@
   "W2334252427",
   "W2334267880",
   "W2334302577",
+  "W2334330931",
   "W2334363480",
   "W2334369750",
   "W2334407963",
@@ -32916,6 +33127,7 @@
   "W2341548809",
   "W2341552873",
   "W2341663335",
+  "W2341810800",
   "W2341832620",
   "W2342062156",
   "W2342065758",
@@ -32959,8 +33171,10 @@
   "W2344128917",
   "W2344136218",
   "W2344183781",
+  "W2344235355",
   "W2344328155",
   "W2344349915",
+  "W2344472878",
   "W2344473214",
   "W2344513537",
   "W2344515394",
@@ -33813,6 +34027,7 @@
   "W2478500750",
   "W2478662219",
   "W2478750405",
+  "W2478846334",
   "W2478908224",
   "W2478911749",
   "W2478962215",
@@ -34011,6 +34226,7 @@
   "W2497820704",
   "W2497828027",
   "W2498042202",
+  "W2498075094",
   "W2498237572",
   "W2498265859",
   "W2498323521",
@@ -35151,6 +35367,7 @@
   "W2568190843",
   "W2568214707",
   "W2568270831",
+  "W2568492778",
   "W2568492936",
   "W2568521921",
   "W2568522374",
@@ -35240,6 +35457,7 @@
   "W2575245669",
   "W2575286476",
   "W2575397500",
+  "W2575510675",
   "W2575838082",
   "W2575973976",
   "W2576215656",
@@ -35982,6 +36200,7 @@
   "W2607920506",
   "W2608005560",
   "W2608071402",
+  "W2608119663",
   "W2608144584",
   "W2608161332",
   "W2608253295",
@@ -36036,6 +36255,7 @@
   "W2610373801",
   "W2610379404",
   "W2610501306",
+  "W2610557599",
   "W2610569479",
   "W2610606104",
   "W2610627042",
@@ -36061,6 +36281,7 @@
   "W2611302578",
   "W2611387561",
   "W2611406942",
+  "W2611506814",
   "W2611557588",
   "W2611685520",
   "W2611716553",
@@ -36579,6 +36800,7 @@
   "W2735182719",
   "W2735230059",
   "W2735262412",
+  "W2735306787",
   "W2735343765",
   "W2735353877",
   "W2735487467",
@@ -36770,6 +36992,7 @@
   "W2745091418",
   "W2745117477",
   "W2745133479",
+  "W2745140351",
   "W2745155426",
   "W2745161526",
   "W2745162386",
@@ -37124,6 +37347,7 @@
   "W2762571769",
   "W2762624117",
   "W2762629733",
+  "W2762642768",
   "W2762658176",
   "W2762809727",
   "W2762869587",
@@ -37144,6 +37368,7 @@
   "W2763535465",
   "W2763563316",
   "W2763618928",
+  "W2763636291",
   "W2763699948",
   "W2763704525",
   "W2763735976",
@@ -37286,6 +37511,7 @@
   "W2767122955",
   "W2767124469",
   "W2767126550",
+  "W2767132051",
   "W2767157270",
   "W2767186032",
   "W2767209418",
@@ -39475,6 +39701,7 @@
   "W2890126830",
   "W2890147611",
   "W2890181927",
+  "W2890187819",
   "W2890200027",
   "W2890232832",
   "W2890233008",
@@ -40067,6 +40294,7 @@
   "W2903187156",
   "W2903197421",
   "W2903214176",
+  "W2903235558",
   "W2903251709",
   "W2903256389",
   "W2903259569",
@@ -40706,6 +40934,7 @@
   "W2919064629",
   "W2919108249",
   "W2919115771",
+  "W2919178237",
   "W2919193315",
   "W2919201162",
   "W2919239087",
@@ -41409,6 +41638,7 @@
   "W2949450945",
   "W2949505632",
   "W2949511453",
+  "W2949513949",
   "W2949519950",
   "W2949526651",
   "W2949545858",
@@ -41706,6 +41936,7 @@
   "W2960467826",
   "W2960476532",
   "W2960602466",
+  "W2960627254",
   "W2960778551",
   "W2960794188",
   "W2960867792",
@@ -42318,6 +42549,7 @@
   "W2981849677",
   "W2981849827",
   "W2981869998",
+  "W2981919744",
   "W2981938452",
   "W2981941716",
   "W2981946492",
@@ -44522,6 +44754,7 @@
   "W3085474239",
   "W3085510383",
   "W3085521027",
+  "W3085522961",
   "W3085607589",
   "W3085641952",
   "W3085649984",
@@ -47204,6 +47437,7 @@
   "W4200344192",
   "W4200358065",
   "W4200362543",
+  "W4200364312",
   "W4200377368",
   "W4200382654",
   "W4200383387",
@@ -47552,6 +47786,7 @@
   "W4213389761",
   "W4213421837",
   "W4213424607",
+  "W4213427251",
   "W4213433647",
   "W4213443373",
   "W4213446895",
@@ -47628,6 +47863,7 @@
   "W4220757897",
   "W4220759567",
   "W4220768349",
+  "W4220773872",
   "W4220774160",
   "W4220775731",
   "W4220777331",
@@ -47729,6 +47965,7 @@
   "W4223543634",
   "W4223554918",
   "W4223564543",
+  "W4223608634",
   "W4223652021",
   "W4223653531",
   "W4223898974",
@@ -47807,6 +48044,7 @@
   "W4225409095",
   "W4225409754",
   "W4225564719",
+  "W4225587532",
   "W4225622407",
   "W4225669880",
   "W4225712742",
@@ -48346,6 +48584,7 @@
   "W4243905413",
   "W4243921723",
   "W4243947749",
+  "W4243971115",
   "W4243973552",
   "W4243997775",
   "W4244057429",
@@ -50390,23 +50629,31 @@
   "W4393295351",
   "W4393440613",
   "W4393447444",
+  "W4393464127",
   "W4393467670",
   "W4393552080",
   "W4393556259",
   "W4393565227",
   "W4393580384",
   "W4393584782",
+  "W4393595128",
   "W4393618361",
   "W4393684656",
   "W4393689961",
+  "W4393694389",
   "W4393725065",
+  "W4393786848",
   "W4393864360",
   "W4393879853",
   "W4393902795",
   "W4393947366",
   "W4394085630",
   "W4394132691",
+  "W4394158752",
+  "W4394328313",
   "W4394357130",
+  "W4394367995",
+  "W4394378937",
   "W4394388476",
   "W4394430792",
   "W4394566322",
@@ -50988,6 +51235,7 @@
   "W6602925903",
   "W6603038897",
   "W6603100367",
+  "W6603147199",
   "W6603321332",
   "W6603339642",
   "W6603379581",
@@ -51555,6 +51803,7 @@
   "W6677039320",
   "W6677050936",
   "W6677166196",
+  "W6677187788",
   "W6677225042",
   "W6677262410",
   "W6677280606",
@@ -52564,6 +52813,7 @@
   "W6892187538",
   "W6892207775",
   "W6892585260",
+  "W6893536085",
   "W6894118018",
   "W6894283618",
   "W6901845714",
@@ -52597,6 +52847,7 @@
   "W6910962246",
   "W6911101926",
   "W6911185146",
+  "W6912687669",
   "W6912839210",
   "W6912932598",
   "W6913026365",
@@ -52707,8 +52958,11 @@
   "W6969260995",
   "W6969329523",
   "W6974635506",
+  "W6976655201",
+  "W6976744624",
   "W6976955812",
   "W6977192360",
+  "W6977192907",
   "W6977369404",
   "W6977404397",
   "W6977407796",
@@ -52781,6 +53035,7 @@
   "W7039665119",
   "W7039743905",
   "W7041982606",
+  "W7045577496",
   "W7046888368",
   "W7047758851",
   "W7049045675",
@@ -52842,6 +53097,7 @@
   "W7151497638",
   "W7154918054",
   "W7160383036",
+  "W7161679062",
   "W7167485363",
   "W7167663611",
   "W7172448462",
@@ -52928,6 +53184,7 @@
   "W7216476079",
   "W7218579288",
   "W7219767846",
+  "W7220418237",
   "W7220697368",
   "W72673922",
   "W72730618",

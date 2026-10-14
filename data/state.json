@@ -151,6 +151,10 @@
    "To review",
    ""
   ],
+  "W2115449476": [
+   "To review",
+   ""
+  ],
   "W2115751385": [
    "To review",
    ""
@@ -288,6 +292,10 @@
    ""
   ],
   "W2529477055": [
+   "To review",
+   ""
+  ],
+  "W2550680757": [
    "To review",
    ""
   ],
@@ -1322,6 +1330,7 @@
    "id",
    "East Kalimantan"
   ],
+  "East Kolkata Wetland, West Bengal, India": null,
   "Eastern Amazon floodplains, Eastern Amazon, Brazil": null,
   "Eastern Amazon, Brazil": null,
   "Eastern Amazon, Para, Brazil": null,
@@ -2027,6 +2036,12 @@
    "us",
    "Minnesota"
   ],
+  "Minnesota to Alaska, USA": [
+   61.1931687,
+   -149.9146349,
+   "us",
+   "Alaska"
+  ],
   "Minnesota wetland-stream system, Minnesota, USA": null,
   "Minnesota, Minnesota, United States": [
    44.9863418,
@@ -2198,6 +2213,13 @@
    "us",
    "New York"
   ],
+  "New Zealand": [
+   -41.5000831,
+   172.8344077,
+   "nz",
+   ""
+  ],
+  "New Zealand sites, Not stated, New Zealand": null,
   "Ngamiland, Botswana": [
    -19.9875533,
    23.4267468,
@@ -2326,6 +2348,7 @@
    "Metro Manila"
   ],
   "Northern peatland complex in northern Michigan, Michigan, USA": null,
+  "Northern peatlands from Minnesota to Alaska, Minnesota to Alaska, USA": null,
   "Northwest Territories, Canada": [
    65.0000004,
    -118.0,
@@ -2339,8 +2362,10 @@
   "Not stated, Kenya": null,
   "Not stated, Malaysia": null,
   "Not stated, Netherlands": null,
+  "Not stated, New Zealand": null,
   "Not stated, Russia": null,
   "Not stated, Southeast Asia": null,
+  "Not stated, United Kingdom": null,
   "Not stated, United States": null,
   "Not stated, West Kalimantan, Indonesia": null,
   "Nova Scotia, Canada": [
@@ -2495,6 +2520,13 @@
    "Selangor"
   ],
   "Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
+  "Pennine blanket bog, Pennines, United Kingdom": null,
+  "Pennines, United Kingdom": [
+   54.704139,
+   -2.482178,
+   "gb",
+   "England"
+  ],
   "Peru": [
    -6.8699697,
    -75.0458515,
@@ -2722,6 +2754,7 @@
    "Schleswig-Holstein"
   ],
   "Schlöppnerbrunnen, Bavaria, Germany": null,
+  "Scotland sites, Not stated, United Kingdom": null,
   "Scotland, United Kingdom": [
    56.7861112,
    -4.1140518,
@@ -2875,6 +2908,7 @@
    "us",
    "South Carolina"
   ],
+  "South Florida Ranchland, Florida, USA": null,
   "South Kalimantan coastal area, South Kalimantan, Indonesia": null,
   "South Kalimantan, Indonesia": [
    -2.9285686,
@@ -3225,6 +3259,7 @@
    "in",
    "West Bengal"
   ],
+  "West Kalimantan Peatlands, West Kalimantan, Indonesia": null,
   "West Kalimantan, Indonesia": [
    -0.1322387,
    111.0968901,
@@ -4383,6 +4418,28 @@
    "retractions": 0,
    "suggested_to_date": 115,
    "triaged": 0,
+   "unique_candidates": 55292
+  },
+  {
+   "candidates_evaluated": 35294,
+   "date": "2026-10-14",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 51,
+   "field_progress": "Forested swamps 338/338; Forested wetlands 1696/1696; All wetlands 1500/1500",
+   "library": 33,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 94,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 115,
+   "triaged": 2,
    "unique_candidates": 55292
   }
  ],

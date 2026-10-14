@@ -70,7 +70,7 @@ Repository > **Settings > Secrets and variables > Actions > New repository secre
 | `GEMINI_API_KEY` | your Gemini key |
 | `CONTACT_EMAIL` | your email (polite pool for OpenAlex) |
 | `S2_API_KEY` | optional |
-| `ZOTERO_API_KEY` | optional: lets AI-drafted findings use your PDFs (zotero.org/settings/keys, read-only access to your library) |
+| `ZOTERO_API_KEY` | optional: lets AI-drafted findings use your PDFs, and creates suggestions you mark *Add to Zotero* (zotero.org/settings/keys; tick write access for the second) |
 | `ZOTERO_USER_ID` | optional: the number shown as "Your user ID for use in API calls" on that same page |
 
 ### 5. First run
@@ -156,8 +156,11 @@ Run from **Actions > Validation > Run workflow**, choosing a task. Results appea
 - **Change how suggestions are ranked**: edit the *Global score* formula in Suggested papers, and the
   `global_score` function in `pipeline.py` (it uses the same weights to choose which candidates to keep).
 - **Your project evolves**: edit `research_context.md`, then clear *Triage date* on papers you want re-scored.
-- **A suggestion looks good**: add it to Zotero (ResearchRabbit or the DOI). Next night it is marked
-  *Added to Zotero* automatically. Mark the others *Not relevant* so they leave the list.
+- **A suggestion looks good**: set its *Decision* to *Add to Zotero*. The next night the pipeline creates it
+  in your Zotero library (collection `PhD ▸ From pipeline`, set in `config.json` > `zotero`) and marks it
+  *Added to Zotero*. Notero then adds it to the library database. This needs `ZOTERO_API_KEY` with write
+  access. Adding it to Zotero yourself (ResearchRabbit or the DOI) also works and is detected the same way.
+  Mark the others *Not relevant* so they leave the list.
 - **Hitting the free quota often**: lower `MAX_TRIAGE_PER_RUN` (default 40) or raise
   `GEMINI_SECONDS_BETWEEN_CALLS` (default 7) in `nightly.yml`. A big first import just takes a few nights.
 - **Paid alternative**: the script also supports the Claude API (`ANTHROPIC_API_KEY`), but you do not need it.

@@ -1194,6 +1194,119 @@ def prospective_eval(existing, state):
     return {"n": len(labels), "auc": None if auc != auc else round(auc, 2)}
 
 
+ZOTERO_KEY = os.environ.get("ZOTERO_API_KEY", "")
+ZOTERO_USER = os.environ.get("ZOTERO_USER_ID", "")
+ZOTERO_API = "https://api.zotero.org"
+ADD_TO_ZOTERO = "Add to Zotero"
+
+
+def zotero(method, path, **kw):
+    headers = {"Zotero-API-Key": ZOTERO_KEY, "Zotero-API-Version": "3", **kw.pop("headers", {})}
+    for attempt in range(4):
+        r = requests.request(method, f"{ZOTERO_API}/users/{ZOTERO_USER}{path}", headers=headers, timeout=60, **kw)
+        if r.status_code == 429 or r.status_code >= 500:
+            time.sleep(float(r.headers.get("Retry-After") or r.headers.get("Backoff") or 2 ** attempt))
+            continue
+        return r
+    return r
+
+
+def zotero_collection(name, parent_name):
+    """Key of the collection new papers go to (created if missing), under the parent collection when it exists."""
+    cols, start = [], 0
+    while True:
+        r = zotero("GET", "/collections", params={"limit": 100, "start": start})
+        if not r.ok:
+            raise RuntimeError(f"Zotero collections -> {r.status_code}: {r.text[:200]}")
+        page = r.json()
+        cols += page
+        if len(page) < 100:
+            break
+        start += 100
+    by_name = lambda n, parent=None: next((c["key"] for c in cols if c["data"]["name"] == n
+                                           and (parent is None or c["data"].get("parentCollection") == parent)), None)
+    parent = by_name(parent_name) if parent_name else None
+    key = by_name(name, parent or False)
+    if key:
+        return key
+    r = zotero("POST", "/collections", json=[{"name": name, "parentCollection": parent or False}])
+    if not r.ok or not r.json().get("successful"):
+        raise RuntimeError(f"Zotero could not create the collection -> {r.status_code}: {r.text[:200]}")
+    return list(r.json()["successful"].values())[0]["key"]
+
+
+def zotero_item(work, collection):
+    """A Zotero journalArticle built from OpenAlex metadata."""
+    creators = []
+    for a in work.get("authorships") or []:
+        name = ((a.get("author") or {}).get("display_name") or "").strip()
+        if name:
+            first, _, last = name.rpartition(" ")
+            creators.append({"creatorType": "author", "firstName": first, "lastName": last or name})
+    loc = work.get("primary_location") or {}
+    bib = work.get("biblio") or {}
+    pages = "-".join(x for x in (bib.get("first_page"), bib.get("last_page")) if x)
+    doi = norm_doi(work.get("doi"))
+    return {
+        "itemType": "journalArticle",
+        "title": work.get("display_name") or "",
+        "creators": creators,
+        "abstractNote": abstract_text(work.get("abstract_inverted_index")),
+        "publicationTitle": (loc.get("source") or {}).get("display_name") or "",
+        "volume": bib.get("volume") or "", "issue": bib.get("issue") or "", "pages": pages,
+        "date": work.get("publication_date") or str(work.get("publication_year") or ""),
+        "DOI": doi or "",
+        "url": f"https://doi.org/{doi}" if doi else (loc.get("landing_page_url") or ""),
+        "tags": [{"tag": "lit-pipeline"}],
+        "collections": [collection],
+    }
+
+
+def push_to_zotero(existing, lib_ids):
+    """Suggestions you marked 'Add to Zotero' in Notion are created in your Zotero library.
+    Notero then brings them back into the Notion library, and the Obsidian sync into your vault."""
+    wanted = {oid: i for oid, i in existing.items() if i["decision"] == ADD_TO_ZOTERO}
+    if not wanted:
+        return 0
+    if not (ZOTERO_KEY and ZOTERO_USER):
+        log(f"   {len(wanted)} suggestion(s) marked '{ADD_TO_ZOTERO}', but ZOTERO_API_KEY / ZOTERO_USER_ID are not set")
+        return 0
+    zcfg = CONFIG.get("zotero", {})
+    added = 0
+    try:
+        collection = None if DRY_RUN else zotero_collection(zcfg.get("collection", "From pipeline"),
+                                                            zcfg.get("parent_collection", "PhD"))
+    except RuntimeError as e:
+        log(f"   Zotero: {e}")
+        if "403" in str(e):
+            log("   tip: your Zotero key is read-only. At zotero.org/settings/keys, edit it and tick 'Allow write access'")
+        return 0
+    for oid, info in wanted.items():
+        if oid in lib_ids:   # already in the library (added by hand)
+            update_page(info["page_id"], {"Decision": p_select("Added to Zotero")})
+            info["decision"] = "Added to Zotero"
+            continue
+        work = openalex(f"/works/{oid}", {"select": WORK_FIELDS + ",biblio,publication_date"})
+        if not work:
+            log(f"   Zotero: OpenAlex has no record for {oid}, add '{info['title'][:60]}' by hand")
+            continue
+        if DRY_RUN:
+            log(f"   [dry-run] would add to Zotero: {work.get('display_name', '')[:80]}")
+            continue
+        r = zotero("POST", "/items", json=[zotero_item(work, collection)])
+        if r.ok and r.json().get("successful"):
+            update_page(info["page_id"], {"Decision": p_select("Added to Zotero")})
+            info["decision"] = "Added to Zotero"
+            added += 1
+        else:
+            log(f"   Zotero refused '{info['title'][:60]}' -> {r.status_code}: {r.text[:200]}")
+            if r.status_code == 403:
+                log("   tip: your Zotero key is read-only. At zotero.org/settings/keys, edit it and tick 'Allow write access'")
+                break
+    log(f"   added {added} accepted suggestion(s) to Zotero")
+    return added
+
+
 def track_decisions(existing, state):
     """Compare decisions with last run's snapshot and log every change (the screening audit trail)."""
     snap = state.setdefault("decisions", {})
@@ -2038,6 +2151,9 @@ def main():
         existing = None
         log("   Could not open the Suggested papers database in Notion. Open it, click ••• > Connections")
         log("   and add your integration (this happens when the database is moved). Details: " + str(e)[:200])
+    if existing:
+        lib_ids = {short_id(p["work"]["id"]) for p in papers if p.get("work")}
+        push_to_zotero(existing, lib_ids)
     decisions = track_decisions(existing, state) if existing is not None else 0
     model = train_preferences(existing or {})
     if model["ready"]:

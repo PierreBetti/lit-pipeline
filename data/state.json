@@ -564,7 +564,7 @@
    "last_fetch": "2026-10-25",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1682,
+   "total": 1686,
    "trend": {
     "1930": 1,
     "1934": 1,
@@ -690,7 +690,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 17887,
+   "total": 17906,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -4717,6 +4717,28 @@
    "suggested_to_date": 118,
    "triaged": 0,
    "unique_candidates": 55469
+  },
+  {
+   "candidates_evaluated": 34025,
+   "date": "2026-10-26",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 0,
+   "field_progress": "Forested swamps 338/338; Forested wetlands 1682/1682; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-2.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 97,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 118,
+   "triaged": 0,
+   "unique_candidates": 55471
   }
  ],
  "seen_candidates": [
@@ -59898,6 +59920,7 @@
   "W7204835474",
   "W7204888888",
   "W7204960971",
+  "W7205004084",
   "W7205007063",
   "W7205007795",
   "W7207569554",
@@ -59965,6 +59988,7 @@
   "W7222473644",
   "W7222805927",
   "W7222819901",
+  "W7223095014",
   "W72673922",
   "W72730618",
   "W72751723",

@@ -287,6 +287,10 @@
    "Not relevant",
    "Duplicate or superseded"
   ],
+  "W2472871865": [
+   "To review",
+   ""
+  ],
   "W2520021624": [
    "Added to Zotero",
    ""
@@ -391,6 +395,10 @@
    "Added to Zotero",
    ""
   ],
+  "W2885517033": [
+   "To review",
+   ""
+  ],
   "W2900315497": [
    "Added to Zotero",
    ""
@@ -483,6 +491,10 @@
    "To review",
    ""
   ],
+  "W4385708678": [
+   "To review",
+   ""
+  ],
   "W4389091633": [
    "To review",
    ""
@@ -491,7 +503,19 @@
    "To review",
    ""
   ],
+  "W4399443747": [
+   "To review",
+   ""
+  ],
+  "W4402573502": [
+   "To review",
+   ""
+  ],
   "W4410216787": [
+   "To review",
+   ""
+  ],
+  "W7165395633": [
    "To review",
    ""
   ]
@@ -642,7 +666,7 @@
    "last_fetch": "2026-10-25",
    "mode": "full",
    "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 338,
+   "total": 340,
    "trend": {
     "1968": 2,
     "1988": 2,
@@ -690,7 +714,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 17906,
+   "total": 17943,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -4761,6 +4785,28 @@
    "suggested_to_date": 124,
    "triaged": 7,
    "unique_candidates": 55493
+  },
+  {
+   "candidates_evaluated": 34134,
+   "date": "2026-10-28",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 0,
+   "field_progress": "Forested swamps 338/338; Forested wetlands 1682/1682; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 1,
+   "notes": "",
+   "pending": 104,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 125,
+   "triaged": 1,
+   "unique_candidates": 55498
   }
  ],
  "seen_candidates": [
@@ -60006,6 +60052,7 @@
   "W7214506652",
   "W7214550558",
   "W7214611646",
+  "W7214633949",
   "W7214706167",
   "W7214913909",
   "W7214961646",
@@ -60019,6 +60066,7 @@
   "W7220713226",
   "W7220908094",
   "W7220938604",
+  "W7221506893",
   "W7221593343",
   "W7221628260",
   "W7221640079",
@@ -60026,12 +60074,15 @@
   "W7221890498",
   "W7221941034",
   "W7222133242",
+  "W7222347899",
   "W7222473644",
+  "W7222658306",
   "W7222805927",
   "W7222819901",
   "W7223095014",
   "W7223188781",
   "W7223250287",
+  "W7223797759",
   "W72673922",
   "W72730618",
   "W72751723",

@@ -1,5 +1,5 @@
 {
-  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list. research_question_descriptions: full wording of each research question, used by the semantic model. semantic: local embedding model settings (no AI quota). geography: levels for geographic filtering, from broadest to narrowest (country_code = ISO 2 letters; state = province or state name in English). synthesis: settings of the Synthesis matrix (draft findings, tiers). zotero: where suggestions you mark 'Add to Zotero' in Notion are created (a subcollection of parent_collection, made if missing; needs a Zotero key with write access).",
+  "_help": "Project configuration. Option lists must match the Notion property options exactly. ai.pinned_model: set an exact model name (e.g. the version shown in data/ai_log.jsonl) to freeze the AI for a study; leave null to use the fallback list. research_question_descriptions: full wording of each research question, used by the semantic model. semantic: local embedding model settings (no AI quota). geography: levels for geographic filtering, from broadest to narrowest (country_code = ISO 2 letters; state = province or state name in English). synthesis: settings of the Synthesis matrix (draft findings, tiers). zotero: where suggestions you mark 'Add to Zotero' in Notion are created (a subcollection of parent_collection, made if missing; needs a Zotero key with write access). research_questions follow the thesis chapters (3-chapter core plan, 29 Oct 2026); legacy_research_questions are the earlier ones, kept only so the field map still counts papers tagged with them. topics: settings for the Notion 'Reading topics' database (topics you type there are searched every night; papers_per_night is the default when a row leaves it empty; min_match drops papers whose semantic match to the topic is lower). suggestions.min_links: citation links a candidate needs to be scored (1 = more papers outside your current reading, 2 = stricter).",
   "notion": {
     "library_data_source": "87a4954a-4928-8345-b3a8-87caeb0b2c4a",
     "suggestions_data_source": "444be872-ca23-4e7e-8d93-665568721b36",
@@ -8,7 +8,8 @@
     "digest_data_source": "771aea1a-9b0a-4637-ba2c-98ea19e0b398",
     "themes_data_source": "27cbc3f1-6c9b-4382-95ad-491898642e6f",
     "findings_data_source": "ea1e518b-f8a5-4cf7-a2e9-f94c40efa4c4",
-    "review_queue_data_source": "3fe370e3-75e8-4cf0-b7d8-3a226bf37ced"
+    "review_queue_data_source": "3fe370e3-75e8-4cf0-b7d8-3a226bf37ced",
+    "topics_data_source": "68105102-73d4-4411-9585-3de5942d5ec5"
   },
   "ai": {
     "temperature": 0,
@@ -30,11 +31,10 @@
     "Nature-based solutions & policy"
   ],
   "research_questions": [
-    "RQ1 Source/sink controls",
-    "RQ2 Disturbed vs intact",
-    "RQ3 Anthropogenic impact",
-    "RQ4 Soil vs water C sources",
-    "RQ5 Microbial taxonomy & function"
+    "Ch1 Controls on fluxes",
+    "Ch2 Sink or source",
+    "Ch3 What tips the balance",
+    "Secondary: microbes, water chemistry & contaminants"
   ],
   "ecosystems": [
     "Forested swamp",
@@ -68,11 +68,10 @@
     "Methods"
   ],
   "research_question_descriptions": {
-    "RQ1 Source/sink controls": "What controls whether a forested swamp is a net source or sink of greenhouse gases (CO2, CH4, N2O), including temperature, water table and soil conditions?",
-    "RQ2 Disturbed vs intact": "How do greenhouse gas fluxes and carbon dynamics differ between disturbed and intact forested wetlands?",
-    "RQ3 Anthropogenic impact": "How do human activities such as drainage, land use, agriculture and pollution affect greenhouse gas fluxes in forested wetlands?",
-    "RQ4 Soil vs water C sources": "How is carbon distributed between soil and water in wetlands, and what are the sources of dissolved carbon and greenhouse gases?",
-    "RQ5 Microbial taxonomy & function": "What is the role of taxonomic and functional microbial diversity, such as methanogens, methanotrophs and denitrifiers, in greenhouse gas production in wetland soils and water?"
+    "Ch1 Controls on fluxes": "What controls soil and tree stem fluxes of CO2, CH4 and N2O in temperate forested swamps along a gradient of sites: water table, soil temperature, redox, vegetation and water chemistry?",
+    "Ch2 Sink or source": "Is a temperate forested swamp a net sink or source of greenhouse gases over a year, as an annual CO2-equivalent budget of CO2, CH4 and N2O, and what share of the methane is emitted through tree stems?",
+    "Ch3 What tips the balance": "Which thresholds, such as water table depth or temperature, switch forested wetlands from greenhouse gas sink to source, and how would climate change scenarios shift that balance?",
+    "Secondary: microbes, water chemistry & contaminants": "How do microbial communities (methanogens, methanotrophs, nitrifiers, denitrifiers), dissolved carbon, water chemistry, metals, road salt and other contaminants influence greenhouse gas production in wetland soils and water?"
   },
   "semantic": {
     "enabled": true,
@@ -81,7 +80,7 @@
     "cos_high": 0.84,
     "discovery_per_question": 60,
     "discovery_keep": 30,
-    "reserved_slots": 8
+    "reserved_slots": 12
   },
   "digest": {
     "every_days": 7
@@ -113,5 +112,20 @@
   "zotero": {
     "collection": "From pipeline",
     "parent_collection": "PhD"
+  },
+  "legacy_research_questions": [
+    "RQ1 Source/sink controls",
+    "RQ2 Disturbed vs intact",
+    "RQ3 Anthropogenic impact",
+    "RQ4 Soil vs water C sources",
+    "RQ5 Microbial taxonomy & function"
+  ],
+  "topics": {
+    "papers_per_night": 8,
+    "search_pool": 50,
+    "min_match": 20
+  },
+  "suggestions": {
+    "min_links": 1
   }
 }

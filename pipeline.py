@@ -116,6 +116,13 @@ elif AI_CFG.get("fallback_models") and "GEMINI_MODELS" not in os.environ:
     GEMINI_MODELS = list(AI_CFG["fallback_models"])
 GEMINI_MODEL = GEMINI_MODELS[0]
 VALIDATION_DS = CONFIG.get("notion", {}).get("validation_data_source", "")
+TOPICS_DS = CONFIG.get("notion", {}).get("topics_data_source", "")
+TOPICS_CFG = {"papers_per_night": 8, "search_pool": 50, "min_match": 20, **CONFIG.get("topics", {})}
+# Research questions used before the current list: kept only so the field map still counts papers tagged with them.
+LEGACY_RQS = [q for q in CONFIG.get("legacy_research_questions", []) if q not in RESEARCH_QUESTIONS]
+MAP_RQS = RESEARCH_QUESTIONS + LEGACY_RQS
+# A candidate needs at least this many citation links (cited by, cites or co-cited with your papers) to be scored.
+MIN_LINKS = int(os.environ.get("MIN_LINKS") or CONFIG.get("suggestions", {}).get("min_links", 2))
 DIGEST_DS = CONFIG.get("notion", {}).get("digest_data_source", "")
 
 
@@ -201,7 +208,7 @@ def read(prop):
     t = prop["type"]
     if t in ("title", "rich_text"):
         return "".join(x.get("plain_text", "") for x in prop[t])
-    if t in ("url", "number"):
+    if t in ("url", "number", "checkbox"):
         return prop[t]
     if t == "multi_select":
         return [o["name"] for o in prop["multi_select"]]
@@ -958,7 +965,65 @@ def load_existing_suggestions():
     return existing
 
 
-def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None):
+# ---- Reading topics (Notion "Reading topics" database) ---------------------
+def topic_label(text):
+    """Notion multi-select options can't contain commas and are limited in length."""
+    return re.sub(r"\s+", " ", text.replace(",", " ")).strip()[:90]
+
+
+def load_topics():
+    """Active rows of the Reading topics database: subjects you want papers on, whatever your library cites."""
+    if not TOPICS_DS:
+        return []
+    try:
+        rows = query_all(TOPICS_DS)
+    except RuntimeError as e:
+        log("   Could not open the Reading topics database in Notion (••• > Connections > add your integration). "
+            + str(e)[:150])
+        return []
+    topics = []
+    for r in rows:
+        pr = r["properties"]
+        text = (read(pr.get("Topic")) or "").strip()
+        if not text or not read(pr.get("Active")):
+            continue
+        topics.append({"page_id": r["id"], "text": text, "label": topic_label(text),
+                       "n": int(read(pr.get("Papers per night")) or TOPICS_CFG["papers_per_night"]),
+                       "found": int(read(pr.get("Papers found")) or 0)})
+    log(f"   {len(topics)} active reading topic{'s' if len(topics) != 1 else ''}")
+    return topics
+
+
+def discover_topics(topics, emb, exclude):
+    """For each topic: OpenAlex relevance search, re-ranked by meaning when the local model is loaded.
+    Returns {work_id: [topic labels]} with up to 'Papers per night' new papers per topic."""
+    import semantic
+    hits = defaultdict(list)
+    for t in topics:
+        res = openalex("/works", {"search": t["text"], "filter": "type:article|review",
+                                  "per_page": TOPICS_CFG["search_pool"],
+                                  "select": "id,display_name,abstract_inverted_index"})
+        works = [w for w in (res or {}).get("results", []) if short_id(w["id"]) not in exclude]
+        ranked = [(short_id(w["id"]), None) for w in works]          # OpenAlex relevance order
+        if emb is not None and works:
+            texts = [semantic.paper_text(w.get("display_name"), abstract_text(w.get("abstract_inverted_index")))
+                     for w in works]
+            _, scores = semantic.match_scores(emb, CONFIG, [t["text"]], texts)
+            ranked = sorted(((short_id(w["id"]), sc) for w, sc in zip(works, scores)), key=lambda x: x[1], reverse=True)
+            ranked = [(i, sc) for i, sc in ranked if sc >= TOPICS_CFG["min_match"]]
+        new = [i for i, _ in ranked if t["label"] not in hits.get(i, [])][:t["n"]]
+        for i in new:
+            hits[i].append(t["label"])
+        log(f"   topic \u201c{t['label']}\u201d: {len(works)} papers not yet suggested, keeping {len(new)}")
+        if not DRY_RUN:
+            try:
+                update_page(t["page_id"], {"Papers found": p_num(t["found"] + len(new)), "Last searched": p_date(TODAY)})
+            except RuntimeError as e:
+                log("   could not update the topic row: " + str(e)[:150])
+    return dict(hits)
+
+
+def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None, topic_hits=None):
     lib = [p for p in papers if p.get("work")]
     lib_ids = {short_id(p["work"]["id"]) for p in lib}
     lib_dois = {p["doi"] for p in papers if p["doi"]}
@@ -1001,12 +1066,14 @@ def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None):
 
     # Cheap pre-ranking, then score the best CANDIDATE_POOL in depth.
     sem_extra = {k: v for k, v in (sem_extra or {}).items() if k not in lib_ids}
-    candidates = (set(cited_by_lib) | set(cites_lib) | set(cocite) | s2 | set(sem_extra)) - lib_ids
+    topic_hits = {k: v for k, v in (topic_hits or {}).items() if k not in lib_ids}
+    candidates = (set(cited_by_lib) | set(cites_lib) | set(cocite) | s2 | set(sem_extra) | set(topic_hits)) - lib_ids
     pre = {x: 2 * len(cited_by_lib[x]) + 2 * len(cites_lib[x]) + sum(cocite[x].values()) + (2 if x in s2 else 0)
               + (3 if x in sem_extra else 0)
            for x in candidates}
-    pool = [x for x, v in sorted(pre.items(), key=lambda kv: kv[1], reverse=True) if v >= 2][:CANDIDATE_POOL]
+    pool = [x for x, v in sorted(pre.items(), key=lambda kv: kv[1], reverse=True) if v >= MIN_LINKS][:CANDIDATE_POOL]
     pool += [x for x in sem_extra if x not in pool]      # papers found by meaning are always scored in depth
+    pool += [x for x in topic_hits if x not in pool]     # and so are papers found for your reading topics
 
     meta = {}
     for chunk in chunks(pool, 50):
@@ -1074,6 +1141,10 @@ def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None):
         if x in sem_extra:
             reasons.append(f"Found by meaning: close to your research questions (semantic match {sem_extra[x]})")
             sources.append("Semantic search")
+        c["topics"] = topic_hits.get(x, [])
+        if c["topics"]:
+            reasons.append("Found for your reading topic " + " and ".join(f"\u201c{t}\u201d" for t in c["topics"]))
+            sources.append("Your topic")
         if c["closest"]:
             reasons.append("Most similar to " + " and ".join(name_of[l] for l in c["closest"]))
         if c["shared_refs"]:
@@ -1093,6 +1164,8 @@ def build_suggestions(papers, existing, keep_n=None, emb=None, sem_extra=None):
     sem_found = [c for c in scored if c["id"] in sem_extra and c not in top][:max(0, reserved - sum(c["id"] in sem_extra for c in top))]
     if sem_found:
         top = top[:len(top) - len(sem_found)] + sem_found
+    # Papers found for your reading topics are always kept: you asked for them.
+    top += [c for c in scored if c["topics"] and c not in top]
     top_ids = {c["id"] for c in top}
     # also refresh suggestions already in Notion that are still in the scored pool
     refresh = [c for c in scored if c["id"] in existing and c["id"] not in top_ids]
@@ -1348,6 +1421,8 @@ def sync_suggestions(top, refresh, lib_ids, existing, triager, scorer, emb=None)
         }
         if c.get("semantic") is not None:
             props["Semantic match"] = p_num(c["semantic"])
+        if c.get("topics"):
+            props["Topic"] = p_multi(c["topics"])
         ps = scorer(c["work"].get("display_name"), abstract_text(w.get("abstract_inverted_index")), c["relevance"],
                     c["similarity"], c["score"], percentile(w), w.get("publication_year"))
         if ps is not None:
@@ -1791,7 +1866,7 @@ def field_stats(corpus, scopes, state, papers):
         for gas in ["All"] + GASES:
             sub = on if gas == "All" else [r for r in on if gas in r["k"]["g"]]
             eco_rq[gas] = {e: {q: round(sum(1 for r in sub if e in r["k"]["e"] and q in r["k"]["q"]) * scale)
-                               for q in RESEARCH_QUESTIONS} for e in ECOSYSTEMS}
+                               for q in MAP_RQS} for e in ECOSYSTEMS}
         design_biome = {d: {b: round(sum(1 for r in on if r["k"]["z"] == d and r["k"]["b"] == b) * scale)
                             for b in BIOMES} for d in STUDY_DESIGNS}
         points = [[pt[0], pt[1], pt[2], (r["t"] or "")[:110], r["y"], r.get("d"),
@@ -1803,7 +1878,7 @@ def field_stats(corpus, scopes, state, papers):
             sub = on if not level.get("country_code") else \
                 [r for r in located if any(in_geo(pt[3], pt[4], level) for pt in r["k"]["p"] if len(pt) >= 5)]
             rq = {}
-            for q in RESEARCH_QUESTIONS:
+            for q in MAP_RQS:
                 k_ = sum(1 for r in sub if q in r["k"]["q"])
                 p, lo, hi = wilson(k_, len(sub))
                 rq[q] = {"n": k_, "p": round(p, 4), "lo": round(lo, 4), "hi": round(hi, 4), "est": round(k_ * scale)}
@@ -1811,7 +1886,7 @@ def field_stats(corpus, scopes, state, papers):
             for gas in ["All"] + GASES:
                 g_sub = sub if gas == "All" else [r for r in sub if gas in r["k"]["g"]]
                 mats[gas] = {e: {q: round(sum(1 for r in g_sub if e in r["k"]["e"] and q in r["k"]["q"]) * scale)
-                                 for q in RESEARCH_QUESTIONS} for e in ECOSYSTEMS}
+                                 for q in MAP_RQS} for e in ECOSYSTEMS}
             geo[level["id"]] = {"n": len(sub), "est": round(len(sub) * scale), "rq": rq, "eco_rq": mats,
                                 "design_biome": {d: {b: round(sum(1 for r in sub if r["k"]["z"] == d and r["k"]["b"] == b) * scale)
                                                      for b in BIOMES} for d in STUDY_DESIGNS}}
@@ -1820,7 +1895,7 @@ def field_stats(corpus, scopes, state, papers):
             "mode": meta.get("mode", "full"), "total": total, "fetched": len(members),
             "classified": len(classified), "on_topic": len(on), "est_on_topic": est_on, "scale": round(scale, 3),
             "title_only": sum(1 for r in classified if r["k"].get("na")),
-            "rq": dist(RESEARCH_QUESTIONS, lambda r: r["k"]["q"]),
+            "rq": dist(MAP_RQS, lambda r: r["k"]["q"]),
             "gases": dist(GASES, lambda r: r["k"]["g"]),
             "ecosystems": dist(ECOSYSTEMS, lambda r: r["k"]["e"]),
             "eco_rq": eco_rq, "design_biome": design_biome,
@@ -2198,7 +2273,16 @@ def main():
             parts.append(pm / 100)
         return round(100 * sum(parts) / len(parts)) if parts else None
 
-    top, refresh, lib_ids, candidates = build_suggestions(papers, existing or {}, emb=emb, sem_extra=sem_extra)
+    topics = load_topics()
+    topic_hits = {}
+    if topics:
+        try:
+            lib_ids_now = {short_id(p["work"]["id"]) for p in papers if p.get("work")}
+            topic_hits = discover_topics(topics, emb, lib_ids_now | set(existing or {}))
+        except Exception as e:
+            log(f"   reading topics skipped: {type(e).__name__}: {str(e)[:150]}")
+    top, refresh, lib_ids, candidates = build_suggestions(papers, existing or {}, emb=emb, sem_extra=sem_extra,
+                                                          topic_hits=topic_hits)
     # everything ever suggested was, by definition, identified by the algorithm
     seen = set(state.get("seen_candidates", [])) | set(candidates) | set(existing or {})
     state["seen_candidates"] = sorted(seen)
@@ -2237,7 +2321,7 @@ def main():
         "runs": state.get("runs", [])[-60:],
         "synthesis": {k: synth.get(k) for k in ("drafts_added", "pending_review", "tiers")}
                      | {"stats": state.get("synthesis_stats", {})},
-        "options": {"rqs": RESEARCH_QUESTIONS, "ecosystems": ECOSYSTEMS, "gases": GASES,
+        "options": {"rqs": MAP_RQS, "ecosystems": ECOSYSTEMS, "gases": GASES,
                     "biomes": BIOMES, "categories": CATEGORIES, "designs": STUDY_DESIGNS,
                     "geography": GEO_LEVELS},
     }

@@ -96,6 +96,16 @@ papers were matched, triaged and suggested. After that it runs by itself every n
 - A **📰 Weekly digest** page appears in Notion every 7 days.
 - The field map now includes French search terms, theses, reports, chapters and preprints (`scopes.json`).
 
+## Reading topics
+
+The Notion database **🔎 Reading topics** (under Literature Matrix) lets reading drive the search instead of
+your current library. Type a topic or question in a new row and tick **Active**. Every night the pipeline
+searches OpenAlex for it, re-ranks the results by meaning with the local model, and adds up to
+**Papers per night** new papers to Suggested papers, with **Source** = Your topic and **Topic** = the row.
+These papers are always kept, even with no citation link to your library. The row's **Papers found** and
+**Last searched** are filled in by the pipeline. Untick Active to stop a topic. Defaults are in
+`config.json` → `topics`, and `suggestions.min_links` sets how many citation links an ordinary candidate needs.
+
 ## Lenses and geography
 
 The dashboard has a control bar (on the Study sites, Evidence gaps, Field rings and Timeline tabs):

@@ -41,7 +41,7 @@ other contaminants.
 - Ch1 Controls on fluxes: drivers of soil and stem fluxes of the three gases.
 - Ch2 Sink or source: annual greenhouse gas budget, CO2-equivalent balance, stem share.
 - Ch3 What tips the balance: thresholds and tipping points, climate scenarios.
-- Secondary: microbes, water chemistry & contaminants.
+- Secondary: microbes water chemistry & contaminants.
 
 ## What counts as relevant
 

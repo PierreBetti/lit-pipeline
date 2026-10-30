@@ -34,7 +34,7 @@
     "Ch1 Controls on fluxes",
     "Ch2 Sink or source",
     "Ch3 What tips the balance",
-    "Secondary: microbes, water chemistry & contaminants"
+    "Secondary: microbes water chemistry & contaminants"
   ],
   "ecosystems": [
     "Forested swamp",
@@ -71,7 +71,7 @@
     "Ch1 Controls on fluxes": "What controls soil and tree stem fluxes of CO2, CH4 and N2O in temperate forested swamps along a gradient of sites: water table, soil temperature, redox, vegetation and water chemistry?",
     "Ch2 Sink or source": "Is a temperate forested swamp a net sink or source of greenhouse gases over a year, as an annual CO2-equivalent budget of CO2, CH4 and N2O, and what share of the methane is emitted through tree stems?",
     "Ch3 What tips the balance": "Which thresholds, such as water table depth or temperature, switch forested wetlands from greenhouse gas sink to source, and how would climate change scenarios shift that balance?",
-    "Secondary: microbes, water chemistry & contaminants": "How do microbial communities (methanogens, methanotrophs, nitrifiers, denitrifiers), dissolved carbon, water chemistry, metals, road salt and other contaminants influence greenhouse gas production in wetland soils and water?"
+    "Secondary: microbes water chemistry & contaminants": "How do microbial communities (methanogens, methanotrophs, nitrifiers, denitrifiers), dissolved carbon, water chemistry, metals, road salt and other contaminants influence greenhouse gas production in wetland soils and water?"
   },
   "semantic": {
     "enabled": true,

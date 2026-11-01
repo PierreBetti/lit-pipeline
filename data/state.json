@@ -87,6 +87,10 @@
    "To review",
    ""
   ],
+  "W2026238421": [
+   "To review",
+   ""
+  ],
   "W2036826963": [
    "To review",
    ""
@@ -131,6 +135,10 @@
    "To review",
    ""
   ],
+  "W2089398431": [
+   "To review",
+   ""
+  ],
   "W2089940084": [
    "To review",
    ""
@@ -144,6 +152,10 @@
    ""
   ],
   "W2094311905": [
+   "To review",
+   ""
+  ],
+  "W2095339859": [
    "To review",
    ""
   ],
@@ -167,11 +179,19 @@
    "To review",
    ""
   ],
+  "W2105898467": [
+   "To review",
+   ""
+  ],
   "W2109730769": [
    "To review",
    ""
   ],
   "W2111989634": [
+   "To review",
+   ""
+  ],
+  "W2113230932": [
    "To review",
    ""
   ],
@@ -220,6 +240,10 @@
    ""
   ],
   "W2138732169": [
+   "To review",
+   ""
+  ],
+  "W2141802517": [
    "To review",
    ""
   ],
@@ -291,6 +315,10 @@
    "To review",
    ""
   ],
+  "W2284819247": [
+   "To review",
+   ""
+  ],
   "W2286609366": [
    "To review",
    ""
@@ -340,6 +368,10 @@
    ""
   ],
   "W2527674082": [
+   "To review",
+   ""
+  ],
+  "W2529007538": [
    "To review",
    ""
   ],
@@ -403,6 +435,10 @@
    "To review",
    ""
   ],
+  "W2776962865": [
+   "To review",
+   ""
+  ],
   "W2785174985": [
    "To review",
    ""
@@ -423,7 +459,15 @@
    "To review",
    ""
   ],
+  "W2795971879": [
+   "To review",
+   ""
+  ],
   "W2798268396": [
+   "To review",
+   ""
+  ],
+  "W2804488418": [
    "To review",
    ""
   ],
@@ -475,6 +519,10 @@
    "To review",
    ""
   ],
+  "W2965051840": [
+   "To review",
+   ""
+  ],
   "W2972407136": [
    "Added to Zotero",
    ""
@@ -515,6 +563,10 @@
    "To review",
    ""
   ],
+  "W3097868119": [
+   "To review",
+   ""
+  ],
   "W3117301098": [
    "To review",
    ""
@@ -551,11 +603,27 @@
    "To review",
    ""
   ],
+  "W4220787108": [
+   "To review",
+   ""
+  ],
+  "W4220881729": [
+   "To review",
+   ""
+  ],
   "W4221102166": [
    "To review",
    ""
   ],
   "W4226333000": [
+   "To review",
+   ""
+  ],
+  "W4281738941": [
+   "To review",
+   ""
+  ],
+  "W4292315861": [
    "To review",
    ""
   ],
@@ -571,7 +639,15 @@
    "To review",
    ""
   ],
+  "W4385609793": [
+   "To review",
+   ""
+  ],
   "W4385708678": [
+   "To review",
+   ""
+  ],
+  "W4387223704": [
    "To review",
    ""
   ],
@@ -627,6 +703,14 @@
    "To review",
    ""
   ],
+  "W4412566292": [
+   "To review",
+   ""
+  ],
+  "W4412926191": [
+   "To review",
+   ""
+  ],
   "W4413132979": [
    "To review",
    ""
@@ -643,11 +727,23 @@
    "To review",
    ""
   ],
+  "W7125368300": [
+   "To review",
+   ""
+  ],
+  "W7129410120": [
+   "To review",
+   ""
+  ],
   "W7134893659": [
    "To review",
    ""
   ],
   "W7154918054": [
+   "To review",
+   ""
+  ],
+  "W7164933340": [
    "To review",
    ""
   ],
@@ -674,7 +770,7 @@
    "Upland forest | RQ1 Source/sink controls",
    "Upland forest | RQ5 Microbial taxonomy & function"
   ],
-  "last": "2026-10-25",
+  "last": "2026-11-01",
   "library": [
    "4014954a-4928-8141-a711-c6b1ef133d99",
    "4014954a-4928-81a8-92e1-f82ebae2b41e",
@@ -718,17 +814,18 @@
  "drafted": [],
  "field_scopes": {
   "forested": {
-   "fetched": 1682,
+   "fetched": 1697,
    "key": "1d89c2f230f3ffa3b1ec9125d6dde0c3",
    "label": "Forested wetlands",
-   "last_fetch": "2026-10-25",
+   "last_fetch": "2026-11-01",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1689,
+   "total": 1697,
    "trend": {
     "1930": 1,
     "1934": 1,
     "1949": 1,
+    "1950": 1,
     "1954": 1,
     "1957": 1,
     "1960": 1,
@@ -754,7 +851,7 @@
     "1984": 4,
     "1986": 7,
     "1987": 5,
-    "1988": 8,
+    "1988": 7,
     "1989": 8,
     "1990": 4,
     "1991": 9,
@@ -764,45 +861,45 @@
     "1995": 11,
     "1996": 15,
     "1997": 14,
-    "1998": 24,
-    "1999": 12,
-    "2000": 19,
-    "2001": 13,
+    "1998": 26,
+    "1999": 11,
+    "2000": 18,
+    "2001": 14,
     "2002": 21,
     "2003": 15,
     "2004": 19,
     "2005": 24,
     "2006": 27,
     "2007": 28,
-    "2008": 30,
-    "2009": 27,
+    "2008": 29,
+    "2009": 29,
     "2010": 54,
     "2011": 56,
-    "2012": 55,
-    "2013": 55,
-    "2014": 70,
-    "2015": 69,
+    "2012": 58,
+    "2013": 56,
+    "2014": 71,
+    "2015": 70,
     "2016": 67,
     "2017": 96,
-    "2018": 72,
-    "2019": 75,
+    "2018": 73,
+    "2019": 77,
     "2020": 70,
-    "2021": 84,
+    "2021": 87,
     "2022": 80,
     "2023": 86,
-    "2024": 89,
+    "2024": 90,
     "2025": 83,
-    "2026": 84
+    "2026": 86
    }
   },
   "swamps": {
-   "fetched": 338,
+   "fetched": 341,
    "key": "ff2918429632d0a97498ce10e5e858a9",
    "label": "Forested swamps",
-   "last_fetch": "2026-10-25",
+   "last_fetch": "2026-11-01",
    "mode": "full",
    "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 340,
+   "total": 341,
    "trend": {
     "1968": 2,
     "1988": 2,
@@ -826,21 +923,21 @@
     "2009": 3,
     "2010": 10,
     "2011": 13,
-    "2012": 10,
-    "2013": 18,
+    "2012": 11,
+    "2013": 17,
     "2014": 17,
     "2015": 14,
     "2016": 15,
-    "2017": 18,
+    "2017": 19,
     "2018": 24,
     "2019": 18,
     "2020": 21,
-    "2021": 15,
+    "2021": 16,
     "2022": 17,
     "2023": 17,
-    "2024": 24,
+    "2024": 25,
     "2025": 20,
-    "2026": 23
+    "2026": 25
    }
   },
   "wetlands": {
@@ -850,7 +947,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 18024,
+   "total": 18067,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -1079,6 +1176,12 @@
   "Amazonian floodplains, Amazon, Brazil": null,
   "Andean-Amazon transition zone, Caquetá / Amazonia, Colombia": null,
   "Andean-Amazon transition zone, Caquetá or similar (Andes-Amazon transition), Colombia": null,
+  "Ankasa, Western Region, Ghana": [
+   5.2119024,
+   -2.6496137,
+   "gh",
+   "Western Region"
+  ],
   "Apopka Marsh, Florida, USA": null,
   "Appalachian peatlands, West Virginia and Western Maryland, USA": null,
   "Argentina / Chile": [
@@ -1165,6 +1268,12 @@
    17.5378188,
    "se",
    ""
+  ],
+  "Blackwater Conservation Area, Louisiana, United States": [
+   30.5337397,
+   -91.0893459,
+   "us",
+   "Louisiana"
   ],
   "Bocas del Toro Province, Panama": [
    8.9683737,
@@ -2061,6 +2170,7 @@
   ],
   "Luanhaizi peatland, Qinghai—Tibet Plateau, China": null,
   "Lutose, Taiga Plains, Alberta, Canada": null,
+  "MY-MLM, Sarawak, Malaysia": null,
   "Madoi wetland, Qinghai, Tibetan plateau, China": null,
   "Madre de Dios peatland, Madre de Dios, Peru": null,
   "Madre de Dios, Peru": [
@@ -3277,6 +3387,7 @@
   "Tamban sub district, South Kalimantan, Indonesia": null,
   "Tanana Lowlands, Interior Alaska, United States": null,
   "Taqiaozhou, Min River estuary, China": null,
+  "Tarkosalinsk gas field region, Western Siberia, Russia": null,
   "Taylor Slough, Florida Everglades, United States": null,
   "Taïga des plaines, Northwest Territories, Canada": null,
   "The Glades, Maryland, United States": [
@@ -3524,6 +3635,7 @@
   "XiaoXing'an Mountains, Heilongjiang, China": null,
   "Xiaobohu swamp, Qinghai—Tibet Plateau, China": null,
   "Xiaoxing'an Mountain region, Heilongjiang, China": null,
+  "Xiaoxing'an Mountains forested wetland, Heilongjiang, China": null,
   "Xiaoxing'an Mountains, Heilongjiang, China": null,
   "Xiaoxing'an Mountains, Northeast China, China": null,
   "Xiaoxing'anling region, Heilongjiang, China": null,
@@ -4406,6 +4518,117 @@
     "name": "record_triage"
    },
    "system": "You triage scientific papers for a PhD student so they can decide what to read first.\n\nHere is the student's research context:\n<context>\n# PhD research context (used by the AI to judge relevance)\n\nEdit this file whenever your project evolves. The more specific it is, the better\nthe relevance scores and research-question tags will be.\n\n## Project\n\nPhD in biology (UQAM). Main question: what makes a forested swamp (marécage\narborescent) of southern Québec a sink or a source of greenhouse gases\n(CO2, CH4, N2O)? The aim is to inform nature-based climate solutions.\n\nFour temperate forested swamps (OKA, SRL, LAT, SLV) form a gradient of slightly\ndifferent swamps (hydrology, stand, soil), not a disturbed vs intact comparison.\nThey are swamps, not peatlands. Each site has 4 clusters of 3 soil collars, plus\nwater table (piezometers), soil temperature and moisture (TOMST), air temperature,\npressure and PAR loggers.\n\nFluxes are measured with closed chambers on soil collars and on tree stems\n(LI-COR LI-7810 / LI-7820 trace gas analyzers), about 10 trees per site at chest\nheight and near the ground. Water chemistry from piezometers (DOC, pH, ions,\nICP-MS metals). No aquatic (water surface) flux measurements and no eddy covariance.\nField seasons: 2026 test year (OKA, SRL), 2027 and 2028 full seasons at all sites.\n\n## Thesis chapters (3-chapter core plan, October 2026)\n\n1. What controls the fluxes? Drivers of soil and stem CO2, CH4 and N2O fluxes\n   along the gradient of sites: water table, soil temperature, redox, vegetation,\n   water chemistry.\n2. Sink or source? Annual CO2-equivalent budget of each swamp and the share of\n   methane emitted by tree stems.\n3. What tips the balance? Thresholds (water table, temperature) that switch a swamp\n   from sink to source, and climate change scenarios (statistical approach:\n   breakpoints, GAMs, mixed models).\n\nSecondary topics, kept but not central: microbial communities (methanogens,\nmethanotrophs, nitrifiers / denitrifiers), dissolved carbon, metals, road salt and\nother contaminants.\n\n## Research questions (tags)\n\n- Ch1 Controls on fluxes: drivers of soil and stem fluxes of the three gases.\n- Ch2 Sink or source: annual greenhouse gas budget, CO2-equivalent balance, stem share.\n- Ch3 What tips the balance: thresholds and tipping points, climate scenarios.\n- Secondary: microbes water chemistry & contaminants.\n\n## What counts as relevant\n\nMost relevant: temperate forested swamps and wetlands of eastern North America;\ntree stem fluxes; water table control of CH4 and N2O; annual GHG budgets and\nCO2-equivalent metrics; chamber methods. Also useful: other forested wetlands and\npeatlands when the processes transfer, and methods or syntheses (FLUXNET-CH4,\nglobal methane budget). N2O and hydrology are under-represented in the library so far.\n\n</context>\n\nRelevance rubric:\n5 = directly on the PhD topic (GHG fluxes or carbon dynamics in forested swamps or very similar systems), or a key method or framework the student will reuse.\n4 = closely related: other wetland types with the same gases or processes, stem fluxes, or microbial drivers of CH4/N2O.\n3 = useful background: general wetland carbon cycling, upland forest fluxes, reviews.\n2 = tangential.\n1 = not relevant.\n\nRules: base everything only on the title and abstract provided. If the abstract is missing, say so at the start of the summary and keep the relevance score conservative. Never invent numbers, sites or methods that are not in the text. Answer in the requested JSON format."
+  },
+  "e2cd9c23661c": {
+   "kind": "field",
+   "schema": {
+    "description": "Classify one paper for a systematic map of the research field.",
+    "input_schema": {
+     "properties": {
+      "biome": {
+       "enum": [
+        "Boreal",
+        "Temperate",
+        "Subtropical",
+        "Tropical",
+        "Arctic / tundra",
+        "Multiple / global",
+        "Not stated"
+       ],
+       "type": "string"
+      },
+      "ecosystems": {
+       "items": {
+        "enum": [
+         "Forested swamp",
+         "Peatland / bog / fen",
+         "Marsh",
+         "Upland forest",
+         "Other wetland",
+         "Other"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "gases": {
+       "items": {
+        "enum": [
+         "CO2",
+         "CH4",
+         "N2O"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "on_topic": {
+       "description": "True if the paper actually studies greenhouse gas or carbon exchange in wetland ecosystems (field, lab, model or review). False for papers that only mention these words.",
+       "type": "boolean"
+      },
+      "research_questions": {
+       "description": "Research questions of the PhD that this paper substantially informs. May be empty.",
+       "items": {
+        "enum": [
+         "Ch1 Controls on fluxes",
+         "Ch2 Sink or source",
+         "Ch3 What tips the balance",
+         "Secondary: microbes water chemistry & contaminants"
+        ],
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "sites": {
+       "description": "Named field sites. Empty if none are named.",
+       "items": {
+        "properties": {
+         "country": {
+          "type": "string"
+         },
+         "name": {
+          "type": "string"
+         },
+         "region": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "name",
+         "region",
+         "country"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      },
+      "study_design": {
+       "enum": [
+        "Field observation",
+        "Field experiment",
+        "Lab / incubation",
+        "Modelling",
+        "Review",
+        "Meta-analysis / synthesis",
+        "Methods"
+       ],
+       "type": "string"
+      }
+     },
+     "required": [
+      "on_topic",
+      "research_questions",
+      "ecosystems",
+      "gases",
+      "biome",
+      "study_design",
+      "sites"
+     ],
+     "type": "object"
+    },
+    "name": "record_field_map"
+   },
+   "system": "You classify papers for a systematic map of a research field, so a PhD student can see what the field as a whole has and has not studied.\n\nThe student's research context, including the research questions to tag:\n<context>\n# PhD research context (used by the AI to judge relevance)\n\nEdit this file whenever your project evolves. The more specific it is, the better\nthe relevance scores and research-question tags will be.\n\n## Project\n\nPhD in biology (UQAM). Main question: what makes a forested swamp (marécage\narborescent) of southern Québec a sink or a source of greenhouse gases\n(CO2, CH4, N2O)? The aim is to inform nature-based climate solutions.\n\nFour temperate forested swamps (OKA, SRL, LAT, SLV) form a gradient of slightly\ndifferent swamps (hydrology, stand, soil), not a disturbed vs intact comparison.\nThey are swamps, not peatlands. Each site has 4 clusters of 3 soil collars, plus\nwater table (piezometers), soil temperature and moisture (TOMST), air temperature,\npressure and PAR loggers.\n\nFluxes are measured with closed chambers on soil collars and on tree stems\n(LI-COR LI-7810 / LI-7820 trace gas analyzers), about 10 trees per site at chest\nheight and near the ground. Water chemistry from piezometers (DOC, pH, ions,\nICP-MS metals). No aquatic (water surface) flux measurements and no eddy covariance.\nField seasons: 2026 test year (OKA, SRL), 2027 and 2028 full seasons at all sites.\n\n## Thesis chapters (3-chapter core plan, October 2026)\n\n1. What controls the fluxes? Drivers of soil and stem CO2, CH4 and N2O fluxes\n   along the gradient of sites: water table, soil temperature, redox, vegetation,\n   water chemistry.\n2. Sink or source? Annual CO2-equivalent budget of each swamp and the share of\n   methane emitted by tree stems.\n3. What tips the balance? Thresholds (water table, temperature) that switch a swamp\n   from sink to source, and climate change scenarios (statistical approach:\n   breakpoints, GAMs, mixed models).\n\nSecondary topics, kept but not central: microbial communities (methanogens,\nmethanotrophs, nitrifiers / denitrifiers), dissolved carbon, metals, road salt and\nother contaminants.\n\n## Research questions (tags)\n\n- Ch1 Controls on fluxes: drivers of soil and stem fluxes of the three gases.\n- Ch2 Sink or source: annual greenhouse gas budget, CO2-equivalent balance, stem share.\n- Ch3 What tips the balance: thresholds and tipping points, climate scenarios.\n- Secondary: microbes water chemistry & contaminants.\n\n## What counts as relevant\n\nMost relevant: temperate forested swamps and wetlands of eastern North America;\ntree stem fluxes; water table control of CH4 and N2O; annual GHG budgets and\nCO2-equivalent metrics; chamber methods. Also useful: other forested wetlands and\npeatlands when the processes transfer, and methods or syntheses (FLUXNET-CH4,\nglobal methane budget). N2O and hydrology are under-represented in the library so far.\n\n</context>\n\nThe paper may be written in French or another language: classify it all the same, using the English labels provided.\nClassify the paper from its title and abstract only. Tag a research question only if the paper substantially informs it. Never invent sites. Use biome \"Not stated\" when there is no clue. Answer in the requested JSON format."
   }
  },
  "runs": [
@@ -5150,6 +5373,28 @@
    "suggested_to_date": 182,
    "triaged": 20,
    "unique_candidates": 55541
+  },
+  {
+   "candidates_evaluated": 34142,
+   "date": "2026-11-01",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 27,
+   "field_progress": "Forested swamps 341/341; Forested wetlands 1697/1697; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 7,
+   "new_suggestions": 24,
+   "notes": "",
+   "pending": 185,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 206,
+   "triaged": 20,
+   "unique_candidates": 55553
   }
  ],
  "seen_candidates": [
@@ -33669,6 +33914,7 @@
   "W2165723186",
   "W2165730445",
   "W2165730768",
+  "W2165739773",
   "W2165739926",
   "W2165740033",
   "W2165779065",
@@ -36700,6 +36946,7 @@
   "W2338034485",
   "W2338039225",
   "W2338049369",
+  "W2338154342",
   "W2338162586",
   "W2338172796",
   "W2338194256",
@@ -42169,6 +42416,7 @@
   "W2778700599",
   "W2778716864",
   "W2778728875",
+  "W2778730962",
   "W2778745338",
   "W2778752226",
   "W2778784665",
@@ -46449,6 +46697,7 @@
   "W2944924881",
   "W2944961008",
   "W2945015664",
+  "W2945020416",
   "W2945042646",
   "W2945051069",
   "W2945096903",
@@ -51330,6 +51579,7 @@
   "W3114016158",
   "W3114022059",
   "W3114079463",
+  "W3114114587",
   "W3114128061",
   "W3114155342",
   "W3114159830",
@@ -56711,6 +56961,7 @@
   "W4313641088",
   "W4313641144",
   "W4313648044",
+  "W4313648657",
   "W4313678795",
   "W4313830668",
   "W4313857460",
@@ -56918,6 +57169,7 @@
   "W4328048731",
   "W4328049521",
   "W4328049650",
+  "W4328053812",
   "W4328089958",
   "W4328090767",
   "W4328125179",
@@ -57458,6 +57710,7 @@
   "W4391053851",
   "W4391065316",
   "W4391066216",
+  "W4391108813",
   "W4391160975",
   "W4391218674",
   "W4391226388",
@@ -57636,6 +57889,7 @@
   "W4395068190",
   "W4395114243",
   "W4395469010",
+  "W4395694566",
   "W4395958894",
   "W4396218618",
   "W4396221827",
@@ -57908,7 +58162,10 @@
   "W4413565083",
   "W4414362057",
   "W4414777488",
+  "W4415278369",
   "W4416116103",
+  "W4416668126",
+  "W4416674674",
   "W4416825641",
   "W4417436018",
   "W44277568",

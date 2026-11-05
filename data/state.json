@@ -35,7 +35,15 @@
    "To review",
    ""
   ],
+  "W1594215189": [
+   "To review",
+   ""
+  ],
   "W1688224942": [
+   "To review",
+   ""
+  ],
+  "W1756121889": [
    "To review",
    ""
   ],
@@ -155,11 +163,19 @@
    "Added to Zotero",
    ""
   ],
+  "W2054835895": [
+   "To review",
+   ""
+  ],
   "W2058522703": [
    "To review",
    ""
   ],
   "W2068676456": [
+   "To review",
+   ""
+  ],
+  "W2071282752": [
    "To review",
    ""
   ],
@@ -507,6 +523,10 @@
    "Added to Zotero",
    ""
   ],
+  "W2767932093": [
+   "To review",
+   ""
+  ],
   "W2769374057": [
    "To review",
    ""
@@ -603,6 +623,10 @@
    "To review",
    ""
   ],
+  "W290467669": [
+   "To review",
+   ""
+  ],
   "W2905026433": [
    "Added to Zotero",
    ""
@@ -612,6 +636,10 @@
    ""
   ],
   "W2918145442": [
+   "To review",
+   ""
+  ],
+  "W2921803918": [
    "To review",
    ""
   ],
@@ -651,6 +679,10 @@
    "To review",
    ""
   ],
+  "W2982187960": [
+   "To review",
+   ""
+  ],
   "W2991975313": [
    "To review",
    ""
@@ -659,11 +691,19 @@
    "To review",
    ""
   ],
+  "W2999618362": [
+   "To review",
+   ""
+  ],
   "W3007563699": [
    "To review",
    ""
   ],
   "W3013783571": [
+   "To review",
+   ""
+  ],
+  "W3019519129": [
    "To review",
    ""
   ],
@@ -775,6 +815,10 @@
    "To review",
    ""
   ],
+  "W3213747621": [
+   "To review",
+   ""
+  ],
   "W3217275620": [
    "To review",
    ""
@@ -816,6 +860,10 @@
    ""
   ],
   "W4281738941": [
+   "To review",
+   ""
+  ],
+  "W4289712986": [
    "To review",
    ""
   ],
@@ -1003,6 +1051,10 @@
    "To review",
    ""
   ],
+  "W7106109355": [
+   "To review",
+   ""
+  ],
   "W7110307662": [
    "To review",
    ""
@@ -1116,7 +1168,7 @@
    "last_fetch": "2026-11-01",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1643,
+   "total": 1642,
    "trend": {
     "1930": 1,
     "1934": 1,
@@ -1243,7 +1295,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 17477,
+   "total": 17481,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -5735,6 +5787,28 @@
    "suggested_to_date": 269,
    "triaged": 14,
    "unique_candidates": 55999
+  },
+  {
+   "candidates_evaluated": 34329,
+   "date": "2026-11-05",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 0,
+   "field_progress": "Forested swamps 341/341; Forested wetlands 1697/1697; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-2.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 248,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 269,
+   "triaged": 0,
+   "unique_candidates": 56017
   }
  ],
  "seen_candidates": [
@@ -14051,6 +14125,7 @@
   "W2000259070",
   "W2000259680",
   "W2000268226",
+  "W2000288244",
   "W2000300334",
   "W2000301053",
   "W2000312867",
@@ -14836,6 +14911,7 @@
   "W2006271908",
   "W2006275059",
   "W2006276667",
+  "W2006282769",
   "W2006283520",
   "W2006293365",
   "W2006295367",
@@ -21517,6 +21593,7 @@
   "W2059243091",
   "W2059253579",
   "W2059261379",
+  "W2059270786",
   "W2059284190",
   "W2059286950",
   "W2059287812",
@@ -24307,6 +24384,7 @@
   "W2080773802",
   "W2080791625",
   "W2080793793",
+  "W2080797493",
   "W2080802647",
   "W2080806329",
   "W2080819489",
@@ -34414,6 +34492,7 @@
   "W2165899766",
   "W2165923127",
   "W2165924947",
+  "W2165928873",
   "W2165930607",
   "W2165949037",
   "W2165958491",
@@ -38728,6 +38807,7 @@
   "W2495322295",
   "W2495369165",
   "W2495403005",
+  "W2495519173",
   "W2495573913",
   "W2495649752",
   "W2495674529",
@@ -43541,6 +43621,7 @@
   "W2791837888",
   "W2791845263",
   "W2791849749",
+  "W2791865385",
   "W2791873330",
   "W2791900138",
   "W2791931258",
@@ -52578,6 +52659,7 @@
   "W3127426316",
   "W3127428289",
   "W3127451226",
+  "W3127463929",
   "W3127529688",
   "W3127560599",
   "W3127572361",
@@ -56416,6 +56498,7 @@
   "W4248697790",
   "W4248738095",
   "W4248741897",
+  "W4248800250",
   "W4248823453",
   "W4248867969",
   "W4248878591",
@@ -57611,6 +57694,7 @@
   "W4311087599",
   "W4311130437",
   "W4311144215",
+  "W4311216107",
   "W4311255807",
   "W4311260493",
   "W4311297018",
@@ -59848,6 +59932,7 @@
   "W6675806377",
   "W6675807372",
   "W6675949101",
+  "W6675950235",
   "W6675983460",
   "W6675990665",
   "W6676028428",
@@ -61148,6 +61233,7 @@
   "W6948403423",
   "W6948532538",
   "W6948984281",
+  "W6949146751",
   "W6949670417",
   "W6949819557",
   "W6949869355",
@@ -61406,6 +61492,7 @@
   "W7203739130",
   "W7203742989",
   "W7203749849",
+  "W7203774724",
   "W7203788285",
   "W7203830305",
   "W7204124979",
@@ -61480,11 +61567,14 @@
   "W7219602796",
   "W7219767846",
   "W7220418237",
+  "W7220673806",
   "W7220697368",
   "W7220713226",
+  "W7220896579",
   "W7220908094",
   "W7220938604",
   "W7220941608",
+  "W7221131664",
   "W7221324731",
   "W7221327652",
   "W7221506893",
@@ -61508,6 +61598,8 @@
   "W7223797759",
   "W7223856997",
   "W7223887923",
+  "W7224750661",
+  "W7224752527",
   "W72673922",
   "W72730618",
   "W72751723",

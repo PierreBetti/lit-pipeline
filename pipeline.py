@@ -160,8 +160,19 @@ def notion(method, path, body=None):
         "Notion-Version": "2025-09-03",
         "Content-Type": "application/json",
     }
+    # Creating a page is the one call that is not safe to repeat blindly: if Notion
+    # created it but the answer got lost, a retry would make a duplicate.
+    safe_to_retry = not (method == "POST" and path == "/pages")
     for attempt in range(6):
-        r = requests.request(method, f"{NOTION_API}{path}", headers=headers, json=body, timeout=60)
+        try:
+            r = requests.request(method, f"{NOTION_API}{path}", headers=headers, json=body, timeout=60)
+        except (requests.Timeout, requests.ConnectionError) as e:
+            if not safe_to_retry or attempt == 5:
+                raise
+            wait = 2 ** attempt * 5
+            log(f"   Notion did not answer ({type(e).__name__}), retrying in {wait}s")
+            time.sleep(wait)
+            continue
         if r.status_code == 429 or r.status_code >= 500:
             time.sleep(float(r.headers.get("Retry-After", 2 ** attempt)))
             continue

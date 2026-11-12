@@ -99,6 +99,10 @@
    "To review",
    ""
   ],
+  "W1992188388": [
+   "To review",
+   ""
+  ],
   "W1997134228": [
    "To review",
    ""
@@ -771,6 +775,10 @@
    "Added to Zotero",
    ""
   ],
+  "W3127016827": [
+   "To review",
+   ""
+  ],
   "W3137605796": [
    "To review",
    ""
@@ -824,6 +832,10 @@
    ""
   ],
   "W4200274615": [
+   "To review",
+   ""
+  ],
+  "W4200362543": [
    "To review",
    ""
   ],
@@ -908,6 +920,10 @@
    ""
   ],
   "W4382752941": [
+   "To review",
+   ""
+  ],
+  "W4384407055": [
    "To review",
    ""
   ],
@@ -999,6 +1015,10 @@
    "To review",
    ""
   ],
+  "W4403636748": [
+   "To review",
+   ""
+  ],
   "W4404720638": [
    "To review",
    ""
@@ -1012,6 +1032,10 @@
    ""
   ],
   "W4410216787": [
+   "To review",
+   ""
+  ],
+  "W4411283642": [
    "To review",
    ""
   ],
@@ -1176,7 +1200,7 @@
    "last_fetch": "2026-11-08",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1652,
+   "total": 1651,
    "trend": {
     "1930": 1,
     "1934": 1,
@@ -1303,7 +1327,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 17508,
+   "total": 17476,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -5957,6 +5981,28 @@
    "suggested_to_date": 277,
    "triaged": 6,
    "unique_candidates": 58144
+  },
+  {
+   "candidates_evaluated": 36594,
+   "date": "2026-11-12",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 0,
+   "field_progress": "Forested swamps 327/327; Forested wetlands 1655/1655; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-2.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 256,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 277,
+   "triaged": 0,
+   "unique_candidates": 58155
   }
  ],
  "seen_candidates": [
@@ -15178,6 +15224,7 @@
   "W2004859181",
   "W2004870604",
   "W2004879077",
+  "W2004893339",
   "W2004902921",
   "W2004907259",
   "W2004921235",
@@ -43685,6 +43732,7 @@
   "W2748492944",
   "W2748587498",
   "W2748607273",
+  "W2748638201",
   "W2748677962",
   "W2748742102",
   "W2748795411",
@@ -53146,6 +53194,7 @@
   "W3049596837",
   "W3049645654",
   "W3049703454",
+  "W3049732719",
   "W3050116180",
   "W3050455281",
   "W3051215041",
@@ -58439,6 +58488,7 @@
   "W4247138639",
   "W4247177794",
   "W4247194329",
+  "W4247201059",
   "W4247223061",
   "W4247226687",
   "W4247242250",
@@ -58495,6 +58545,7 @@
   "W4248936878",
   "W424894938",
   "W4248978909",
+  "W4248979896",
   "W4248990833",
   "W4249007492",
   "W4249011709",
@@ -58970,6 +59021,7 @@
   "W4283450452",
   "W4283450993",
   "W4283452439",
+  "W4283453523",
   "W4283461353",
   "W4283519467",
   "W4283527791",
@@ -61061,6 +61113,7 @@
   "W4404029125",
   "W4404050323",
   "W4404075038",
+  "W4404076488",
   "W4404134495",
   "W4404137804",
   "W4404147962",
@@ -61240,6 +61293,7 @@
   "W4414777802",
   "W4415278369",
   "W4416116103",
+  "W4416150271",
   "W4416668126",
   "W4416674674",
   "W4416772646",
@@ -63797,12 +63851,14 @@
   "W7213329589",
   "W7213391314",
   "W7213428560",
+  "W7213536425",
   "W7213540030",
   "W7213547695",
   "W7213885806",
   "W7213908082",
   "W7213976092",
   "W7213984881",
+  "W7214002144",
   "W7214025438",
   "W7214063295",
   "W7214075960",
@@ -63870,6 +63926,7 @@
   "W7225405667",
   "W7225461955",
   "W7225617353",
+  "W7225775215",
   "W72350423",
   "W72673922",
   "W72730618",

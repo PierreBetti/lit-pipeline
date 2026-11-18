@@ -607,6 +607,10 @@
    "To review",
    ""
   ],
+  "W2890397926": [
+   "To review",
+   ""
+  ],
   "W2895193800": [
    "To review",
    ""
@@ -896,6 +900,10 @@
    ""
   ],
   "W4310067281": [
+   "To review",
+   ""
+  ],
+  "W4311664742": [
    "To review",
    ""
   ],
@@ -1200,7 +1208,7 @@
    "last_fetch": "2026-11-15",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1799,
+   "total": 1798,
    "trend": {
     "1930": 1,
     "1934": 1,
@@ -1279,7 +1287,7 @@
    "last_fetch": "2026-11-15",
    "mode": "full",
    "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 355,
+   "total": 354,
    "trend": {
     "1968": 1,
     "1988": 2,
@@ -1327,7 +1335,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 18443,
+   "total": 18453,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -6114,6 +6122,28 @@
    "suggested_to_date": 279,
    "triaged": 2,
    "unique_candidates": 60834
+  },
+  {
+   "candidates_evaluated": 38718,
+   "date": "2026-11-18",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 0,
+   "field_progress": "Forested swamps 324/324; Forested wetlands 1638/1638; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 1,
+   "notes": "",
+   "pending": 259,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 280,
+   "triaged": 1,
+   "unique_candidates": 60837
   }
  ],
  "seen_candidates": [
@@ -63650,6 +63680,7 @@
   "W4404688684",
   "W4404692346",
   "W4404720638",
+  "W4404720653",
   "W4404720992",
   "W4404763474",
   "W4404764059",
@@ -66535,6 +66566,7 @@
   "W7161679062",
   "W7162752275",
   "W7163145879",
+  "W7164364967",
   "W7164824917",
   "W7164933340",
   "W7165395633",
@@ -66931,6 +66963,7 @@
   "W9749461",
   "W975426301",
   "W97597859",
+  "W976725555",
   "W976802161",
   "W97770637",
   "W977745501",

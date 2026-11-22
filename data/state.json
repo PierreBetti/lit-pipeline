@@ -1166,7 +1166,7 @@
    "Upland forest | RQ1 Source/sink controls",
    "Upland forest | RQ5 Microbial taxonomy & function"
   ],
-  "last": "2026-11-15",
+  "last": "2026-11-22",
   "library": [
    "4014954a-4928-8141-a711-c6b1ef133d99",
    "4014954a-4928-81a8-92e1-f82ebae2b41e",
@@ -1210,130 +1210,135 @@
  "drafted": [],
  "field_scopes": {
   "forested": {
-   "fetched": 1638,
+   "fetched": 1809,
    "key": "1d89c2f230f3ffa3b1ec9125d6dde0c3",
    "label": "Forested wetlands",
-   "last_fetch": "2026-11-15",
+   "last_fetch": "2026-11-22",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1798,
+   "total": 1809,
    "trend": {
     "1930": 1,
     "1934": 1,
+    "1947": 1,
     "1949": 1,
-    "1950": 1,
+    "1950": 3,
     "1954": 1,
+    "1955": 1,
     "1957": 1,
-    "1960": 1,
-    "1963": 3,
+    "1960": 2,
+    "1961": 1,
+    "1963": 4,
     "1964": 1,
-    "1966": 1,
-    "1967": 2,
+    "1966": 2,
+    "1967": 3,
     "1968": 2,
     "1969": 2,
-    "1971": 3,
-    "1972": 1,
-    "1973": 1,
-    "1974": 1,
-    "1975": 3,
-    "1976": 2,
+    "1970": 1,
+    "1971": 4,
+    "1972": 3,
+    "1973": 2,
+    "1974": 3,
+    "1975": 4,
+    "1976": 6,
     "1977": 3,
-    "1978": 1,
-    "1979": 1,
+    "1978": 2,
+    "1979": 3,
     "1980": 2,
     "1981": 4,
-    "1982": 3,
-    "1983": 2,
-    "1984": 4,
-    "1986": 7,
-    "1987": 5,
-    "1988": 7,
-    "1989": 9,
-    "1990": 4,
-    "1991": 9,
-    "1992": 10,
+    "1982": 5,
+    "1983": 3,
+    "1984": 6,
+    "1986": 8,
+    "1987": 6,
+    "1988": 9,
+    "1989": 11,
+    "1990": 7,
+    "1991": 14,
+    "1992": 11,
     "1993": 14,
-    "1994": 15,
-    "1995": 11,
-    "1996": 14,
-    "1997": 14,
-    "1998": 23,
+    "1994": 17,
+    "1995": 12,
+    "1996": 15,
+    "1997": 18,
+    "1998": 24,
     "1999": 10,
-    "2000": 18,
+    "2000": 21,
     "2001": 13,
-    "2002": 17,
-    "2003": 16,
-    "2004": 18,
-    "2005": 24,
-    "2006": 26,
-    "2007": 24,
-    "2008": 30,
-    "2009": 29,
-    "2010": 52,
-    "2011": 56,
-    "2012": 59,
-    "2013": 55,
-    "2014": 69,
-    "2015": 67,
-    "2016": 62,
-    "2017": 92,
-    "2018": 72,
+    "2002": 20,
+    "2003": 21,
+    "2004": 19,
+    "2005": 27,
+    "2006": 27,
+    "2007": 25,
+    "2008": 32,
+    "2009": 33,
+    "2010": 59,
+    "2011": 59,
+    "2012": 61,
+    "2013": 58,
+    "2014": 68,
+    "2015": 68,
+    "2016": 66,
+    "2017": 94,
+    "2018": 83,
     "2019": 75,
-    "2020": 69,
-    "2021": 91,
-    "2022": 77,
-    "2023": 79,
-    "2024": 77,
-    "2025": 80,
-    "2026": 89
+    "2020": 77,
+    "2021": 94,
+    "2022": 85,
+    "2023": 89,
+    "2024": 83,
+    "2025": 92,
+    "2026": 102
    }
   },
   "swamps": {
-   "fetched": 324,
+   "fetched": 354,
    "key": "ff2918429632d0a97498ce10e5e858a9",
    "label": "Forested swamps",
-   "last_fetch": "2026-11-15",
+   "last_fetch": "2026-11-22",
    "mode": "full",
    "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
    "total": 354,
    "trend": {
     "1968": 1,
     "1988": 2,
-    "1991": 1,
-    "1992": 1,
+    "1991": 2,
+    "1992": 2,
     "1993": 1,
     "1994": 1,
     "1995": 2,
-    "1996": 1,
+    "1996": 2,
     "1997": 1,
     "1998": 4,
     "1999": 2,
     "2000": 2,
     "2001": 1,
-    "2002": 1,
+    "2002": 3,
+    "2003": 1,
     "2004": 2,
     "2005": 2,
     "2006": 4,
     "2007": 3,
-    "2008": 6,
-    "2009": 3,
-    "2010": 11,
-    "2011": 12,
-    "2012": 10,
-    "2013": 17,
+    "2008": 5,
+    "2009": 4,
+    "2010": 10,
+    "2011": 11,
+    "2012": 11,
+    "2013": 19,
     "2014": 17,
     "2015": 13,
-    "2016": 13,
-    "2017": 18,
-    "2018": 22,
+    "2016": 17,
+    "2017": 19,
+    "2018": 27,
     "2019": 17,
-    "2020": 21,
-    "2021": 16,
-    "2022": 14,
-    "2023": 15,
+    "2020": 24,
+    "2021": 18,
+    "2022": 16,
+    "2023": 16,
     "2024": 23,
-    "2025": 20,
-    "2026": 24
+    "2025": 22,
+    "2026": 27
    }
   },
   "wetlands": {
@@ -1343,7 +1348,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 18480,
+   "total": 18521,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -1608,7 +1613,9 @@
    "at",
    "Lower Austria"
   ],
+  "BOREAS northern site, Manitoba, Canada": null,
   "BOREAS study area, Saskatchewan, Canada": null,
+  "Bacho peatland, Southern Thailand, Thailand": null,
   "Bacho, Narathiwat Province, Thailand": [
    6.5532944,
    101.6579885,
@@ -1634,11 +1641,23 @@
    "de",
    "Bavaria"
   ],
+  "Bay of Panama, Panama": [
+   8.2819238,
+   -79.6960544,
+   "pa",
+   ""
+  ],
   "Bear Creek watershed, central Iowa, USA": null,
   "Belait / Tutong / Temburong, Brunei Darussalam": null,
   "Belait or Temburong, Brunei": null,
   "Belize coastal and terrestrial peatlands, National, Belize": null,
   "Berbak Delta, Jambi, Indonesia": null,
+  "Beverly Swamp, Ontario, Canada": [
+   43.3820801,
+   -80.0902655,
+   "ca",
+   "Ontario"
+  ],
   "Bibai, Hokkaido, Japan": [
    43.3325763,
    141.8537339,
@@ -1694,6 +1713,13 @@
    14.5182783,
    "cz",
    ""
+  ],
+  "Bohemian Forest, Bohemian Forest, Czech Republic": null,
+  "Bohemian Forest, Czech Republic": [
+   48.9373184,
+   13.7386011,
+   "cz",
+   "South Bohemian Region"
   ],
   "Bonanza Creek, Alaska, United States": [
    61.0615267,
@@ -1836,6 +1862,12 @@
    "pl",
    "Silesian Voivodeship"
   ],
+  "Central Finland, Finland": [
+   62.6093658,
+   25.579461,
+   "fi",
+   "Central Finland"
+  ],
   "Central Forest State Nature Biosphere Reserve, European Russia, Russia": null,
   "Central Java, Indonesia": [
    -7.3032412,
@@ -1902,6 +1934,18 @@
   "China wetlands, National, China": null,
   "Chokurdakh, Indigirka River lowland, Russia": null,
   "Chongming Dongtan, Yangtze estuary, China": null,
+  "Chungcheong, South Korea": [
+   36.6593,
+   126.6729,
+   "kr",
+   "South Chungcheong"
+  ],
+  "Chungcheongnam-do, South Korea": [
+   36.6593,
+   126.6729,
+   "kr",
+   "South Chungcheong"
+  ],
   "Churchill fen, Manitoba, Canada": null,
   "Churchill, Manitoba, Canada": [
    58.769268,
@@ -2028,6 +2072,12 @@
    96.7547987,
    "ru",
    "Eastern Sayan"
+  ],
+  "Elbe Valley, Germany": [
+   51.8246301,
+   13.5174425,
+   "de",
+   "Brandenburg"
   ],
   "Elkhorn Slough Hester Marsh, California, United States": null,
   "England, England, United Kingdom": [
@@ -2158,11 +2208,13 @@
   ],
   "Germany floodplain forests, Not stated, Germany": null,
   "Germany, National, Germany": null,
+  "Geum River basin wetlands, Chungcheong, South Korea": null,
   "Giam Siak Kecil–Bukit Batu Biosphere Reserve, Sumatra, Indonesia": null,
   "Glacial Lake Agassiz Peatland Complex, Minnesota, USA": null,
   "Glacial Lake Agassiz peatlands, northern Minnesota, USA": null,
   "Glacial Lake Agassiz peatlands, northern Minnesota, United States": null,
   "Glennamong forest, West, Ireland": null,
+  "Goheung forest wetland, Jeollanam-do, South Korea": null,
   "Goldstream Valley, Alaska, USA": [
    64.912874,
    -147.9093046,
@@ -2351,6 +2403,12 @@
    103.5186977,
    "id",
    "Jambi"
+  ],
+  "Jeollanam-do, South Korea": [
+   34.6429669,
+   126.4014288,
+   "kr",
+   ""
   ],
   "Jiangsu Province, China": [
    33.0000001,
@@ -2565,6 +2623,7 @@
    "us",
    "Georgia"
   ],
+  "Lower middle Elbe River floodplain forests, Elbe Valley, Germany": null,
   "Luanhaizi peatland, Qinghai—Tibet Plateau, China": null,
   "Lutose, Taiga Plains, Alberta, Canada": null,
   "MY-MLM, Sarawak, Malaysia": null,
@@ -2590,6 +2649,7 @@
    "my",
    ""
   ],
+  "Malaysia Airport Agriculture - Horticulture, Selangor, Malaysia": null,
   "Malaysia and Indonesia": null,
   "Malaysia and Indonesia, Malaysia and Indonesia": null,
   "Malaysia peat swamp forest and oil palm plantation, Not stated, Malaysia": null,
@@ -2942,6 +3002,12 @@
    "North Carolina"
   ],
   "North Carolina coastal plain, North Carolina, USA": null,
+  "North Carolina, U.S.": [
+   35.6729639,
+   -79.0392919,
+   "us",
+   "North Carolina"
+  ],
   "North Carolina, USA": [
    35.6729639,
    -79.0392919,
@@ -3090,6 +3156,7 @@
    "Georgia"
   ],
   "Okefenokee swamp, Georgia / Florida, USA": null,
+  "Oksong-ri back swamp, Chungcheongnam-do, South Korea": null,
   "Oldman River, southern Alberta, Canada": null,
   "Ontario / Manitoba / Nunavut, Canada": null,
   "Ontario / Quebec, Canada": [
@@ -3099,6 +3166,7 @@
    "Quebec"
   ],
   "Ontario agricultural and forest soils, Ontario, Canada": null,
+  "Ontario peat profiles, Ontario, Canada": null,
   "Ontario, Canada": [
    50.000678,
    -86.000977,
@@ -3142,6 +3210,7 @@
    "id",
    "Central Kalimantan"
   ],
+  "Panama's Bay mangrove, Bay of Panama, Panama": null,
   "Pangody, Yamalo-Nenets Autonomous Okrug, Russia": [
    65.8563271,
    74.4947031,
@@ -3219,6 +3288,7 @@
    "Selangor"
   ],
   "Peninsular Malaysia, Peninsular Malaysia, Malaysia": null,
+  "Peninsular Malaysia, Sumatra and Borneo, South-East Asia, Malaysia and Indonesia": null,
   "Pennine blanket bog, Pennines, United Kingdom": null,
   "Pennines, United Kingdom": [
    54.704139,
@@ -3321,6 +3391,7 @@
    "my",
    "Selangor"
   ],
+  "Raja Musa Peat Swamp Forest Reserved, Selangor, Malaysia": null,
   "Republic of Khakassia, Russia": [
    53.4399379,
    90.0664303,
@@ -3636,6 +3707,7 @@
    "id",
    "South Sumatra"
   ],
+  "South-East Asia, Malaysia and Indonesia": null,
   "Southeast Asia": [
    -22.0159585,
    -47.897938,
@@ -3678,6 +3750,12 @@
    25.8143982,
    "fi",
    "Mainland Finland"
+  ],
+  "Southern Karelia, Karelia, Russia": [
+   61.7386192,
+   34.4511771,
+   "ru",
+   "Karelia"
   ],
   "Southern Ontario agricultural catchment, Ontario, Canada": null,
   "Southern Ontario poor fen, Ontario, Canada": null,
@@ -3768,6 +3846,7 @@
    "id",
    "Aceh"
   ],
+  "Sumatran peatland, Sumatra, Indonesia": null,
   "Sungai Dua Village, South Sumatera, Indonesia": [
    -3.0570103,
    104.8633981,
@@ -3978,6 +4057,7 @@
   ],
   "West Siberia Lowland, West Siberia, Russia": null,
   "West Siberia tundra mires, West Siberia, Russia": null,
+  "West Siberia wetlands, Siberia, Russia": null,
   "West Siberia, Russia": [
    62.0,
    76.0,
@@ -4044,6 +4124,7 @@
   "Xiaoxing'an Mountains, Heilongjiang, China": null,
   "Xiaoxing'an Mountains, Northeast China, China": null,
   "Xiaoxing'anling region, Heilongjiang, China": null,
+  "Xiaoxing'anling, Heilongjiang, China": null,
   "Xiaoxing’an Mountains, Northeast China, China": null,
   "Xining City urban wetland, Qinghai Province, China": null,
   "Yakutsk, Eastern Siberia, Russia": null,
@@ -4120,6 +4201,7 @@
   ],
   "Zoige, Sichuan / Tibetan Plateau, China": null,
   "Zotino Tall Tower Observatory, Siberia, Russia": null,
+  "central Finland drained mire, Central Finland, Finland": null,
   "central Iowa, USA": [
    41.896572,
    -87.7653745,
@@ -4139,6 +4221,7 @@
   "dry continental treed bog in boreal Alberta, Alberta, Canada": null,
   "eastern edge of Qinghai-Tibetan Plateau, Qinghai, China": null,
   "forested swamp near Ithaca, New York, USA": null,
+  "lower coastal plain forested wetland, North Carolina, U.S.": null,
   "north-central Canada, Canada": null,
   "north-central Florida ecosystem sites, Florida, United States": null,
   "north-eastern New South Wales wetlands, New South Wales, Australia": null,
@@ -6218,6 +6301,28 @@
    "suggested_to_date": 281,
    "triaged": 0,
    "unique_candidates": 62523
+  },
+  {
+   "candidates_evaluated": 40112,
+   "date": "2026-11-22",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 192,
+   "field_progress": "Forested swamps 354/354; Forested wetlands 1809/1809; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 0,
+   "notes": "",
+   "pending": 260,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 281,
+   "triaged": 0,
+   "unique_candidates": 62524
   }
  ],
  "seen_candidates": [
@@ -67858,6 +67963,7 @@
   "W6930941660",
   "W6931182252",
   "W6931625182",
+  "W6932065710",
   "W6936877523",
   "W6936929040",
   "W6939082277",

@@ -959,6 +959,10 @@
    "To review",
    ""
   ],
+  "W4389329890": [
+   "To review",
+   ""
+  ],
   "W4389470470": [
    "To review",
    ""
@@ -1216,7 +1220,7 @@
    "last_fetch": "2026-11-22",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1782,
+   "total": 1780,
    "trend": {
     "1930": 1,
     "1934": 1,
@@ -1299,7 +1303,7 @@
    "last_fetch": "2026-11-22",
    "mode": "full",
    "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 356,
+   "total": 358,
    "trend": {
     "1968": 1,
     "1988": 2,
@@ -1348,7 +1352,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 18279,
+   "total": 18334,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -6367,6 +6371,28 @@
    "suggested_to_date": 282,
    "triaged": 1,
    "unique_candidates": 63087
+  },
+  {
+   "candidates_evaluated": 38546,
+   "date": "2026-11-25",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 0,
+   "field_progress": "Forested swamps 354/354; Forested wetlands 1809/1809; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 2,
+   "new_suggestions": 8,
+   "notes": "",
+   "pending": 269,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 290,
+   "triaged": 8,
+   "unique_candidates": 63093
   }
  ],
  "seen_candidates": [
@@ -62416,6 +62442,7 @@
   "W4224211134",
   "W4224211240",
   "W4224211744",
+  "W4224214312",
   "W4224216533",
   "W4224217565",
   "W4224218381",
@@ -64602,6 +64629,7 @@
   "W4308994256",
   "W4309030160",
   "W4309109232",
+  "W4309168071",
   "W4309191747",
   "W4309222064",
   "W4309243336",
@@ -66017,6 +66045,7 @@
   "W4401996415",
   "W4402003899",
   "W4402092463",
+  "W4402121990",
   "W4402276415",
   "W4402331644",
   "W4402397510",
@@ -66163,6 +66192,7 @@
   "W4406394176",
   "W4406462613",
   "W4406487350",
+  "W4406490952",
   "W4406580247",
   "W4406584997",
   "W4406605278",
@@ -68829,6 +68859,7 @@
   "W7028761470",
   "W7028886140",
   "W7028992966",
+  "W7029429567",
   "W7029736630",
   "W7030123711",
   "W7030283500",
@@ -69205,6 +69236,7 @@
   "W7234872725",
   "W7235026592",
   "W72350423",
+  "W7236623151",
   "W7236666645",
   "W7236820409",
   "W7238774733",

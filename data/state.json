@@ -1252,7 +1252,7 @@
    "last_fetch": "2026-11-22",
    "mode": "full",
    "query": "(\"forested wetland\" OR \"forested wetlands\" OR swamp OR swamps OR \"floodplain forest\" OR \"floodplain forests\" OR \"riparian forest\" OR \"wooded fen\" OR \"treed fen\" OR \"treed bog\" OR \"forested peatland\" OR \"forested peatlands\" OR \"milieu humide boisé\" OR \"milieux humides boisés\" OR \"marécage\" OR \"marécages\" OR \"tourbière boisée\" OR \"tourbières boisées\" OR \"forêt riveraine\" OR \"plaine inondable\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 1786,
+   "total": 1800,
    "trend": {
     "1930": 1,
     "1934": 1,
@@ -1335,7 +1335,7 @@
    "last_fetch": "2026-11-22",
    "mode": "full",
    "query": "(\"forested swamp\" OR \"forested swamps\" OR \"swamp forest\" OR \"swamp forests\" OR \"treed swamp\" OR \"treed swamps\" OR \"wooded swamp\" OR \"red maple swamp\" OR \"cedar swamp\" OR \"marécage arborescent\" OR \"marécages arborescents\" OR \"marécage boisé\" OR \"marécages boisés\" OR \"érablière humide\") AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 360,
+   "total": 363,
    "trend": {
     "1968": 1,
     "1988": 2,
@@ -1384,7 +1384,7 @@
    "last_fetch": "2026-10-04",
    "mode": "sample",
    "query": "(wetland OR wetlands OR peatland OR peatlands OR bog OR bogs OR fen OR fens OR marsh OR marshes OR swamp OR swamps OR mire OR mires OR \"milieu humide\" OR \"milieux humides\" OR tourbière OR tourbières OR marais OR marécage OR marécages) AND (methane OR CH4 OR \"carbon dioxide\" OR CO2 OR \"nitrous oxide\" OR N2O OR \"greenhouse gas\" OR \"greenhouse gases\" OR \"carbon flux\" OR \"carbon fluxes\" OR méthane OR \"dioxyde de carbone\" OR \"oxyde nitreux\" OR \"protoxyde d'azote\" OR \"gaz à effet de serre\" OR \"flux de carbone\")",
-   "total": 18353,
+   "total": 18501,
    "trend": {
     "1828": 1,
     "1830": 1,
@@ -6447,6 +6447,28 @@
    "suggested_to_date": 290,
    "triaged": 0,
    "unique_candidates": 63100
+  },
+  {
+   "candidates_evaluated": 38510,
+   "date": "2026-11-27",
+   "decisions": 0,
+   "drafts_added": 0,
+   "excluded": 1,
+   "extracted": 0,
+   "field_classified": 0,
+   "field_progress": "Forested swamps 354/354; Forested wetlands 1809/1809; All wetlands 1500/1500",
+   "library": 37,
+   "model": "gemini-3.5-flash-lite",
+   "new_relevant": 0,
+   "new_suggestions": 2,
+   "notes": "",
+   "pending": 271,
+   "pending_findings": 0,
+   "retained": 20,
+   "retractions": 0,
+   "suggested_to_date": 292,
+   "triaged": 3,
+   "unique_candidates": 63102
   }
  ],
  "seen_candidates": [
@@ -55706,6 +55728,7 @@
   "W3004469112",
   "W3004487011",
   "W3004491534",
+  "W3004522021",
   "W3004523064",
   "W3004523975",
   "W3004527590",
@@ -66377,6 +66400,7 @@
   "W4413981072",
   "W4414022105",
   "W4414157285",
+  "W4414210929",
   "W4414253909",
   "W4414362057",
   "W4414499127",
